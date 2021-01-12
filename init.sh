@@ -170,8 +170,8 @@ configureSsh()
 removeTemporaryFiles()
 {
   setStep 15;
-  rm "RESUME.tmp";
-  rm "tmpConfigFile.tmp";
+  rm -f "RESUME.tmp";
+  rm -f "tmpConfigFile.tmp";
 }
 
 while true; do
