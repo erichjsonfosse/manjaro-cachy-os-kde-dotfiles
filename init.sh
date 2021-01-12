@@ -9,7 +9,7 @@ fi
 while true; do
   read -rp "Continue with installation? (y/n)" yn
   case $yn in
-    [Yy]* ) doRun(); break;;
+    [Yy]* ) doRun; break;;
     [Nn]* ) exit;;
     * ) echo "Please answer yes or no.";;
   esac
