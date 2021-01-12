@@ -75,7 +75,7 @@ doRun()
 setStep()
 {
   filename="RESUME.tmp";
-  rm $filename;
+  rm -f $filename;
   echo $1 > $filename;
 }
 
