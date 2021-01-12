@@ -6,15 +6,6 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
-while true; do
-  read -rp "Continue with installation? (y/n)" yn
-  case $yn in
-    [Yy]* ) doRun; break;;
-    [Nn]* ) exit;;
-    * ) echo "Please answer yes or no.";;
-  esac
-done
-
 doRun()
 {
   filename="RESUME.tmp"
@@ -171,3 +162,12 @@ configureSsh()
   echo "Changing ownership of home folder..."
   chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR"
 }
+
+while true; do
+  read -rp "Continue with installation? (y/n)" yn
+  case $yn in
+    [Yy]* ) doRun; break;;
+    [Nn]* ) exit;;
+    * ) echo "Please answer yes or no.";;
+  esac
+done
