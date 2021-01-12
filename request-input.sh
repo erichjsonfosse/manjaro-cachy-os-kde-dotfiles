@@ -6,8 +6,8 @@ tmpConfigFile="tmpConfigFile.tmp";
 read -rp 'Git Config Name: ' MANJARO_DOTFILES_GITCONFIG_NAME
 read -rp 'Git Config Email: ' MANJARO_DOTFILES_GITCONFIG_EMAIL
 
-echo "MANJARO_DOTFILES_GITCONFIG_NAME=$MANJARO_DOTFILES_GITCONFIG_NAME" >> $tmpConfigFile
-echo "MANJARO_DOTFILES_GITCONFIG_EMAIL=$MANJARO_DOTFILES_GITCONFIG_EMAIL" >> $tmpConfigFile
+echo "MANJARO_DOTFILES_GITCONFIG_NAME=\"$MANJARO_DOTFILES_GITCONFIG_NAME\"" >> $tmpConfigFile
+echo "MANJARO_DOTFILES_GITCONFIG_EMAIL=\"$MANJARO_DOTFILES_GITCONFIG_EMAIL\"" >> $tmpConfigFile
 ######################### Git Config ##########################
 
 # Ensure .ssh folder exists
