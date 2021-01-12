@@ -17,55 +17,55 @@ doRun()
   
   chmodScripts;
   
-  if [ $step lt 2 ]; then
+  if [ $step -lt 2 ]; then
     setVariables;
   fi
   
-  if [ $step lt 3 ]; then
+  if [ $step -lt 3 ]; then
     requestInput;
   fi
   
-  if [ $step lt 4 ]; then
+  if [ $step -lt 4 ]; then
     installPackmanPackages;
   fi
   
-  if [ $step lt 5 ]; then
+  if [ $step -lt 5 ]; then
     enableSnapService;
   fi
   
-  if [ $step lt 6 ]; then
+  if [ $step -lt 6 ]; then
     installSnapPackages;
   fi
   
-  if [ $step lt 7 ]; then
+  if [ $step -lt 7 ]; then
     installAurPackages;
   fi
   
-  if [ $step lt 8 ]; then
+  if [ $step -lt 8 ]; then
     installAppImages;
   fi
   
-  if [ $step lt 9 ]; then
+  if [ $step -lt 9 ]; then
     configureUfw;
   fi
   
-  if [ $step lt 10 ]; then
+  if [ $step -lt 10 ]; then
     configureZsh;
   fi
   
-  if [ $step lt 11 ]; then
+  if [ $step -lt 11 ]; then
     configureGit;
   fi
   
-  if [ $step lt 12 ]; then
+  if [ $step -lt 12 ]; then
     configureSsh;
   fi
   
-  if [ $step lt 13 ]; then
+  if [ $step -lt 13 ]; then
     bumpVersion;
   fi
   
-  if [ $step lt 14 ]; then
+  if [ $step -lt 14 ]; then
     configureSsh;
   fi
 }
