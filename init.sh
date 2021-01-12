@@ -13,6 +13,10 @@ doRun()
     setStep 0;
   fi
   
+  if [ ! -f "tmpConfigFile.tmp" ]; then
+    source ./tmpConfigFile.tmp
+  fi
+  
   step=$(head -n 1 $filename);
   
   chmodScripts;
