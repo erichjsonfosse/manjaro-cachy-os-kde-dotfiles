@@ -9,11 +9,11 @@ fi
 doRun()
 {
   filename="RESUME.tmp"
-  if [ -f "$filename" ]; then
-    step=$(head -n 1 $filename);
-  else
-    step=0;
+  if [ ! -f "$filename" ]; then
+    setStep 0;
   fi
+  
+  step=$(head -n 1 $filename);
   
   chmodScripts;
   
