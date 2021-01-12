@@ -15,5 +15,11 @@ ufw allow ssh
 ufw enable
 
 # Rebooting
-reboot
-exit
+while true; do
+  read -rp "Reboot (recommended)? (y/n)" yn
+  case $yn in
+    [Yy]* ) reboot; exit;;
+    [Nn]* ) break;;
+    * ) echo "Please answer yes or no.";;
+  esac
+done
