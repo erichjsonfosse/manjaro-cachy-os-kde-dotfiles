@@ -13,7 +13,7 @@ doRun()
     setStep 0;
   fi
   
-  if [ ! -f "tmpConfigFile.tmp" ]; then
+  if [ -f "tmpConfigFile.tmp" ]; then
     source ./tmpConfigFile.tmp
   fi
   
