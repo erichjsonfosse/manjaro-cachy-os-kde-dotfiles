@@ -6,3 +6,4 @@ echo "Enabling snap service..."
 systemctl enable --now snapd.socket
 
 reboot
+exit
