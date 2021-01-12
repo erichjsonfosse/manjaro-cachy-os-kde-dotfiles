@@ -16,3 +16,4 @@ ufw enable
 
 # Rebooting
 reboot
+exit
