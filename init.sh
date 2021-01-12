@@ -17,9 +17,7 @@ doRun()
   
   chmodScripts;
   
-  if [ $step -lt 2 ]; then
-    setVariables;
-  fi
+  setVariables;
   
   if [ $step -lt 3 ]; then
     requestInput;
@@ -67,6 +65,10 @@ doRun()
   
   if [ $step -lt 14 ]; then
     configureSsh;
+  fi
+  
+  if [ $step -lt 15 ]; then
+    removeTemporaryFiles;
   fi
 }
 
@@ -163,6 +165,11 @@ configureSsh()
   # Change ownership of home folder files recursively
   echo "Changing ownership of home folder..."
   chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR"
+}
+
+removeTemporaryFiles()
+{
+  setStep 15;
 }
 
 while true; do
