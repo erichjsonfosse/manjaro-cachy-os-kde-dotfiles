@@ -13,3 +13,6 @@ ufw allow ssh
 
 # Enabling
 ufw enable
+
+# Rebooting
+reboot
