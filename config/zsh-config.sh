@@ -31,3 +31,6 @@ mkdir "$OHMYZSHFOLDER/plugins/manjaro-dotfiles"
 cp -rf "$ALIASESDIR/git.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/git.zsh"
 cp -rf "$ALIASESDIR/pacman.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/pacman.zsh"
 cp -rf "$ALIASESDIR/uuid.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/uuid.zsh"
+
+# Setting Zsh as shell for user
+chsh -s /bin/zsh $LOGNAME
