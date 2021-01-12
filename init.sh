@@ -11,6 +11,8 @@ doRun()
   filename="RESUME.tmp"
   if [ -f "$filename" ]; then
     step=$(head -n 1 $filename);
+  else
+    step=0;
   fi
   
   chmodScripts;
