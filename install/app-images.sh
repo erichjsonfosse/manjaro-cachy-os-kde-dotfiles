@@ -12,6 +12,6 @@ wget -O "$APP_IMAGE_DIR/insomnia-designer.AppImage" "https://updates.insomnia.re
 # Insomnia REST Client
 wget -O "$APP_IMAGE_DIR/insomnia-rest-client.AppImage" "https://updates.insomnia.rest/downloads/linux/latest"
 # Rambox
-wget -O "$APP_IMAGE_DIR/rambox.AppImage" "https://rambox.pro/api/downloadCE?os=linux&filetype=AppImage&arch=x86_64"
+# wget -O "$APP_IMAGE_DIR/rambox.AppImage" "https://rambox.pro/api/downloadCE?os=linux&filetype=AppImage&arch=x86_64"
 
 echo "App images downloaded"
