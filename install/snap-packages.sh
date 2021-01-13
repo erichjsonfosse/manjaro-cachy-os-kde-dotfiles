@@ -8,3 +8,6 @@ snap install rambox
 snap install insomnia
 snap install insomnia-designer
 snap install atom --classic
+snap install powershell --classic
+snap install datagrip --classic
+snap install code --classic
