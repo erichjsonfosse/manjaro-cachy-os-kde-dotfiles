@@ -13,6 +13,7 @@ pacman -Sy --noconfirm \
  docker \
  docker-compose \
  libreoffice-fresh \
+ openjdk-src \
  `# Fonts` \
  powerline-fonts \
  ttf-fira-code \
