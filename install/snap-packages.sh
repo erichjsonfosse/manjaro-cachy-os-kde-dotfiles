@@ -11,3 +11,4 @@ snap install atom --classic
 snap install powershell --classic
 snap install datagrip --classic
 snap install code --classic
+snap install flutter --classic
