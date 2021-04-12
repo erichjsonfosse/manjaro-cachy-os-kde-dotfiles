@@ -5,8 +5,6 @@ pacman -Syu --noconfirm
 
 echo "Installing pacman packages..."
 pacman -Sy --noconfirm \
- appimagelauncher \
- libappimage \
  `# Browsers` \
  google-chrome \
  vivaldi \
@@ -21,7 +19,6 @@ pacman -Sy --noconfirm \
  `# Utilities` \
  curl \
  filezilla \
- konsole \
  pamac \
  snapd \
  squashfuse \
