@@ -16,7 +16,7 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
 - Flutter (Snap)
-- Google Chrome Browser (pacman)
+- Google Chrome Browser (AUR)
 - Insomnia Designer (Snap)
 - Insomnia Core (Snap)
 - IntelliJ IDEA Ultimate (Snap)
