@@ -6,7 +6,6 @@ pacman -Syu --noconfirm
 echo "Installing pacman packages..."
 pacman -Sy --noconfirm \
  `# Browsers` \
- google-chrome \
  vivaldi \
  `# Development` \
  docker \
