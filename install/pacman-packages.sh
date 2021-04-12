@@ -8,7 +8,8 @@ pacman -Sy --noconfirm \
  appimagelauncher \
  libappimage \
  `# Browsers` \
- chromium \
+ google-chrome \
+ vivaldi \
  `# Development` \
  docker \
  docker-compose \
