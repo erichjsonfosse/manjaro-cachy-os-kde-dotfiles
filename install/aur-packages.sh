@@ -2,4 +2,14 @@
 
 echo "Installing AUR packages..."
 
-pamac build --no-confirm otf-fira-code-git google-chrome
+pamac build --no-confirm \
+  google-chrome \
+  flutter \
+  insomnia-bin \
+  insomnia-designer-bin \
+  otf-fira-code-git \
+  postman-bin \
+  powershell-bin
+
+
+echo "AUR packages installed"

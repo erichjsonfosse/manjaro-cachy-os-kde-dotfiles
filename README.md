@@ -10,15 +10,25 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 
 ## Packages
 
-- Atom (Snap)
+- aspnet-runtime (pacman)
+- Atom (pacman)
+- Azure Storage Explorer (Snap)
+- Datagrip (snap)
 - Docker (pacman)
 - Docker Compose (pacman)
+- dotnet-host (pacman)
+- dotnet-runtime (pacman)
+- dotnet-sdk (pacman)
+- dotnet-targeting-pack (pacman)
+- Ferdi (Snap)
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
-- Flutter (Snap)
+- Flutter (AUR)
 - Google Chrome Browser (AUR)
-- Insomnia Designer (Snap)
-- Insomnia Core (Snap)
+- guake (pacman)
+- Inkscape (pacman)
+- Insomnia Designer (AUR)
+- Insomnia Core (AUR)
 - IntelliJ IDEA Ultimate (Snap)
 - Libre Office (pacman)
 - Oh My Zsh (shell script)
@@ -26,10 +36,10 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - Oh My Zsh plugin: syntaxhighlighting (shell script)
 - Oh My Zsh theme: powerlevel10k (shell script)
 - Pamac (pacman)
-- Postman (Snap)
+- Postman (AUR)
 - Powerline Fonts (pacman)
-- PowerShell (Snap)
-- Rambox (Snap)
+- PowerShell (AUR)
+- PyCharm Professional Edition (snap)
 - Snap (pacman)
 - UFW (pacman)
 - Visual Studio Code (Snap)
@@ -45,8 +55,6 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - hextouuid
 
 ## Git Aliases
-- cp - short for `cherry-pick`
-- co - short for `checkout`
 - last - shows last log entry
 - tl - shows list of tags
 
