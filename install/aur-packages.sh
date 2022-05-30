@@ -2,6 +2,8 @@
 
 echo "Installing AUR packages..."
 
+sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
+
 pamac build --no-confirm \
   google-chrome \
   flutter \
