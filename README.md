@@ -24,8 +24,9 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
 - Flutter (AUR)
+- gnome-shell-extension-gsconnect (if GNOME)
 - Google Chrome Browser (AUR)
-- guake (pacman)
+- guake (pacman) (if GNOME)
 - Inkscape (pacman)
 - Insomnia Designer (AUR)
 - Insomnia Core (AUR)
@@ -45,8 +46,8 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - Visual Studio Code (Snap)
 - Vivaldi (pacman)
 - Xournal Plus Plus (pacman)
-- Yakuake (pacman)
-- Zsh (pacman)
+- Yakuake (pacman) (if KDE)
+- Zsh (pacman) (if KDE (already default in GNOME))
 
 ## Aliases
 

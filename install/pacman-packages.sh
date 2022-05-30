@@ -35,14 +35,16 @@ pacman -Sy --noconfirm \
 
 if [ "$XDG_CURRENT_DESKTOP" = 'GNOME' ]
  then
-  pacman -Sy --noconfirm guake
+  pacman -Sy --noconfirm \
+   gnome-shell-extension-gsconnect \
+   guake
 fi
 
 if [ "$XDG_CURRENT_DESKTOP" = 'KDE' ]
  then
   pacman -Sy --noconfirm \
-  yakuake \
-  zsh
+   yakuake \
+   zsh
 fi
 
 
