@@ -17,7 +17,6 @@ pacman -Sy --noconfirm \
  dotnet-runtime \
  dotnet-sdk \
  dotnet-targeting-pack \
- guake \
  libreoffice-fresh \
  openjdk-src \
  `# Fonts` \
@@ -32,9 +31,19 @@ pacman -Sy --noconfirm \
  squashfuse \
  ufw \
  unzip \
- xournalpp \
- yakuake \
- zsh
+ xournalpp
+
+if [ "$XDG_CURRENT_DESKTOP" = 'GNOME' ]
+ then
+  pacman -Sy --noconfirm guake
+fi
+
+if [ "$XDG_CURRENT_DESKTOP" = 'KDE' ]
+ then
+  pacman -Sy --noconfirm \
+  yakuake \
+  zsh
+fi
 
 
 echo "Pacman packages installed"
