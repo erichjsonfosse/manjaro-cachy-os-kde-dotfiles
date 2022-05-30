@@ -17,6 +17,8 @@ pacman -Sy --noconfirm \
  dotnet-runtime \
  dotnet-sdk \
  dotnet-targeting-pack \
+ libpamac-flatpak-plugin \
+ libpamac-snap-plugin \
  libreoffice-fresh \
  openjdk-src \
  `# Fonts` \
