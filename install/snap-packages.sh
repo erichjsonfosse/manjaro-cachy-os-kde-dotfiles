@@ -2,6 +2,8 @@
 
 echo "Installing Snap packages..."
 
+ln -s /var/lib/snapd/snap /snap
+
 snap install code --classic
 snap install datagrip --classic
 snap install ferdi
