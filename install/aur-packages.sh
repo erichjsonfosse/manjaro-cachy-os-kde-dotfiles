@@ -6,6 +6,7 @@ sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
 pamac build --no-confirm \
   google-chrome \
+  ferdi-bin \
   flutter \
   insomnia-bin \
   insomnia-designer-bin \

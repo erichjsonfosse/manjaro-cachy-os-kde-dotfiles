@@ -6,7 +6,6 @@ ln -s /var/lib/snapd/snap /snap
 
 snap install code --classic
 snap install datagrip --classic
-snap install ferdi
 snap install intellij-idea-ultimate --classic
 snap install pycharm-professional --classic
 snap install rider --classic
