@@ -11,7 +11,6 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 ## Packages
 
 - aspnet-runtime (pacman)
-- Atom (pacman)
 - Azure Storage Explorer (Snap)
 - Datagrip (snap)
 - Docker (pacman)
@@ -20,7 +19,7 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - dotnet-runtime (pacman)
 - dotnet-sdk (pacman)
 - dotnet-targeting-pack (pacman)
-- Ferdi (Snap)
+- Ferdium (AUR)
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
 - Flutter (AUR)

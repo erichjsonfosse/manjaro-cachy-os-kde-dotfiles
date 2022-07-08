@@ -10,7 +10,6 @@ pacman -Sy --noconfirm \
  vivaldi \
  `# Development` \
  aspnet-runtime \
- atom \
  docker \
  docker-compose \
  dotnet-host \
