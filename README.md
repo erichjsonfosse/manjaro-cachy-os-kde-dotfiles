@@ -4,10 +4,6 @@ Dotfiles for Manjaro installations
 
 Enables AUR.
 
-Contains .env.example file with common environment variables. This file will be copied to .env during init, so that custom environment variables can be added by the user.
-
-The file VERSION contains the latest version number, and will be copied to VERSION.CURRENT after successful install / upgrade. The VERSION.CURRENT file is ignored, and MUST NOT be removed or edited.
-
 ## Packages
 
 - aspnet-runtime (pacman)
@@ -49,16 +45,32 @@ The file VERSION contains the latest version number, and will be copied to VERSI
 - Yakuake (pacman) (if KDE)
 - Zsh (pacman) (if KDE (already default in GNOME))
 
-## Aliases
 
-- icanhas
-- gitcanhas
-- hextouuid
+## Utility functions
+
+| Name                            | Description                                    | Usage                                            |
+|---------------------------------|------------------------------------------------|--------------------------------------------------|
+| getlatesttag                    | Returns latest git tag for a given repositotry | getlatesttag https://github.com/nvm-sh/nvm       |
+| gitcanhas (not yet implemented) | Clones given repository into given folder      | gitcanhas https://github.com/nvm-sh/nvm          |
+| hextouuid                       | Converts hexadecimal string into a uuid string | `hextouuid 9CE4F1095C05422CB261AAAAE2F04476`     |
+| icanhas (not yet implemented)   | Installs package                               | icanhas htop                                     |
+| uuidtohex                       | Converts uuid string into hexadecimal string   | `uuidtohex ade75aee-69ce-41e3-88ea-048124776ca1` |
+
+
+## Aliases
+- glt => getlatesttag
 
 ## Git Aliases
 - last - shows last log entry
 - tl - shows list of tags
 
 ## Config
-- SSH - ServerAliveInterval 60
-- SSH - ServerAliveCountMax 2
+- SSH - ServerAliveInterval 60 (not yet implemented)
+- SSH - ServerAliveCountMax 2 (not yet implemented)
+
+
+# TODO
+- Ask for which major versions to install for dotnet / aspnet
+- Separate user specific config and setup from the rest, and make it available as a final optional step
+- Enable full pre-config support to enable unattended setup
+- Add full documentation of the whole process
