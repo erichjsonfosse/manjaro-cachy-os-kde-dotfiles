@@ -5,11 +5,13 @@ echo "Installing AUR packages..."
 sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
 pamac build --no-confirm \
+  azure-cli-bin \
   google-chrome \
-  ferdi-bin \
+  ferdium-bin \
   flutter \
   insomnia-bin \
   insomnia-designer-bin \
+  noson-bin \
   otf-fira-code-git \
   postman-bin \
   powershell-bin
