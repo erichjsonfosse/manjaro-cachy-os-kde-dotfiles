@@ -6,12 +6,18 @@ export BASEDIR
 
 CONFIGDIR="$BASEDIR/config"
 export CONFIGDIR
+
 ZSHPLUGINDIR="$CONFIGDIR/zsh-plugin"
 export ZSHPLUGINDIR
 
 INSTALLDIR="$BASEDIR/install"
 export INSTALLDIR
 ######################### Directories ##########################
+
+######################### Files ##########################
+RESUME_FILE_NAME="RESUME.tmp"
+export RESUME_FILE_NAME
+######################### Files ##########################
 
 ######################### HOMEDIR ##########################
 LOGNAME=$(logname)

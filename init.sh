@@ -6,10 +6,6 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
-resumeFilename="RESUME.tmp"
-configFolder="./config"
-installFolder="./install"
-
 steps=(
 [0]="chmodScripts"
 [1]="setVariables"
@@ -31,7 +27,7 @@ steps=(
 
 doRun()
 {
-  if [ ! -f "$resumeFilename" ]; then
+  if [ ! -f "$RESUME_FILE_NAME" ]; then
     setStep 0;
   fi
   
@@ -39,7 +35,7 @@ doRun()
     source ./tmpConfigFile.tmp
   fi
   
-  step=$(head -n 1 $resumeFilename);
+  step=$(head -n 1 "$RESUME_FILE_NAME");
 
   runStep "$step"
 }
@@ -57,8 +53,8 @@ doot()
 
 setStep()
 {
-  rm -f $resumeFilename;
-  echo $1 > $resumeFilename;
+  rm -f "$RESUME_FILE_NAME";
+  echo $1 > "$RESUME_FILE_NAME";
 }
 
 chmodScripts()
@@ -78,52 +74,52 @@ requestInput()
 
 installPacmanPackages()
 {
-  source "$installFolder/pacman-packages.sh"
+  source "$INSTALLDIR/pacman-packages.sh"
 }
 
 enableSnapService()
 {
-  source "$installFolder/enable-snap-service.sh"
+  source "$INSTALLDIR/enable-snap-service.sh"
 }
 
 installSnapPackages()
 {
-  source "$installFolder/snap-packages.sh"
+  source "$INSTALLDIR/snap-packages.sh"
 }
 
 installAurPackages()
 {
-  source "$installFolder/aur-packages.sh"
+  source "$INSTALLDIR/aur-packages.sh"
 }
 
 installAppImages()
 {
-  source "$installFolder/app-images.sh"
+  source "$INSTALLDIR/app-images.sh"
 }
 
 installNvm()
 {
-  source "$installFolder/nvm.sh"
+  source "$INSTALLDIR/nvm.sh"
 }
 
 configureUfw()
 {
-  source "$configFolder/ufw-config.sh"
+  source "$CONFIGDIR/ufw-config.sh"
 }
 
 configureZsh()
 {
-  source "$configFolder/zsh-config.sh"
+  source "$CONFIGDIR/zsh-config.sh"
 }
 
 configureGit()
 {
-  source "$configFolder/git-config.sh"
+  source "$CONFIGDIR/git-config.sh"
 }
 
 configureSsh()
 {
-  source "$configFolder/ssh-config.sh"
+  source "$CONFIGDIR/ssh-config.sh"
 }
 
 bumpVersion()
