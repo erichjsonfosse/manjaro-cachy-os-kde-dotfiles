@@ -6,10 +6,32 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
+resumeFilename="RESUME.tmp"
+configFolder="./config"
+installFolder="./install"
+
+steps=(
+[0]="chmodScripts"
+[1]="setVariables"
+[2]="requestInput"
+[3]="configureZsh"
+[4]="configureGit"
+[5]="installPacmanPackages"
+[6]="enableSnapService"
+[7]="installSnapPackages"
+[8]="installAurPackages"
+[9]="installAppImages"
+[10]="installNvm"
+[11]="configureUfw"
+[12]="ensureUserOwnershipOfHomeFolder"
+[13]="bumpVersion"
+[14]="removeTemporaryFiles"
+[69]="doot"
+)
+
 doRun()
 {
-  filename="RESUME.tmp"
-  if [ ! -f "$filename" ]; then
+  if [ ! -f "$resumeFilename" ]; then
     setStep 0;
   fi
   
@@ -17,155 +39,100 @@ doRun()
     source ./tmpConfigFile.tmp
   fi
   
-  step=$(head -n 1 $filename);
-  
-  chmodScripts;
-  
-  setVariables;
-  
-  if [ $step -lt 3 ]; then
-    requestInput;
-  fi
-  
-  if [ $step -lt 4 ]; then
-    installPackmanPackages;
-  fi
-  
-  if [ $step -lt 5 ]; then
-    enableSnapService;
-  fi
-  
-  if [ $step -lt 6 ]; then
-    installSnapPackages;
-  fi
-  
-  if [ $step -lt 7 ]; then
-    installAurPackages;
-  fi
-  
-  if [ $step -lt 8 ]; then
-    installAppImages;
-  fi
-  
-  if [ $step -lt 9 ]; then
-    configureUfw;
-  fi
-  
-  if [ $step -lt 10 ]; then
-    configureZsh;
-  fi
-  
-  if [ $step -lt 11 ]; then
-    configureGit;
-  fi
-  
-  if [ $step -lt 12 ]; then
-    configureSsh;
-  fi
-  
-  if [ $step -lt 13 ]; then
-    bumpVersion;
-  fi
-  
-  if [ $step -lt 14 ]; then
-    configureSsh;
-  fi
-  
-  if [ $step -lt 15 ]; then
-    removeTemporaryFiles;
-  fi
+  step=$(head -n 1 $resumeFilename);
+
+  runStep "$step"
+}
+
+runStep()
+{
+  setStep $(($1 + 1))
+  eval "${steps[$1]}"
+}
+
+doot()
+{
+  echo "bloop"
 }
 
 setStep()
 {
-  filename="RESUME.tmp";
-  rm -f $filename;
-  echo $1 > $filename;
+  rm -f $resumeFilename;
+  echo $1 > $resumeFilename;
 }
 
 chmodScripts()
 {
-  setStep 1;
-  chmod +x ./*.sh
-  chmod +x ./install/*.sh
-  chmod +x ./config/*.sh
+  chmod +x ./**/*.sh
 }
 
 setVariables()
 {
-  setStep 2;
   source ./set-variables.sh
 }
 
 requestInput()
 {
-  setStep 3;
   source ./request-input.sh
 }
 
-installPackmanPackages()
+installPacmanPackages()
 {
-  setStep 4;
-  source ./install/pacman-packages.sh
+  source "$installFolder/pacman-packages.sh"
 }
 
 enableSnapService()
 {
-  setStep 5;
-  source ./install/enable-snap-service.sh
+  source "$installFolder/enable-snap-service.sh"
 }
 
 installSnapPackages()
 {
-  setStep 6;
-  source ./install/snap-packages.sh
+  source "$installFolder/snap-packages.sh"
 }
 
 installAurPackages()
 {
-  setStep 7;
-#  source ./install/aur-packages.sh
+  source "$installFolder/aur-packages.sh"
 }
 
 installAppImages()
 {
-  setStep 8;
-  source ./install/app-images.sh
+  source "$installFolder/app-images.sh"
+}
+
+installNvm()
+{
+  source "$installFolder/nvm.sh"
 }
 
 configureUfw()
 {
-  setStep 9;
-  source ./config/ufw-config.sh
+  source "$configFolder/ufw-config.sh"
 }
 
 configureZsh()
 {
-  setStep 10;
-  source ./config/zsh-config.sh
+  source "$configFolder/zsh-config.sh"
 }
 
 configureGit()
 {
-  setStep 11;
-  source ./config/git-config.sh
+  source "$configFolder/git-config.sh"
 }
 
 configureSsh()
 {
-  setStep 12;
-  source ./config/ssh-config.sh
+  source "$configFolder/ssh-config.sh"
 }
 
 bumpVersion()
 {
-  setStep 13;
   source ./bump-version.sh
 }
 
-configureSsh()
+ensureUserOwnershipOfHomeFolder()
 {
-  setStep 14;
   # Change ownership of home folder files recursively
   echo "Changing ownership of home folder..."
   chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR"
@@ -173,16 +140,17 @@ configureSsh()
 
 removeTemporaryFiles()
 {
-  setStep 15;
   rm -f "RESUME.tmp";
   rm -f "tmpConfigFile.tmp";
 }
 
-while true; do
-  read -rp "Continue with installation? (y/n)" yn
-  case $yn in
-    [Yy]* ) doRun; break;;
-    [Nn]* ) exit;;
-    * ) echo "Please answer yes or no.";;
-  esac
-done
+runStep 69
+
+#while true; do
+#  read -rp "Continue with installation? (y/n)" yn
+#  case $yn in
+#    [Yy]* ) doRun; break;;
+#    [Nn]* ) exit;;
+#    * ) echo "Please answer yes or no.";;
+#  esac
+#done
