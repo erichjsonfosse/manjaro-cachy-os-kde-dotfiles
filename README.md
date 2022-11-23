@@ -8,6 +8,7 @@ Enables AUR.
 
 - aspnet-runtime (pacman)
 - Atom (pacman)
+- Azure CLI (AUR)
 - Azure Storage Explorer (Snap)
 - Datagrip (snap)
 - Docker (pacman)
@@ -16,18 +17,23 @@ Enables AUR.
 - dotnet-runtime (pacman)
 - dotnet-sdk (pacman)
 - dotnet-targeting-pack (pacman)
-- Ferdi (Snap)
+- Ferdium (AUR)
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
 - Flutter (AUR)
 - gnome-shell-extension-gsconnect (if GNOME)
 - Google Chrome Browser (AUR)
 - guake (pacman) (if GNOME)
+- helm (pacman)
 - Inkscape (pacman)
 - Insomnia Designer (AUR)
 - Insomnia Core (AUR)
 - IntelliJ IDEA Ultimate (Snap)
+- jq (pacman)
+- keditbookmarks (pacman)
+- kubectl (pacman)
 - Libre Office (pacman)
+- noson (AUR)
 - Oh My Zsh (shell script)
 - Oh My Zsh plugin: autosuggestions (shell script)
 - Oh My Zsh plugin: syntaxhighlighting (shell script)
@@ -70,7 +76,12 @@ Enables AUR.
 
 
 # TODO
-- Ask for which major versions to install for dotnet / aspnet
+- Ask for which major versions to install for
+  - dotnet / aspnet
+  - Guake / Yakuake
+  - GS Connect / KDE Connect
+- Install zsh early in the process if it's not already installed
 - Separate user specific config and setup from the rest, and make it available as a final optional step
 - Enable full pre-config support to enable unattended setup
+  - Add support for providing config files for which packages to install
 - Add full documentation of the whole process
