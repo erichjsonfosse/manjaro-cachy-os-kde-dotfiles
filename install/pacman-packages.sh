@@ -27,7 +27,11 @@ pacman -Sy --noconfirm \
  `# Utilities` \
  curl \
  filezilla \
+ helm \
  inkscape \
+ jq \
+ keditbookmarks \
+ kubectl \
  pamac \
  snapd \
  squashfuse \
