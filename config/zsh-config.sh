@@ -24,13 +24,24 @@ sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSH
 
 # Activate plugins
 sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRCFILE"
-sed -i "/^\# plugins=\(.*\)/a plugins=\(git zsh-autosuggestions zsh-syntax-highlighting\)" "$ZSHRCFILE"
+sed -i "/^\# plugins=\(.*\)/a plugins=\(
+  docker
+  docker-compose
+  dotnet
+  fd
+  git
+  helm
+  kubectl
+  manjaro-dotfiles
+  nvm
+  ufw
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+\)" "$ZSHRCFILE"
 
 # Add aliases
-mkdir "$OHMYZSHFOLDER/plugins/manjaro-dotfiles"
-cp -rf "$ALIASESDIR/git.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/git.zsh"
-cp -rf "$ALIASESDIR/pacman.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/pacman.zsh"
-cp -rf "$ALIASESDIR/uuid.conf" "$OHMYZSHFOLDER/plugins/manjaro-dotfiles/uuid.zsh"
+mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
+cp -rf "$ZSHPLUGINDIR/*" "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Setting Zsh as shell for user
 chsh -s /bin/zsh $LOGNAME
