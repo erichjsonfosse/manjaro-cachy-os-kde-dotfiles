@@ -5,6 +5,6 @@
 	default = simple
 [alias]
 	last = log -1 --stat
-	tl = for-each-ref --sort=taggerdate --format '%(tag) - %(objectname:short) - %(subject) - %(taggerdate)' refs/tags
+	tl = for-each-ref --sort=taggerdate --format '%(refname:short) - %(objectname:short) - %(subject) - %(taggerdate)' refs/tags
 [core]
 	editor = nano
