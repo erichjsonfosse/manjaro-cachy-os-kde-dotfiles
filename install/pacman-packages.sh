@@ -37,6 +37,7 @@ pacman -Sy --noconfirm \
  squashfuse \
  ufw \
  unzip \
+ xclip \
  xournalpp
 
 if [ "$XDG_CURRENT_DESKTOP" = 'GNOME' ]
