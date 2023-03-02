@@ -14,7 +14,8 @@ pamac build --no-confirm \
   noson-bin \
   otf-fira-code-git \
   postman-bin \
-  powershell-bin
+  powershell-bin \
+  xxd-standalone
 
 
 echo "AUR packages installed"
