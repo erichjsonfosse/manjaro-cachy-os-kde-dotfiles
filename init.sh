@@ -6,6 +6,18 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
+askForReboot()
+{
+  while true; do
+    read -rp "Reboot (recommended)? (y/n)" yn
+    case $yn in
+      [Yy]* ) reboot; exit;;
+      [Nn]* ) break;;
+      * ) echo "Please answer yes or no.";;
+    esac
+  done
+}
+
 steps=(
 [1]="chmodScripts"
 [2]="requestInput"
