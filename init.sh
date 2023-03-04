@@ -41,7 +41,7 @@ doRun()
   while true; do
     runStep "$step";
     
-    maxKey=$(getMaxKey "$steps")
+    maxKey=$(getMaxKey "${steps[@]}")
     echo "Step: "$(("$step"))
     echo "MaxKey: "$(("$maxKey"))
     
