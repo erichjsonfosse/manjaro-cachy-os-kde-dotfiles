@@ -66,7 +66,7 @@ doRun()
     
     maxKey=$(getMaxKey steps)
     
-    if [ $step lte $maxKey ]; then
+    if [ "$step" -lte "$maxKey" ]; then
       break;
     fi
     
