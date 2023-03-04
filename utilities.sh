@@ -24,16 +24,13 @@ waitUntilServiceIsRunning()
 
 function getMaxKey()
 {
-  max=-1
-  array=("$@")
+  local max=-1
+  local array=("$@")
   for key in "${!array[@]}"; do
-    echo "${key}"
-    echo "${max}"
     if [ $((${key})) -lt $((${max})) ]; then
       max=$((${key}))
     fi
   done
-  echo "Max key in array is $max"
   
-  return $((${max}));
+  echo "$max";
 }
