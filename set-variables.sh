@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ######################### Directories ##########################
-BASEDIR=$(dirname "$0")
+BASEDIR=$(realpath "$0" | sed 's|\(.*\)/.*|\1|')
 echo "BASEDIR set to $BASEDIR"
 export BASEDIR
 
