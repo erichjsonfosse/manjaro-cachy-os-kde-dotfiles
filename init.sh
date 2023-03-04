@@ -41,6 +41,7 @@ doRun()
   while true; do
     echo "Running step $step";
     runStep "$step";
+    step=$(head -n 1 "$RESUME_FILE_NAME");
   done
 }
 
