@@ -7,20 +7,20 @@ if [ "$EUID" -ne 0 ]
 fi
 
 steps=(
-[1]="chmodScripts"
-[2]="requestInput"
-[3]="configureZsh"
-[4]="configureGit"
-[5]="installPacmanPackages"
-[6]="enableSnapService"
-[7]="installSnapPackages"
-[8]="installAurPackages"
-[9]="installAppImages"
-[10]="installNvm"
-[11]="configureUfw"
-[12]="ensureUserOwnershipOfHomeFolder"
-[13]="bumpVersion"
-[14]="removeTemporaryFiles"
+[0]="chmodScripts"
+[1]="requestInput"
+[2]="configureZsh"
+[3]="configureGit"
+[4]="installPacmanPackages"
+[5]="enableSnapService"
+[6]="installSnapPackages"
+[7]="installAurPackages"
+[8]="installAppImages"
+[9]="installNvm"
+[10]="configureUfw"
+[11]="ensureUserOwnershipOfHomeFolder"
+[12]="bumpVersion"
+[13]="removeTemporaryFiles"
 )
 
 doRun()
@@ -29,7 +29,7 @@ doRun()
   setVariables;
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
-    step=1;
+    step=0;
     setStep "$step";
   else
     step=$(head -n 1 "$RESUME_FILE_NAME");
