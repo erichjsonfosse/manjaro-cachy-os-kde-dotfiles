@@ -39,7 +39,8 @@ doRun()
   fi
 
   while true; do
-    runStep "$step"
+    echo "Running step $step";
+    runStep "$step";
   done
 }
 
