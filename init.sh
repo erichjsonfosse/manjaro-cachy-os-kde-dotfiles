@@ -54,7 +54,7 @@ doRun()
 
 runStep()
 {
-  echo "Running step $1";
+  echo "Running step $1 (${steps[$1]})";
   setStep $(($1 + 1))
   eval "${steps[$1]}"
 }
