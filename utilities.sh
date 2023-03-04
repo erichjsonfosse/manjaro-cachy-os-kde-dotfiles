@@ -28,9 +28,12 @@ getMaxKey()
   array=$1
   for key in "${!array[@]}"; do
     echo "${key}"
-    ((${key} > max)) && max=$((${key}))
+    echo "${max}"
+    if [ $((${key})) -lt $((${max})) ]; then
+      max=$((${key}))
+    fi
   done
   echo "Max key in array is $max"
   
-  return $max;
+  return $((${max}));
 }
