@@ -21,7 +21,8 @@ askForReboot()
 getMaxKey()
 {
   max=-1
-  for key in "${!$1[@]}"; do
+  array=$1
+  for key in "${!array[@]}"; do
     len=${#key}
     ((len > max)) && max=$len
   done
