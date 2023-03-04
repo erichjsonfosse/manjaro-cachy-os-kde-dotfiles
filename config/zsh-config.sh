@@ -28,7 +28,7 @@ sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n
 
 # Add aliases
 mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
-cp -rf "$ZSHPLUGINDIR/*" "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
+cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Setting Zsh as shell for user
 chsh -s /bin/zsh $LOGNAME
