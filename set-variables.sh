@@ -2,6 +2,7 @@
 
 ######################### Directories ##########################
 BASEDIR=$(dirname "$0")
+echo "BASEDIR set to $BASEDIR"
 export BASEDIR
 
 CONFIGDIR="$BASEDIR/config"
