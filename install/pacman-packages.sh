@@ -56,4 +56,4 @@ fi
 
 
 echo "Pacman packages installed"
-
+askForReboot
