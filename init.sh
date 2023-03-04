@@ -29,7 +29,8 @@ doRun()
   setVariables;
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
-    setStep 1;
+    step=1;
+    setStep "$step";
   else
     step=$(head -n 1 "$RESUME_FILE_NAME");
   fi
