@@ -18,6 +18,15 @@ askForReboot()
   done
 }
 
+waitUntilServiceIsRunning()
+{
+  isActive=$(systemctl status "$1" | grep "Active: active (running)")
+  
+  while -z "$isActive" ; do
+    isActive=$(systemctl status "$1" | grep "Active: active (running)")
+  done
+}
+
 getMaxKey()
 {
   max=-1
