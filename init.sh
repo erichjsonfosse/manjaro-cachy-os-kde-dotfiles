@@ -39,10 +39,11 @@ doRun()
   fi
 
   while true; do
-    echo "Running step $step";
     runStep "$step";
     
     maxKey=$(getMaxKey "$steps")
+    echo $(("$step"))
+    echo $(("$maxKey"))
     
     if [ $(("$step")) -le $(("$maxKey")) ]; then
       break;
@@ -54,6 +55,7 @@ doRun()
 
 runStep()
 {
+  echo "Running step $1";
   setStep $(($1 + 1))
   eval "${steps[$1]}"
 }
