@@ -20,6 +20,7 @@ askForReboot()
 
 waitUntilServiceIsRunning()
 {
+  echo "Waiting for $1 to become active..."
   isActive=$(systemctl status "$1" | grep "Active: active (running)")
   
   while -z "$isActive" ; do
