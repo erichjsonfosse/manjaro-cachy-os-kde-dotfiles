@@ -2,7 +2,6 @@
 
 ######################### Directories ##########################
 BASEDIR=$(realpath "$0" | sed 's|\(.*\)/.*|\1|')
-echo "BASEDIR set to $BASEDIR"
 export BASEDIR
 
 CONFIGDIR="$BASEDIR/config"
