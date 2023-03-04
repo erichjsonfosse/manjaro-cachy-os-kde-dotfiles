@@ -24,20 +24,7 @@ sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSH
 
 # Activate plugins
 sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRCFILE"
-sed -i "/^\# plugins=\(.*\)/a plugins=\(
-  docker
-  docker-compose
-  dotnet
-  fd
-  git
-  helm
-  kubectl
-  manjaro-dotfiles
-  nvm
-  ufw
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-\)" "$ZSHRCFILE"
+sed -i "/^\# plugins=\(.*\)/a plugins=\(docker\ndocker-compose\ndotnet\nfd\ngit\nhelm\nkubectl\nmanjaro-dotfiles\nnvm\nufw\nzsh-autosuggestions\nzsh-syntax-highlighting\)" "$ZSHRCFILE"
 
 # Add aliases
 mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
