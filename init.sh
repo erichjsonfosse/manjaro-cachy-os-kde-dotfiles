@@ -30,13 +30,13 @@ doRun()
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
     setStep 1;
+  else
+    step=$(head -n 1 "$RESUME_FILE_NAME");
   fi
   
   if [ -f "tmpConfigFile.tmp" ]; then
     source ./tmpConfigFile.tmp
   fi
-  
-  step=$(head -n 1 "$RESUME_FILE_NAME");
 
   while true; do
     runStep "$step"
