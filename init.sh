@@ -42,8 +42,8 @@ doRun()
     runStep "$step";
     
     maxKey=$(getMaxKey "$steps")
-    echo $(("$step"))
-    echo $(("$maxKey"))
+    echo "Step: "$(("$step"))
+    echo "MaxKey: "$(("$maxKey"))
     
     if [ $(("$step")) -le $(("$maxKey")) ]; then
       break;
