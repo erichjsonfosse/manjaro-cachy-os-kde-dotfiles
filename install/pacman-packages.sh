@@ -19,7 +19,9 @@ pacman -Sy --noconfirm \
  libpamac-flatpak-plugin \
  libpamac-snap-plugin \
  libreoffice-fresh \
+ nvm \
  openjdk-src \
+ pyenv \
  `# Fonts` \
  powerline-fonts \
  ttf-fira-code \
