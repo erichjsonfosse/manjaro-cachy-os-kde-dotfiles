@@ -7,8 +7,7 @@ if [ "$EUID" -ne 0 ]
 fi
 
 steps=(
-[0]="chmodScripts"
-[1]="setVariables"
+[1]="chmodScripts"
 [2]="requestInput"
 [3]="configureZsh"
 [4]="configureGit"
@@ -22,13 +21,15 @@ steps=(
 [12]="ensureUserOwnershipOfHomeFolder"
 [13]="bumpVersion"
 [14]="removeTemporaryFiles"
-[69]="doot"
+[69]="setVariables"
 )
 
 doRun()
 {
+  runStep 69;
+
   if [ ! -f "$RESUME_FILE_NAME" ]; then
-    setStep 0;
+    setStep 1;
   fi
   
   if [ -f "tmpConfigFile.tmp" ]; then
@@ -44,11 +45,6 @@ runStep()
 {
   setStep $(($1 + 1))
   eval "${steps[$1]}"
-}
-
-doot()
-{
-  echo "bloop"
 }
 
 setStep()
@@ -140,13 +136,11 @@ removeTemporaryFiles()
   rm -f "tmpConfigFile.tmp";
 }
 
-runStep 69
-
-#while true; do
-#  read -rp "Continue with installation? (y/n)" yn
-#  case $yn in
-#    [Yy]* ) doRun; break;;
-#    [Nn]* ) exit;;
-#    * ) echo "Please answer yes or no.";;
-#  esac
-#done
+while true; do
+ read -rp "Continue with installation? (y/n)" yn
+ case $yn in
+   [Yy]* ) doRun; break;;
+   [Nn]* ) exit;;
+   * ) echo "Please answer yes or no.";;
+ esac
+done
