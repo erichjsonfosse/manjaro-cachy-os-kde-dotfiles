@@ -63,7 +63,9 @@ doRun()
     echo "Running step $step";
     runStep "$step";
     
-    if [ $step lte getMaxKey steps ]; then
+    maxKey = getMaxKey steps
+    
+    if [ $step lte $maxKey ]; then
       break;
     fi
     
