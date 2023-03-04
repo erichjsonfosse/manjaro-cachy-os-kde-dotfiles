@@ -17,7 +17,7 @@ mkdir -p "$HOMEDIR/.ssh"
 while true; do
   read -rp "Generate SSH key files? (y/n)" yn
   case $yn in
-    [Yy]* ) ssh-keygen -t ed25519 -f "$HOMEDIR/.ssh/id_rsa" && chown "$LOGNAME":"$LOGNAME" "$HOMEDIR/.ssh/id_rsa" && break;;
+    [Yy]* ) SSHKEYFILENAME="$HOMEDIR/.ssh/id_ed25519" && ssh-keygen -t ed25519 -f "$SSHKEYFILENAME" && chown "$LOGNAME":"$LOGNAME" "$SSHKEYFILENAME" && break;;
     [Nn]* ) break;;
     * ) echo "Please answer yes or no.";;
   esac
