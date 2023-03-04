@@ -18,6 +18,16 @@ askForReboot()
   done
 }
 
+getMaxKey()
+{
+  max=-1
+  for key in "${!$1[@]}"; do
+    len=${#key}
+    ((len > max)) && max=$len
+  done
+  return $max;
+}
+
 steps=(
 [1]="chmodScripts"
 [2]="requestInput"
@@ -33,7 +43,6 @@ steps=(
 [12]="ensureUserOwnershipOfHomeFolder"
 [13]="bumpVersion"
 [14]="removeTemporaryFiles"
-[69]="setVariables"
 )
 
 doRun()
@@ -53,6 +62,11 @@ doRun()
   while true; do
     echo "Running step $step";
     runStep "$step";
+    
+    if [ $step lte getMaxKey steps ]; then
+      break;
+    fi
+    
     step=$(head -n 1 "$RESUME_FILE_NAME");
   done
 }
