@@ -54,7 +54,6 @@ doot()
 setStep()
 {
   rm -f "$RESUME_FILE_NAME";
-  touch "$RESUME_FILE_NAME";
   echo $1 > "$RESUME_FILE_NAME";
 }
 
