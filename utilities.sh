@@ -22,10 +22,10 @@ waitUntilServiceIsRunning()
   done
 }
 
-getMaxKey()
+function getMaxKey()
 {
   max=-1
-  array=$1
+  array=("$@")
   for key in "${!array[@]}"; do
     echo "${key}"
     echo "${max}"
