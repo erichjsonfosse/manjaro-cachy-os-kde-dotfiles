@@ -6,39 +6,6 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
-askForReboot()
-{
-  while true; do
-    read -rp "Reboot (recommended)? (y/n)" yn
-    case $yn in
-      [Yy]* ) reboot; exit;;
-      [Nn]* ) break;;
-      * ) echo "Please answer yes or no.";;
-    esac
-  done
-}
-
-waitUntilServiceIsRunning()
-{
-  echo "Waiting for $1 to become active..."
-  isActive=$(systemctl status "$1" | grep "Active: active (running)")
-  
-  while -z "$isActive" ; do
-    isActive=$(systemctl status "$1" | grep "Active: active (running)")
-  done
-}
-
-getMaxKey()
-{
-  max=-1
-  array=$1
-  for key in "${!array[@]}"; do
-    len=${#key}
-    ((len > max)) && max=$len
-  done
-  return $max;
-}
-
 steps=(
 [1]="chmodScripts"
 [2]="requestInput"
@@ -58,6 +25,7 @@ steps=(
 
 doRun()
 {
+  includeUtilities;
   setVariables;
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
@@ -100,6 +68,11 @@ setStep()
 chmodScripts()
 {
   chmod +x ./**/*.sh
+}
+
+includeUtilities()
+{
+  source ./utilities.sh
 }
 
 setVariables()
