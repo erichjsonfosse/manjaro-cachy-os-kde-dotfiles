@@ -27,8 +27,8 @@ function getMaxKey()
   local max=-1
   local array=("$@")
   for key in "${!array[@]}"; do
-    if [ $((${key})) -lt $((${max})) ]; then
-      max=$((${key}))
+    if [ $((${key})) -gt $((${max})) ]; then
+      max=${key}
     fi
   done
   
