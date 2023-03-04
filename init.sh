@@ -26,7 +26,7 @@ steps=(
 
 doRun()
 {
-  runStep 69;
+  setVariables;
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
     setStep 1;
@@ -38,7 +38,9 @@ doRun()
   
   step=$(head -n 1 "$RESUME_FILE_NAME");
 
-  runStep "$step"
+  while true; do
+    runStep "$step"
+  done
 }
 
 runStep()
