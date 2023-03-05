@@ -31,7 +31,7 @@ mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
 cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Preparing PATH config
-sed -i "s/^\# PATH=\(.*\)/PATH=\1/g" "$ZSHRCFILE"
+sed -i "s/^\# export PATH=\(.*\)/export PATH=\1/g" "$ZSHRCFILE"
 
 addToPath()
 {
