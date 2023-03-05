@@ -1,3 +1,3 @@
 #!/bin/bash
 
-addToZshrcPath "before" "\$(pyenv root)/shims"
+addToZshrcPath "\$(pyenv root)/shims"
