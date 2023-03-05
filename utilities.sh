@@ -42,3 +42,12 @@ function getMaxKey()
   
   echo "$max";
 }
+
+addToZshrcPath()
+{
+  if [ "$2" == "before" ]; then
+    sed -i "s/^PATH=\(.*\)/PATH=$2:\1/g" "$ZSHRCFILE"
+  else
+    sed -i "s/^PATH=\(.*\)/PATH=\1:$2/g" "$ZSHRCFILE"
+  fi
+}
