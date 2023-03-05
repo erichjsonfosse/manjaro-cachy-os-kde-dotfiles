@@ -12,15 +12,17 @@ steps=(
 [2]="configureZsh"
 [3]="configureGit"
 [4]="installPacmanPackages"
-[5]="enableSnapService"
-[6]="installSnapPackages"
-[7]="installAurPackages"
-[8]="installAppImages"
-[9]="installNvm"
-[10]="configureUfw"
-[11]="ensureUserOwnershipOfHomeFolder"
-[12]="bumpVersion"
-[13]="removeTemporaryFiles"
+[5]="configureNvm"
+[6]="configurePyenv"
+[7]="enableSnapService"
+[8]="installSnapPackages"
+[9]="installAurPackages"
+[10]="installAppImages"
+[11]="installNvm"
+[12]="configureUfw"
+[13]="ensureUserOwnershipOfHomeFolder"
+[14]="bumpVersion"
+[15]="removeTemporaryFiles"
 )
 
 doRun()
@@ -89,6 +91,16 @@ requestInput()
 installPacmanPackages()
 {
   source "$INSTALLDIR/pacman-packages.sh"
+}
+
+configureNvm()
+{
+  source "$CONFIGDIR/nvm-config.sh"
+}
+
+configurePyenv()
+{
+  source "$CONFIGDIR/pyenv-config.sh"
 }
 
 enableSnapService()
