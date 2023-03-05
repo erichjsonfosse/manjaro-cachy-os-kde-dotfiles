@@ -45,7 +45,6 @@ function getMaxKey()
 
 addToZshrcPath()
 {
-  echo "Adding $1 to the path ($2)"
   if [ "$2" == "before" ]; then
     sed -i "s/^export PATH=\(.*\)/export PATH=$2:\1/g" "$ZSHRCFILE"
   else
