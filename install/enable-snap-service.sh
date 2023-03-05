@@ -6,5 +6,5 @@ echo "Enabling snap service..."
 systemctl enable --now snapd.socket
 systemctl enable --now snapd.service
 
-waitUntilServiceIsRunning "snapd.socket"
-waitUntilServiceIsRunning "snapd.service"
+waitUntilServiceIsRunning "snapd.socket" 5
+waitUntilServiceIsRunning "snapd.service" 5
