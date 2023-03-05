@@ -12,6 +12,9 @@ askForReboot()
   done
 }
 
+# Takes two arguments
+# First is name of service to wait for
+# Second is period to wait after attempting to wait for service (not all services properly report)
 waitUntilServiceIsRunning()
 {
   echo "Waiting for $1 to become active..."
