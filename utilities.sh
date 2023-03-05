@@ -19,12 +19,12 @@ waitUntilServiceIsRunning()
 {
   echo "Waiting for $1 to become active..."
   isActive=$(systemctl status "$1" | grep "Active: active (running)")
-  
+
   while [ -z "$isActive" ] ; do
     echo "$isActive"
     isActive=$(systemctl status "$1" | grep "Active: active (running)")
   done
-  
+
   if [ ! -z "$2" ]; then
     sleep $(($2))
   fi
@@ -39,12 +39,13 @@ function getMaxKey()
       max=${key}
     fi
   done
-  
+
   echo "$max";
 }
 
 addToZshrcPath()
 {
+  echo "Adding $1 to the path ($2)"
   if [ "$2" == "before" ]; then
     sed -i "s/^export PATH=\(.*\)/export PATH=$2:\1/g" "$ZSHRCFILE"
   else
