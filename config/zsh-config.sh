@@ -35,7 +35,11 @@ sed -i "s/^\# PATH=\(.*\)/PATH=\1/g" "$ZSHRCFILE"
 
 addToPath()
 {
-  sed -i "s/^PATH=\(.*\)/PATH=\1:$1/g" "$ZSHRCFILE"
+  if [ "$2" == "before" ]; then
+    sed -i "s/^PATH=\(.*\)/PATH=$2:\1/g" "$ZSHRCFILE"
+  else
+    sed -i "s/^PATH=\(.*\)/PATH=\1:$2/g" "$ZSHRCFILE"
+  fi
 }
 
 # Setting Zsh as shell for user
