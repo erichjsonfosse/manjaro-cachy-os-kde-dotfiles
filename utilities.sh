@@ -21,6 +21,10 @@ waitUntilServiceIsRunning()
     echo "$isActive"
     isActive=$(systemctl status "$1" | grep "Active: active (running)")
   done
+  
+  if [ ! -z "$2" ]; then
+    sleep $(($2))
+  fi
 }
 
 function getMaxKey()
