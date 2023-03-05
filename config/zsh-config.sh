@@ -33,14 +33,5 @@ cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 # Preparing PATH config
 sed -i "s/^\# export PATH=\(.*\)/export PATH=\1/g" "$ZSHRCFILE"
 
-addToPath()
-{
-  if [ "$2" == "before" ]; then
-    sed -i "s/^PATH=\(.*\)/PATH=$2:\1/g" "$ZSHRCFILE"
-  else
-    sed -i "s/^PATH=\(.*\)/PATH=\1:$2/g" "$ZSHRCFILE"
-  fi
-}
-
 # Setting Zsh as shell for user
 chsh -s /bin/zsh $LOGNAME
