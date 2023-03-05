@@ -30,5 +30,13 @@ sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n
 mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
 cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 
+# Preparing PATH config
+sed -i "s/^\# PATH=\(.*\)/PATH=\1/g" "$ZSHRCFILE"
+
+addToPath()
+{
+  sed -i "s/^PATH=\(.*\)/PATH=\1:$1/g" "$ZSHRCFILE"
+}
+
 # Setting Zsh as shell for user
 chsh -s /bin/zsh $LOGNAME
