@@ -31,7 +31,7 @@ mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
 cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Preparing PATH config
-sed -i '/^\# export PATH=\(.*\)/{p;s//export PATH=\1/g;}' "$ZSHRCFILE"
+uncommentZshrcPath
 
 # Setting Zsh as shell for user
 chsh -s /bin/zsh $LOGNAME
