@@ -17,13 +17,13 @@ askForReboot()
 # Second is period to wait after attempting to wait for service (not all services properly report)
 startServiceAndWaitUntilItIsRunning()
 {
-  isActive=$(systemctl status "$1" | grep "Active: active (running)")
+  isActive=$(systemctl status "$1" | grep -E "Active: active (running)|Active: active (listening)")
   systemctl enable --now $1
 
   while [ -z "$isActive" ] ; do
     echo "Waiting for $1 to become active"
     sleep 3
-    isActive=$(systemctl status "$1" | grep "Active: active (running)")
+    isActive=$(systemctl status "$1" | grep -E "Active: active (running)|Active: active (listening)")
   done
 
   if [ ! -z "$2" ]; then
