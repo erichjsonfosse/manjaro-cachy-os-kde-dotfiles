@@ -1,3 +1,4 @@
 #!/bin/bash
 
-addToZshrcPath "\$(pyenv root)/shims"
+PYSHIMS=$(su "$LOGNAME" -c "pyenv root")/shims
+addToZshrcPath "$PYSHIMS"
