@@ -85,3 +85,4 @@ Enables AUR.
 - Enable full pre-config support to enable unattended setup
   - Add support for providing config files for which packages to install
 - Add full documentation of the whole process
+- Colored output for better readability during installation process
