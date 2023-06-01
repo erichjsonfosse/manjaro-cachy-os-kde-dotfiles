@@ -22,6 +22,7 @@ waitUntilServiceIsRunning()
 
   while [ -z "$isActive" ] ; do
     echo "$isActive"
+    sleep 2
     isActive=$(systemctl status "$1" | grep "Active: active (running)")
   done
 
