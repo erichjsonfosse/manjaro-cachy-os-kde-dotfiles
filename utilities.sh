@@ -45,9 +45,16 @@ function getMaxKey()
 
 uncommentZshrcPath()
 {
+  if grep -exq "^export PATH=(.*)" "$ZSHRCFILE"
+  then
+    sed -i "s@^\(# export PATH=\)\(.*\)\(:\$PATH\)@export PATH=\2\3@g" "$ZSHRCFILE";
+  else
+    echo ".zshrc PATH already uncommented. skipping...";
+  fi
 }
 
 addToZshrcPath()
 {
-  sed -i "s@^\(export PATH=\)\(.*\)\(:\$PATH\)@\1\2:$1\3@g" "$ZSHRCFILE"
+  uncommentZshrcPath;
+  sed -i "s@^\(export PATH=\)\(.*\)\(:\$PATH\)@\1\2:$1\3@g" "$ZSHRCFILE";
 }
