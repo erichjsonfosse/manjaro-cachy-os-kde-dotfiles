@@ -20,7 +20,6 @@ Enables AUR.
 - Ferdium (AUR)
 - FileZilla (pacman)
 - Fira Code Fonts (pacman)
-- Flutter (AUR)
 - gnome-shell-extension-gsconnect (if GNOME)
 - Google Chrome Browser (AUR)
 - guake (pacman) (if GNOME)
@@ -80,6 +79,7 @@ Enables AUR.
   - dotnet / aspnet
   - Guake / Yakuake
   - GS Connect / KDE Connect
+- Ask which types of ssh keys to add
 - Install zsh early in the process if it's not already installed
 - Separate user specific config and setup from the rest, and make it available as a final optional step
 - Enable full pre-config support to enable unattended setup
