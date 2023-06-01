@@ -8,7 +8,6 @@ pamac build --no-confirm \
   azure-cli-bin \
   google-chrome \
   ferdium-bin \
-  flutter \
   insomnia-bin \
   insomnia-designer-bin \
   noson-app \
