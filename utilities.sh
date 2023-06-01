@@ -49,7 +49,7 @@ uncommentZshrcPath()
   then
     echo ".zshrc PATH already uncommented. skipping...";
   else
-    sed -i "s@^\(# export PATH=\)\(.*\)\(:\$PATH\)@\1\2\3\nexport PATH=\2\3@" "$ZSHRCFILE";
+    sed -i '/^\# export PATH=\(.*\)/{p;s//export PATH=\1/;}' "$ZSHRCFILE"
   fi
 }
 
