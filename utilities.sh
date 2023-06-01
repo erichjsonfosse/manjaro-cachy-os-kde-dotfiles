@@ -45,7 +45,7 @@ function getMaxKey()
 
 uncommentZshrcPath()
 {
-  if grep -exqs "^export PATH=(.*)" "$ZSHRCFILE"
+  if grep -Eqs "^export PATH=(.*)" "$ZSHRCFILE"
   then
     echo ".zshrc PATH already uncommented. skipping...";
   else
@@ -56,7 +56,7 @@ uncommentZshrcPath()
 addToZshrcPath()
 {
   uncommentZshrcPath;
-  if grep -Fxqs "$1" "$ZSHRCFILE"
+  if grep -Fqs "$1" "$ZSHRCFILE"
   then
     echo ".zshrc PATH already contains '$1'. skipping...";
   else
