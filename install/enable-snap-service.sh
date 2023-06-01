@@ -2,5 +2,5 @@
 
 echo "Enabling snap service..."
 
-startServiceAndWaitUntilItIsRunning "snapd.socket" 5
 startServiceAndWaitUntilItIsRunning "snapd.service" 5
+startServiceAndWaitUntilItIsRunning "snapd.socket" 5
