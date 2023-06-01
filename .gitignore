@@ -3,4 +3,5 @@
 ###< ide ###
 
 .env
-VERSION.CURRENT
+RESUME.tmp
+tmpConfigFile.tmp
