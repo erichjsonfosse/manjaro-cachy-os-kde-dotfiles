@@ -43,7 +43,11 @@ function getMaxKey()
   echo "$max";
 }
 
+uncommentZshrcPath()
+{
+}
+
 addToZshrcPath()
 {
-  sed -i "/^\# export PATH=\(.*\)/{p;s//export PATH=$1:\1/g;}" "$ZSHRCFILE"
+  sed -i "s@^\(export PATH=\)\(.*\)\(:\$PATH\)@\1\2:$1\3@g" "$ZSHRCFILE"
 }
