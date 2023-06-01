@@ -11,7 +11,7 @@ pamac build --no-confirm \
   flutter \
   insomnia-bin \
   insomnia-designer-bin \
-  noson-bin \
+  noson-app \
   otf-fira-code-git \
   postman-bin \
   powershell-bin \
