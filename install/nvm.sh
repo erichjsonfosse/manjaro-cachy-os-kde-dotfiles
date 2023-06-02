@@ -1,2 +1,3 @@
 latestNvmVersion=$(getlatesttag https://github.com/nvm-sh/nvm)
-su "$LOGNAME" -c 'curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$latestNvmVersion/install.sh" | bash'
+curl -fsSL -o install-nvm.sh "https://raw.githubusercontent.com/nvm-sh/nvm/$latestNvmVersion/install.sh"
+su "$LOGNAME" -c 'install-nvm.sh'
