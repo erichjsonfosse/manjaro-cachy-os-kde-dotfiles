@@ -36,6 +36,7 @@ pacman -Sy --noconfirm \
  jq \
  keditbookmarks \
  kubectl \
+ make \
  pamac \
  snapd \
  squashfuse \
