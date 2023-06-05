@@ -1,8 +1,11 @@
 #!/bin/bash
 
+echo "Clearing pamac build files cache..."
+pamac clean --build-files
+
 echo "Installing AUR packages..."
 
-sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
+#sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
 pamac build --no-confirm \
   azure-cli-bin \
