@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+echo "Updating pacman mirrors..."
+pacman-mirrors -f5
 echo "Upgrading pacman packages..."
 pacman -Syu --noconfirm
 echo "Pacman packages upgraded"
