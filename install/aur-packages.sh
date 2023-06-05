@@ -14,7 +14,6 @@ pamac build --no-confirm \
   insomnia-bin \
   insomnia-designer-bin \
   noson-app \
-  otf-fira-code-git \
   postman-bin \
   powershell-bin \
   xxd-standalone
