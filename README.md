@@ -86,3 +86,4 @@ Enables AUR.
   - Add support for providing config files for which packages to install
 - Add full documentation of the whole process
 - Colored output for better readability during installation process
+- Move the Oh My Zsh plugin to separate repository?
