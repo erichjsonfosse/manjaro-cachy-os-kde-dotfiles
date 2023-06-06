@@ -13,6 +13,7 @@ pamac build --no-confirm \
   ferdium-bin \
   insomnia-bin \
   insomnia-designer-bin \
+  kubent-bin \
   noson-app \
   postman-bin \
   powershell-bin \
