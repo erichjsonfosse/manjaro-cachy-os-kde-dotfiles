@@ -26,6 +26,7 @@ pacman -Sy --noconfirm \
  openjdk-src \
  pyenv \
  `# Fonts` \
+ noto-fonts-emoji \
  powerline-fonts \
  ttf-fira-code \
  `# Utilities` \
