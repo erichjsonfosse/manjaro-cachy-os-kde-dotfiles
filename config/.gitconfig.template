@@ -1,6 +1,7 @@
 [user]
 	name = MANJARO_DOTFILES_GITCONFIG_NAME
 	email = MANJARO_DOTFILES_GITCONFIG_EMAIL
+	signingkey = MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY
 [push]
 	default = simple
 [alias]
@@ -8,3 +9,9 @@
 	tl = for-each-ref --sort=taggerdate --format '%(refname:short) - %(objectname:short) - %(subject) - %(taggerdate)' refs/tags
 [core]
 	editor = nano
+[pull]
+	ff = only
+[gpg]
+	format = ssh
+[commit]
+	gpgSign = true
