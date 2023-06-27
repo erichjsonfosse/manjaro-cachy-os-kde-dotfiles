@@ -32,6 +32,7 @@ pacman -Sy --noconfirm \
  `# Utilities` \
  curl \
  filezilla \
+ gum \
  helm \
  inkscape \
  jq \
@@ -39,6 +40,7 @@ pacman -Sy --noconfirm \
  kubectl \
  make \
  pamac \
+ shellcheck \
  snapd \
  squashfuse \
  ufw \
