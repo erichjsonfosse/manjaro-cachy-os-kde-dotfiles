@@ -75,6 +75,7 @@ Enables AUR.
 
 
 # TODO
+- Starship instead of Powerlevel10k
 - Gum (https://github.com/charmbracelet/gum)
 - Ask for which major versions to install for
   - dotnet / aspnet
