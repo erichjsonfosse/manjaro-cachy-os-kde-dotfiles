@@ -18,8 +18,10 @@ while true; do
   read -rp "Generate SSH key files? (y/n)" yn
   case $yn in
     [Yy]* ) SSHKEYFILENAME="$HOMEDIR/.ssh/id_ed25519" && ssh-keygen -t ed25519 -f "$SSHKEYFILENAME" && chown "$LOGNAME":"$LOGNAME" "$SSHKEYFILENAME" && break;;
-    [Nn]* ) break;;
+    [Nn]* ) read -rp 'Git Config path to signing key: ' MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY && break;;
     * ) echo "Please answer yes or no.";;
   esac
 done
 ######################### SSH key files ##########################
+
+echo "MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY=\"$MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY\"" >> $tmpConfigFile
