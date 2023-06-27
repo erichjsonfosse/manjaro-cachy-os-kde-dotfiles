@@ -75,6 +75,7 @@ Enables AUR.
 
 
 # TODO
+- Gum (https://github.com/charmbracelet/gum)
 - Ask for which major versions to install for
   - dotnet / aspnet
   - Guake / Yakuake
