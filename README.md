@@ -37,6 +37,7 @@ Enables AUR.
 - Oh My Zsh plugin: autosuggestions (shell script)
 - Oh My Zsh plugin: syntaxhighlighting (shell script)
 - Oh My Zsh theme: powerlevel10k (shell script)
+- Openlens (AUR)
 - Pamac (pacman)
 - Postman (AUR)
 - Powerline Fonts (pacman)
