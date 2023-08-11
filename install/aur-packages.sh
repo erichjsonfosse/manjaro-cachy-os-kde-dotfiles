@@ -15,6 +15,7 @@ pamac build --no-confirm \
   insomnia-designer-bin \
   kubent-bin \
   noson-app \
+  openlens-bin \
   postman-bin \
   powershell-bin \
   xxd-standalone
