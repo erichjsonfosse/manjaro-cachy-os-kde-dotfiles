@@ -32,6 +32,7 @@ pacman -Sy --noconfirm \
  `# Utilities` \
  curl \
  filezilla \
+ gufw \
  gum \
  helm \
  inkscape \
