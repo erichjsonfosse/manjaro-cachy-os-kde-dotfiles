@@ -23,6 +23,7 @@ Enables AUR.
 - gnome-shell-extension-gsconnect (if GNOME)
 - Google Chrome Browser (AUR)
 - guake (pacman) (if GNOME)
+- gufw (pacman)
 - helm (pacman)
 - Inkscape (pacman)
 - Insomnia Designer (AUR)
