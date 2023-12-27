@@ -12,7 +12,6 @@ pamac build --no-confirm \
   google-chrome \
   ferdium-bin \
   insomnia-bin \
-  insomnia-designer-bin \
   kubent-bin \
   noson-app \
   openlens-bin \
