@@ -39,7 +39,6 @@ pacman -Sy --noconfirm \
  gum \
  helm \
  inkscape \
- jupyter-notebook \
  jq \
  keditbookmarks \
  kubectl \
