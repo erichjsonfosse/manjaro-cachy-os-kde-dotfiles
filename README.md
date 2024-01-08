@@ -29,7 +29,6 @@ Enables AUR.
 - Insomnia Designer (AUR)
 - Insomnia Core (AUR)
 - IntelliJ IDEA Ultimate (Snap)
-- Jupyter Notebook (pacman)
 - jq (pacman)
 - keditbookmarks (pacman)
 - kubectl (pacman)
