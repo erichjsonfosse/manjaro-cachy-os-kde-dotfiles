@@ -11,6 +11,7 @@ pamac build --no-confirm \
   azure-cli-bin \
   google-chrome \
   ferdium-bin \
+  hyphen-nb \
   insomnia-bin \
   kubent-bin \
   noson-app \
