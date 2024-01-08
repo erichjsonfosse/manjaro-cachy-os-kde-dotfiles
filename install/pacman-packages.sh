@@ -21,7 +21,6 @@ pacman -Sy --noconfirm \
  dotnet-targeting-pack \
  libpamac-flatpak-plugin \
  libpamac-snap-plugin \
- libreoffice-fresh \
  nvm \
  openjdk-src \
  pyenv \
@@ -29,6 +28,10 @@ pacman -Sy --noconfirm \
  noto-fonts-emoji \
  powerline-fonts \
  ttf-fira-code \
+ `# Office` \
+ libreoffice-fresh \
+ libreoffice-fresh-nb \hyphen-nb \
+ xournalpp \
  `# Utilities` \
  curl \
  filezilla \
@@ -36,6 +39,7 @@ pacman -Sy --noconfirm \
  gum \
  helm \
  inkscape \
+ jupyter-notebook \
  jq \
  keditbookmarks \
  kubectl \
@@ -46,8 +50,7 @@ pacman -Sy --noconfirm \
  squashfuse \
  ufw \
  unzip \
- xclip \
- xournalpp
+ xclip
 
 if [ "$XDG_CURRENT_DESKTOP" = 'GNOME' ]
  then
