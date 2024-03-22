@@ -16,3 +16,7 @@
 	format = ssh
 [commit]
 	gpgSign = true
+[init]
+	defaultBranch = main
+[rerere]
+	enabled = true
