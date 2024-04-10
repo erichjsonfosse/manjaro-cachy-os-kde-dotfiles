@@ -7,7 +7,7 @@
 [alias]
 	last = log -1 --stat
 	tch = rev-list --abbrev-commit -n1
-	tl = "!f() { git for-each-ref --sort=taggerdate --format '%(refname:short) - %(objectname:short) - %(subject) - %(taggerdate)' refs/tags | sed -E \"s/^([^,]+) - ([a-f0-9]{7}) - (.*)/\\1 (\\2) - thisiswherethecommithashgoes - \\3/\" | while read l; do tag=$(echo  $l | sed -E 's/^([^,]+) \\(([a-f0-9]{7})\\) - (.*)/\\1/'); tag_commit_hash=$(git tch "$tag"); echo "$l" | sed "s/thisiswherethecommithashgoes/$tag_commit_hash/"; done; }; f"
+	tl = "for-each-ref --sort=v:tag --format '%(refname:strip=2) - (%(objectname:short)) - %(*objectname:short) - %(subject) - %(taggerdate)' refs/tags"
 [core]
 	editor = nano
 [pull]
