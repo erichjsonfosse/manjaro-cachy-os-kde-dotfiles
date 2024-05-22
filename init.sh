@@ -18,11 +18,10 @@ steps=(
 [8]="installSnapPackages"
 [9]="installAurPackages"
 [10]="installAppImages"
-[11]="installNvm"
-[12]="configureUfw"
-[13]="ensureUserOwnershipOfHomeFolder"
-[14]="bumpVersion"
-[15]="removeTemporaryFiles"
+[11]="configureUfw"
+[12]="ensureUserOwnershipOfHomeFolder"
+[13]="bumpVersion"
+[14]="removeTemporaryFiles"
 )
 
 doRun()
@@ -121,11 +120,6 @@ installAurPackages()
 installAppImages()
 {
   source "$INSTALLDIR/app-images.sh"
-}
-
-installNvm()
-{
-  source "$INSTALLDIR/nvm.sh"
 }
 
 configureUfw()
