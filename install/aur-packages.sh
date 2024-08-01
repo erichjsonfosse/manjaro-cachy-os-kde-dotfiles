@@ -9,6 +9,7 @@ echo "Installing AUR packages..."
 
 pamac build --no-confirm \
   azure-cli-bin \
+  gnome-shell-extension-wintile \
   google-chrome \
   ferdium-bin \
   hyphen-nb \
