@@ -43,6 +43,7 @@ pacman -Sy --noconfirm \
  keditbookmarks \
  kubectl \
  make \
+ onefetch \
  pamac \
  shellcheck \
  snapd \
