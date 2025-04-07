@@ -10,8 +10,6 @@
   printf "\n"
   printf "source /usr/share/nvm/bash_completion"
   printf "\n"
-  printf "source /usr/share/nvm/install-nvm-exec"
-  printf "\n"
   printf "##### nvm init #####"
   printf "\n"
 } >> "$ZSHRCFILE"
