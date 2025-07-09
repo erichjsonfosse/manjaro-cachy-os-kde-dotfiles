@@ -15,6 +15,7 @@ pacman -Sy --noconfirm \
  aspnet-runtime \
  docker \
  docker-compose \
+ docker-buildx \
  dotnet-host \
  dotnet-runtime \
  dotnet-sdk \
