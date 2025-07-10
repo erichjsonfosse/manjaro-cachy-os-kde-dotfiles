@@ -13,6 +13,7 @@ pacman -Sy --noconfirm \
  vivaldi \
  `# Development` \
  aspnet-runtime \
+ azure-cli \
  docker \
  docker-compose \
  docker-buildx \
@@ -31,7 +32,7 @@ pacman -Sy --noconfirm \
  ttf-fira-code \
  `# Office` \
  libreoffice-fresh \
- libreoffice-fresh-nb \hyphen-nb \
+ libreoffice-fresh-nb \
  xournalpp \
  `# Utilities` \
  curl \
@@ -49,6 +50,7 @@ pacman -Sy --noconfirm \
  shellcheck \
  snapd \
  squashfuse \
+ tinyxxd \
  ufw \
  unzip \
  xclip

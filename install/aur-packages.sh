@@ -8,7 +8,6 @@ echo "Installing AUR packages..."
 #sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
 pamac build --no-confirm \
-  azure-cli-bin \
   google-chrome \
   ferdium-bin \
   hyphen-nb \
@@ -17,8 +16,7 @@ pamac build --no-confirm \
   noson-app \
   openlens-bin \
   postman-bin \
-  powershell-bin \
-  xxd-standalone
+  powershell-bin
 
 
 echo "AUR packages installed"
