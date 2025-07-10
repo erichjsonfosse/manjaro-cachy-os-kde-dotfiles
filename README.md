@@ -44,5 +44,7 @@ Dotfiles for Manjaro installations
 - Usermod -> docker group
 - One install command per package to avoid failures when packages go missing
 - Password protected ssh keys?
-- Start ssh-agent
-  - Add generated ssh key to agent
+- Use ZSH plugins gpg-agent and ssh-agent
+  - zstyle :omz:plugins:ssh-agent quiet yes
+  - zstyle :omz:plugins:ssh-agent lazy yes
+  - Add ssh config file (chmod 600) `Host *\n  AddKeysToAgent yes`
