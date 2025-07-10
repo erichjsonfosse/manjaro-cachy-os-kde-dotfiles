@@ -2,58 +2,6 @@
 
 Dotfiles for Manjaro installations
 
-Enables AUR.
-
-## Packages
-
-- aspnet-runtime (pacman)
-- Atom (pacman)
-- Azure CLI (AUR)
-- Azure Storage Explorer (Snap)
-- Datagrip (snap)
-- Docker (pacman)
-- Docker Compose (pacman)
-- dotnet-host (pacman)
-- dotnet-runtime (pacman)
-- dotnet-sdk (pacman)
-- dotnet-targeting-pack (pacman)
-- Ferdium (AUR)
-- FileZilla (pacman)
-- Fira Code Fonts (pacman)
-- gnome-shell-extension-gsconnect (if GNOME)
-- Google Chrome Browser (AUR)
-- guake (pacman) (if GNOME)
-- gufw (pacman)
-- helm (pacman)
-- Inkscape (pacman)
-- Insomnia Designer (AUR)
-- Insomnia Core (AUR)
-- IntelliJ IDEA Ultimate (Snap)
-- jq (pacman)
-- keditbookmarks (pacman)
-- kubectl (pacman)
-- Libre Office Fresh (pacman)
-- Libre Office Fresh, Norwegian language pack (pacman)
-- Libre Office, Norwegian hyphenation extension (AUR)
-- noson (AUR)
-- Oh My Zsh (shell script)
-- Oh My Zsh plugin: autosuggestions (shell script)
-- Oh My Zsh plugin: syntaxhighlighting (shell script)
-- Oh My Zsh theme: powerlevel10k (shell script)
-- Openlens (AUR)
-- Pamac (pacman)
-- Postman (AUR)
-- Powerline Fonts (pacman)
-- PowerShell (AUR)
-- PyCharm Professional Edition (snap)
-- Snap (pacman)
-- UFW (pacman)
-- Visual Studio Code (Snap)
-- Vivaldi (pacman)
-- Xournal Plus Plus (pacman)
-- Yakuake (pacman) (if KDE)
-- Zsh (pacman) (if KDE (already default in GNOME))
-
 
 ## Utility functions
 
