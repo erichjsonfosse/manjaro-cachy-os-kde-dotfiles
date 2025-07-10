@@ -97,3 +97,4 @@ Enables AUR.
 - One install command per package to avoid failures when packages go missing
 - Password protected ssh keys?
 - Start ssh-agent
+  - Add generated ssh key to agent
