@@ -27,7 +27,7 @@ Dotfiles for Manjaro installations
 
 
 # TODO
-- Starship instead of Powerlevel10k?
+- Starship instead of OMZ and Powerlevel10k?
 - Gum (https://github.com/charmbracelet/gum)
 - Ask which major versions to install for
   - dotnet / aspnet
@@ -42,6 +42,8 @@ Dotfiles for Manjaro installations
 - Colored output for better readability during installation process
 - Move the Oh My Zsh plugin to separate repository?
 - Usermod -> docker group
+- Configure git commit signing
+  - Add allowed_signers to the .ssh folder
 - One install command per package to avoid failures when packages go missing
 - Password protected ssh keys?
 - Use ZSH plugins gpg-agent and ssh-agent

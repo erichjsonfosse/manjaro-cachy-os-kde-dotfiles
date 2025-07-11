@@ -37,7 +37,6 @@ pacman -Sy --noconfirm \
  `# Utilities` \
  curl \
  filezilla \
- gufw \
  gum \
  helm \
  inkscape \
@@ -51,7 +50,6 @@ pacman -Sy --noconfirm \
  snapd \
  squashfuse \
  tinyxxd \
- ufw \
  unzip \
  xclip
 
