@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 {
@@ -34,5 +34,4 @@
   printf "\n"
   printf "##### Onefetch Git repository greeter #####"
   printf "\n"
-} >> "$ZSHRCFILE"
-
+} >> "$ZSHRC_FILE"

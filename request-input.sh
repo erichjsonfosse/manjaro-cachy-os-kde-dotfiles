@@ -1,27 +1,9 @@
-#!/bin/bash
-
-tmpConfigFile="tmpConfigFile.tmp";
+#!/usr/bin/env bash
 
 ######################### Git Config ##########################
-read -rp 'Git Config Name: ' MANJARO_DOTFILES_GITCONFIG_NAME
-read -rp 'Git Config Email: ' MANJARO_DOTFILES_GITCONFIG_EMAIL
+read -rp 'Name for Git Config: ' MANJARO_DOTFILES_GIT_CONFIG_NAME
+read -rp 'Email address for Git Config: ' MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS
 
-echo "MANJARO_DOTFILES_GITCONFIG_NAME=\"$MANJARO_DOTFILES_GITCONFIG_NAME\"" >> $tmpConfigFile
-echo "MANJARO_DOTFILES_GITCONFIG_EMAIL=\"$MANJARO_DOTFILES_GITCONFIG_EMAIL\"" >> $tmpConfigFile
+echo "MANJARO_DOTFILES_GIT_CONFIG_NAME=\"$MANJARO_DOTFILES_GIT_CONFIG_NAME\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
+echo "MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS=\"$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
 ######################### Git Config ##########################
-
-# Ensure .ssh folder exists
-mkdir -p "$HOMEDIR/.ssh"
-
-######################### SSH key files ##########################
-while true; do
-  read -rp "Generate SSH key files? (y/n)" yn
-  case $yn in
-    [Yy]* ) SSHKEYFILENAME="$HOMEDIR/.ssh/id_ed25519" && ssh-keygen -t ed25519 -f "$SSHKEYFILENAME" && chown "$LOGNAME":"$LOGNAME" "$SSHKEYFILENAME" && break;;
-    [Nn]* ) read -rp 'Git Config path to signing key: ' MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY && break;;
-    * ) echo "Please answer yes or no.";;
-  esac
-done
-######################### SSH key files ##########################
-
-echo "MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY=\"$MANJARO_DOTFILES_GITCONFIG_SIGNING_KEY\"" >> $tmpConfigFile

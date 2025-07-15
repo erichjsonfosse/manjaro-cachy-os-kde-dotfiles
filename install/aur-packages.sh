@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Clearing pamac build files cache..."
 pamac clean --build-files --no-confirm

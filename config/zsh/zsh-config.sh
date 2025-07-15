@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Configuring Zsh with Oh My Zsh..."
 ZSH="$HOMEDIR/.oh-my-zsh"
@@ -19,19 +19,19 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH/custom/
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
 
 # Activate theme
-sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRCFILE"
-sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSHRCFILE"
+sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRC_FILE"
+sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSHRC_FILE"
 
 # Activate plugins
-sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRCFILE"
-sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  kubectl\n  manjaro-dotfiles\n  nvm\n  zsh-autosuggestions\n  zsh-syntax-highlighting\n\)" "$ZSHRCFILE"
+sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
+sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  kubectl\n  manjaro-dotfiles\n  nvm\n  zsh-autosuggestions\n  zsh-syntax-highlighting\n\)" "$ZSHRC_FILE"
 
 # Add aliases
-mkdir "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles"
-cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSHFOLDER/custom/plugins/manjaro-dotfiles/"
+mkdir "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles"
+cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Preparing PATH config
 uncommentZshrcPath
 
 # Setting Zsh as shell for user
-chsh -s /bin/zsh $LOGNAME
+chsh -s /bin/zsh "$LOGNAME"

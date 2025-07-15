@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 echo "Updating pacman mirrors..."
@@ -47,6 +47,7 @@ declare -a packages=(
 "make"
 "onefetch"
 "pamac"
+"qbittorrent"
 "shellcheck"
 "snapd"
 "squashfuse"

@@ -28,23 +28,17 @@ Dotfiles for Manjaro installations
 
 # TODO
 - Starship instead of OMZ and Powerlevel10k?
+  - Not until transient prompt is supported for zsh
 - Gum (https://github.com/charmbracelet/gum)
-- Ask which major versions to install for
-  - dotnet / aspnet
-  - Guake / Yakuake
-  - GS Connect / KDE Connect
 - Ask which types of ssh keys to add
-- Install zsh early in the process if it's not already installed
 - Separate user specific config and setup from the rest, and make it available as a final optional step
 - Enable full pre-config support to enable unattended setup
   - Add support for providing config files for which packages to install
 - Add full documentation of the whole process
 - Colored output for better readability during installation process
 - Move the Oh My Zsh plugin to separate repository?
-- Usermod -> docker group
 - Configure git commit signing
   - Add allowed_signers to the .ssh folder
-- One install command per package to avoid failures when packages go missing
 - Password protected ssh keys?
 - Use ZSH plugins gpg-agent and ssh-agent
   - zstyle :omz:plugins:ssh-agent quiet yes

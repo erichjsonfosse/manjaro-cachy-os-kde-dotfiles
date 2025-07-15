@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 {
   printf "\n\n"
@@ -12,4 +12,4 @@
   printf "\n"
   printf "##### nvm init #####"
   printf "\n"
-} >> "$ZSHRCFILE"
+} >> "$ZSHRC_FILE"

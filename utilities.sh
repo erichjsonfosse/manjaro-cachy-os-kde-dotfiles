@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 askForReboot()
 {
@@ -46,22 +46,22 @@ function getMaxKey()
 
 uncommentZshrcPath()
 {
-  if grep -Eqs "^export PATH=(.*)" "$ZSHRCFILE"
+  if grep -Eqs "^export PATH=(.*)" "$ZSHRC_FILE"
   then
     echo ".zshrc PATH already uncommented. skipping...";
   else
-    sed -i '/^\# export PATH=\(.*\)/{p;s//export PATH=\1/;}' "$ZSHRCFILE"
+    sed -i '/^\# export PATH=\(.*\)/{p;s//export PATH=\1/;}' "$ZSHRC_FILE"
   fi
 }
 
 addToZshrcPath()
 {
   uncommentZshrcPath;
-  if grep -Fqs "$1" "$ZSHRCFILE"
+  if grep -Fqs "$1" "$ZSHRC_FILE"
   then
     echo ".zshrc PATH already contains '$1'. skipping...";
   else
-    sed -i "s@^\(export PATH=\)\(.*\)\(:\$PATH\)@\1\2:$1\3@g" "$ZSHRCFILE";
+    sed -i "s@^\(export PATH=\)\(.*\)\(:\$PATH\)@\1\2:$1\3@g" "$ZSHRC_FILE";
   fi
 }
 

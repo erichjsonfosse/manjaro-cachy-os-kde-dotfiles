@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]
   then
@@ -18,10 +18,24 @@ steps=(
 [8]="installSnapPackages"
 [9]="installAurPackages"
 [10]="installAppImages"
-[11]="ensureUserOwnershipOfHomeFolder"
-[12]="bumpVersion"
-[13]="removeTemporaryFiles"
+[11]="configureDocker"
+[12]="configureOnefetch"
+[13]="configureSsh"
+[14]="bumpVersion"
+[15]="postInstall"
+[16]="ensureUserOwnershipOfHomeFolder"
+[17]="removeTemporaryFiles"
 )
+
+includeUtilities()
+{
+  source ./utilities.sh
+}
+
+setVariables()
+{
+  source ./set-variables.sh
+}
 
 doRun()
 {
@@ -71,19 +85,19 @@ chmodScripts()
   chmod +x ./**/*.sh
 }
 
-includeUtilities()
-{
-  source ./utilities.sh
-}
-
-setVariables()
-{
-  source ./set-variables.sh
-}
-
 requestInput()
 {
   source ./request-input.sh
+}
+
+configureZsh()
+{
+  source "$CONFIGDIR/zsh/zsh-config.sh"
+}
+
+configureGit()
+{
+  source "$CONFIGDIR/git/git-config.sh"
 }
 
 installPacmanPackages()
@@ -93,12 +107,12 @@ installPacmanPackages()
 
 configureNvm()
 {
-  source "$CONFIGDIR/nvm-config.sh"
+  source "$CONFIGDIR/nvm/nvm-config.sh"
 }
 
 configurePyenv()
 {
-  source "$CONFIGDIR/pyenv-config.sh"
+  source "$CONFIGDIR/pyenv/pyenv-config.sh"
 }
 
 enableSnapService()
@@ -121,24 +135,31 @@ installAppImages()
   source "$INSTALLDIR/app-images.sh"
 }
 
-configureZsh()
+configureDocker()
 {
-  source "$CONFIGDIR/zsh-config.sh"
+  source "$CONFIGDIR/docker/docker-config.sh"
 }
 
-configureGit()
+configureOnefetch()
 {
-  source "$CONFIGDIR/git-config.sh"
+  source "$CONFIGDIR/onefetch/onefetch-config.sh"
 }
 
 configureSsh()
 {
-  source "$CONFIGDIR/ssh-config.sh"
+  source "$CONFIGDIR/ssh/ssh-config.sh"
 }
 
 bumpVersion()
 {
   source ./bump-version.sh
+}
+
+postInstall()
+{
+  # Order matters
+  source "$CONFIGDIR/ssh/ssh-post-install.sh"
+  source "$CONFIGDIR/git/git-post-install.sh"
 }
 
 ensureUserOwnershipOfHomeFolder()
@@ -150,8 +171,8 @@ ensureUserOwnershipOfHomeFolder()
 
 removeTemporaryFiles()
 {
-  rm -f "RESUME.tmp";
-  rm -f "tmpConfigFile.tmp";
+  rm -f "$RESUME_FILE_NAME";
+  rm -f "$TEMPORARY_CONFIG_FILE_NAME";
 }
 
 while true; do
