@@ -2,3 +2,4 @@
 
 # Add user to docker group
 usermod -aG docker "$LOGNAME"
+askForReboot
