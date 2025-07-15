@@ -2,70 +2,64 @@
 
 
 echo "Updating pacman mirrors..."
-pacman-mirrors -f5
+pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
 echo "Upgrading pacman packages..."
 pacman -Syu --noconfirm
 echo "Pacman packages upgraded"
 
+declare -a packages=(
+# Browsers
+"vivaldi"
+# Development
+"aspnet-runtime"
+"azure-cli"
+"docker"
+"docker-compose"
+"docker-buildx"
+"dotnet-host"
+"dotnet-runtime"
+"dotnet-sdk"
+"dotnet-targeting-pack"
+"nvm"
+"openjdk-src"
+"pyenv"
+# Fonts
+"noto-fonts-emoji"
+"powerline-fonts"
+"ttf-fira-code"
+# Office
+"libreoffice-fresh"
+"libreoffice-fresh-nb"
+"xournalpp"
+# Utilities
+"curl"
+"filezilla"
+"gnome-shell-extension-gsconnect"
+"guake"
+"gum"
+"helm"
+"inkscape"
+"jq"
+"keditbookmarks"
+"kubectl"
+"libpamac-flatpak-plugin"
+"libpamac-snap-plugin"
+"make"
+"onefetch"
+"pamac"
+"shellcheck"
+"snapd"
+"squashfuse"
+"tinyxxd"
+"unzip"
+"xclip"
+)
+
 echo "Installing pacman packages..."
-pacman -Sy --noconfirm \
- `# Browsers` \
- vivaldi \
- `# Development` \
- aspnet-runtime \
- azure-cli \
- docker \
- docker-compose \
- docker-buildx \
- dotnet-host \
- dotnet-runtime \
- dotnet-sdk \
- dotnet-targeting-pack \
- libpamac-flatpak-plugin \
- libpamac-snap-plugin \
- nvm \
- openjdk-src \
- pyenv \
- `# Fonts` \
- noto-fonts-emoji \
- powerline-fonts \
- ttf-fira-code \
- `# Office` \
- libreoffice-fresh \
- libreoffice-fresh-nb \
- xournalpp \
- `# Utilities` \
- curl \
- filezilla \
- gum \
- helm \
- inkscape \
- jq \
- keditbookmarks \
- kubectl \
- make \
- onefetch \
- pamac \
- shellcheck \
- snapd \
- squashfuse \
- tinyxxd \
- unzip \
- xclip
-
-if [ "$XDG_CURRENT_DESKTOP" = 'GNOME' ]
- then
-  pacman -Sy --noconfirm \
-   gnome-shell-extension-gsconnect \
-   guake
-fi
-
-if [ "$XDG_CURRENT_DESKTOP" = 'KDE' ]
- then
-  pacman -Sy --noconfirm \
-   yakuake \
-   zsh
-fi
+for p in "${packages[@]}"
+do
+  pacman -Sy --noconfirm "$p"
+done
 
 
 echo "Pacman packages installed"

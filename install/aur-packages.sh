@@ -1,22 +1,28 @@
 #!/bin/bash
 
 echo "Clearing pamac build files cache..."
-pamac clean --build-files
+pamac clean --build-files --no-confirm
 
 echo "Installing AUR packages..."
 
 #sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
-pamac build --no-confirm \
-  google-chrome \
-  ferdium-bin \
-  hyphen-nb \
-  insomnia-bin \
-  kubent-bin \
-  noson-app \
-  openlens-bin \
-  postman-bin \
-  powershell-bin
+declare -a packages=(
+"google-chrome"
+"ferdium-bin"
+"hyphen-nb"
+"insomnia-bin"
+"kubent-bin"
+"noson-app"
+"openlens-bin"
+"postman-bin"
+"powershell-bin"
+)
+
+for p in "${packages[@]}"
+do
+  pamac build --no-confirm "$p"
+done
 
 
 echo "AUR packages installed"
