@@ -50,8 +50,8 @@ doRun()
     step=$(head -n 1 "$RESUME_FILE_NAME");
   fi
   
-  if [ -f "tmpConfigFile.tmp" ]; then
-    source ./tmpConfigFile.tmp
+  if [ -f "$TEMPORARY_CONFIG_FILE_NAME" ]; then
+    source "$TEMPORARY_CONFIG_FILE_NAME"
   fi
 
   while true; do
