@@ -4,7 +4,7 @@
   printf "\n\n"
   printf "##### nvm init #####"
   printf "\n"
-  printf "[ -z \"%s\" ] && export NVM_DIR=\"%s/.nvm\"" "$NVM_DIR" "$HOME"
+  printf "[ -z \"%s\" ] && export NVM_DIR=\"%s/.nvm\"" "$NVM_DIR" "$HOMEDIR"
   printf "\n"
   printf "source /usr/share/nvm/nvm.sh"
   printf "\n"
