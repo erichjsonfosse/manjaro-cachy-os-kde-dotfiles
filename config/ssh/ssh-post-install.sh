@@ -4,7 +4,7 @@
 while true; do
   read -rp "Generate SSH key files? (y/n)" yn
   case $yn in
-    [Yy]* ) SSH_KEY_FILE="$HOMEDIR/.ssh/id_ed25519" && ssh-keygen -t ed25519 -C "$LOGNAME@$HOST" -f "$SSH_KEY_FILE" && chown "$LOGNAME":"$LOGNAME" "$SSH_KEY_FILE" && break;;
+    [Yy]* ) SSH_KEY_FILE="$HOMEDIR/.ssh/id_ed25519" && ssh-keygen -t ed25519 -C "$LOGNAME@$(hostname)" -f "$SSH_KEY_FILE" && chown "$LOGNAME":"$LOGNAME" "$SSH_KEY_FILE" && break;;
     [Nn]* ) break;;
     * ) echo "Please answer yes or no.";;
   esac
