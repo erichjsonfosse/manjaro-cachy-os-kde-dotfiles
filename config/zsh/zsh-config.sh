@@ -24,17 +24,24 @@ sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSH
 
 # Activate plugins
 sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
-sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  kubectl\n  manjaro-dotfiles\n  nvm\n  zsh-autosuggestions\n  zsh-syntax-highlighting\n\)\n\n# End plugins" "$ZSHRC_FILE"
+sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  kubectl\n  manjaro-dotfiles\n  nvm\n  zsh-autosuggestions\n  zsh-syntax-highlighting\n\)\n\n\# End plugins" "$ZSHRC_FILE"
 
 # Activate agent plugins
-sed -i "s/# End plugins/# End plugins\n\n\n# Agent plugins\nzstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes/" "$ZSHRC_FILE"
+sed -i "s/^\# End plugins/\# End plugins\n\n\n\# Agent plugins\nzstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes/" "$ZSHRC_FILE"
 
 # Add aliases
 mkdir "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles"
 cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
 
+# Edit date format for history command output
+sed -i "/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"
+
 # Preparing PATH config
 uncommentZshrcPath
 
-# Setting Zsh as shell for user
+# Setting Zsh as shell for root and user
+chsh -s /bin/zsh
 chsh -s /bin/zsh "$LOGNAME"
+
+# Copying .zshrc to root home folder
+cp "$HOMEDIR/.zshrc" /root/.zshrc
