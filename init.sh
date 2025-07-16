@@ -23,9 +23,11 @@ steps=(
 [13]="configureNano"
 [14]="configureSsh"
 [15]="bumpVersion"
-[16]="postInstall"
-[17]="ensureUserOwnershipOfHomeFolder"
-[18]="removeTemporaryFiles"
+[16]="postInstallSshConfig"
+[17]="postInstallGitConfig"
+[18]="postInstallZshConfig"
+[19]="ensureUserOwnershipOfHomeFolder"
+[20]="removeTemporaryFiles"
 )
 
 includeUtilities()
@@ -161,11 +163,18 @@ bumpVersion()
   source ./bump-version.sh
 }
 
-postInstall()
+postInstallSshConfig()
 {
-  # Order matters
   source "$CONFIGDIR/ssh/ssh-post-install.sh"
+}
+
+postInstallGitConfig()
+{
   source "$CONFIGDIR/git/git-post-install.sh"
+}
+
+postInstallZshConfig()
+{
   source "$CONFIGDIR/zsh/zsh-post-install.sh"
 }
 
