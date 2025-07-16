@@ -9,16 +9,16 @@ fi
 steps=(
 [0]="chmodScripts"
 [1]="requestInput"
-[2]="configureZsh"
-[3]="configureGit"
-[4]="installPacmanPackages"
-[5]="configureNvm"
-[6]="configurePyenv"
-[7]="enableSnapService"
-[8]="installSnapPackages"
-[9]="installAurPackages"
-[10]="installAppImages"
-[11]="configureDocker"
+[2]="configureGit"
+[3]="installPacmanPackages"
+[4]="configureNvm"
+[5]="configurePyenv"
+[6]="enableSnapService"
+[7]="installSnapPackages"
+[8]="installAurPackages"
+[9]="installAppImages"
+[10]="configureDocker"
+[11]="configureZsh"
 [12]="configureOnefetch"
 [13]="configureSsh"
 [14]="bumpVersion"
@@ -90,11 +90,6 @@ requestInput()
   source ./request-input.sh
 }
 
-configureZsh()
-{
-  source "$CONFIGDIR/zsh/zsh-config.sh"
-}
-
 configureGit()
 {
   source "$CONFIGDIR/git/git-config.sh"
@@ -140,6 +135,11 @@ configureDocker()
   source "$CONFIGDIR/docker/docker-config.sh"
 }
 
+configureZsh()
+{
+  source "$CONFIGDIR/zsh/zsh-config.sh"
+}
+
 configureOnefetch()
 {
   source "$CONFIGDIR/onefetch/onefetch-config.sh"
@@ -160,6 +160,7 @@ postInstall()
   # Order matters
   source "$CONFIGDIR/ssh/ssh-post-install.sh"
   source "$CONFIGDIR/git/git-post-install.sh"
+  source "$CONFIGDIR/zsh/zsh-post-install.sh"
 }
 
 ensureUserOwnershipOfHomeFolder()

@@ -31,7 +31,7 @@ sed -i "s/^\# End plugins/\# End plugins\n\n\n\# Agent plugins\nzstyle :omz:plug
 
 # Add aliases
 mkdir "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles"
-cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
+cp -rf "$ZSHPLUGINDIR/*" "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
 
 # Edit date format for history command output
 sed -i "/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"
@@ -42,6 +42,3 @@ uncommentZshrcPath
 # Setting Zsh as shell for root and user
 chsh -s /bin/zsh
 chsh -s /bin/zsh "$LOGNAME"
-
-# Copying .zshrc to root home folder
-cp "$HOMEDIR/.zshrc" /root/.zshrc
