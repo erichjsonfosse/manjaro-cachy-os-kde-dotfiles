@@ -22,8 +22,9 @@ Dotfiles for Manjaro installations
 - tl - shows list of tags
 
 ## Config
-- SSH - ServerAliveInterval 60 (not yet implemented)
-- SSH - ServerAliveCountMax 2 (not yet implemented)
+- SSH - AddKeysToAgent yes
+- SSH - ServerAliveInterval 60
+- SSH - ServerAliveCountMax 2
 
 
 # TODO
