@@ -20,11 +20,12 @@ steps=(
 [10]="configureNvm"
 [11]="configurePyenv"
 [12]="configureOnefetch"
-[13]="configureSsh"
-[14]="bumpVersion"
-[15]="postInstall"
-[16]="ensureUserOwnershipOfHomeFolder"
-[17]="removeTemporaryFiles"
+[13]="configureNano"
+[14]="configureSsh"
+[15]="bumpVersion"
+[16]="postInstall"
+[17]="ensureUserOwnershipOfHomeFolder"
+[18]="removeTemporaryFiles"
 )
 
 includeUtilities()
@@ -143,6 +144,11 @@ configurePyenv()
 configureOnefetch()
 {
   source "$CONFIGDIR/onefetch/onefetch-config.sh"
+}
+
+configureNano()
+{
+  source "$CONFIGDIR/nano/nano-config.sh"
 }
 
 configureSsh()
