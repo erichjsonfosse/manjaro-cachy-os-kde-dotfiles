@@ -11,14 +11,14 @@ steps=(
 [1]="requestInput"
 [2]="configureGit"
 [3]="installPacmanPackages"
-[4]="configureNvm"
-[5]="configurePyenv"
-[6]="enableSnapService"
-[7]="installSnapPackages"
-[8]="installAurPackages"
-[9]="installAppImages"
-[10]="configureDocker"
-[11]="configureZsh"
+[4]="enableSnapService"
+[5]="installSnapPackages"
+[6]="installAurPackages"
+[7]="installAppImages"
+[8]="configureDocker"
+[9]="configureZsh"
+[10]="configureNvm"
+[11]="configurePyenv"
 [12]="configureOnefetch"
 [13]="configureSsh"
 [14]="bumpVersion"
@@ -100,16 +100,6 @@ installPacmanPackages()
   source "$INSTALLDIR/pacman-packages.sh"
 }
 
-configureNvm()
-{
-  source "$CONFIGDIR/nvm/nvm-config.sh"
-}
-
-configurePyenv()
-{
-  source "$CONFIGDIR/pyenv/pyenv-config.sh"
-}
-
 enableSnapService()
 {
   source "$INSTALLDIR/enable-snap-service.sh"
@@ -138,6 +128,16 @@ configureDocker()
 configureZsh()
 {
   source "$CONFIGDIR/zsh/zsh-config.sh"
+}
+
+configureNvm()
+{
+  source "$CONFIGDIR/nvm/nvm-config.sh"
+}
+
+configurePyenv()
+{
+  source "$CONFIGDIR/pyenv/pyenv-config.sh"
 }
 
 configureOnefetch()
