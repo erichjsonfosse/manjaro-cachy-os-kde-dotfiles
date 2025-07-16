@@ -26,6 +26,7 @@ steps=(
 [16]="postInstall"
 [17]="ensureUserOwnershipOfHomeFolder"
 [18]="removeTemporaryFiles"
+[19]="runZshToTriggerP10kConfig"
 )
 
 includeUtilities()
@@ -180,6 +181,11 @@ removeTemporaryFiles()
 {
   rm -f "$RESUME_FILE_NAME";
   rm -f "$TEMPORARY_CONFIG_FILE_NAME";
+}
+
+runZshToTriggerP10kConfig()
+{
+  zsh
 }
 
 while true; do
