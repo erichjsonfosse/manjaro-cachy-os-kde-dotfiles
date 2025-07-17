@@ -3,5 +3,4 @@
 
 source "${0:A:h}"/aliases.zsh
 source "${0:A:h}"/git.zsh
-source "${0:A:h}"/keychain.zsh
 source "${0:A:h}"/uuid.zsh
