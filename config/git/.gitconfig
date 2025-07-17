@@ -6,7 +6,6 @@
 	default = simple
 [alias]
 	last = log -1 --stat
-	tch = rev-list --abbrev-commit -n1
 	tl = "for-each-ref --sort=v:tag --format '%(refname:strip=2) - (%(objectname:short)) - %(*objectname:short) - %(subject) - %(taggerdate)' refs/tags"
 [core]
 	editor = nano

@@ -8,9 +8,7 @@ Dotfiles for Manjaro installations
 | Name                            | Description                                    | Usage                                            |
 |---------------------------------|------------------------------------------------|--------------------------------------------------|
 | getlatesttag                    | Returns latest git tag for a given repositotry | getlatesttag https://github.com/nvm-sh/nvm       |
-| gitcanhas (not yet implemented) | Clones given repository into given folder      | gitcanhas https://github.com/nvm-sh/nvm          |
 | hextouuid                       | Converts hexadecimal string into a uuid string | `hextouuid 9CE4F1095C05422CB261AAAAE2F04476`     |
-| icanhas (not yet implemented)   | Installs package                               | icanhas htop                                     |
 | uuidtohex                       | Converts uuid string into hexadecimal string   | `uuidtohex ade75aee-69ce-41e3-88ea-048124776ca1` |
 
 
@@ -20,11 +18,6 @@ Dotfiles for Manjaro installations
 ## Git Aliases
 - last - shows last log entry
 - tl - shows list of tags
-
-## Config
-- SSH - AddKeysToAgent yes
-- SSH - ServerAliveInterval 60
-- SSH - ServerAliveCountMax 2
 
 
 # TODO
