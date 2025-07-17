@@ -47,6 +47,7 @@ declare -a packages=(
 "make"
 "onefetch"
 "pamac"
+"pkgfile"
 "qbittorrent"
 "shellcheck"
 "snapd"
