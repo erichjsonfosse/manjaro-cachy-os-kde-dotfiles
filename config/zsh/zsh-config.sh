@@ -26,6 +26,9 @@ sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSH
 sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
 sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-dotfiles\n  nvm\n  qrcode\n  ssh-agent\n  sudo\n  zsh-autosuggestions\n  zsh-syntax-highlighting\n\)\n\n\# End plugins" "$ZSHRC_FILE"
 
+# Configure plugins
+sed -i "s/^\# End plugins/\# End plugins\n\n\n\# Agent plugins\nzstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes/" "$ZSHRC_FILE"
+
 # Add aliases
 mkdir "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles"
 cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
