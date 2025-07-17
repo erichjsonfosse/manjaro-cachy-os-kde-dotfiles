@@ -24,10 +24,10 @@ Dotfiles for Manjaro installations
 - Starship instead of OMZ and Powerlevel10k?
   - Not until transient prompt is supported for zsh
 - Gum for dotfile scripts? (https://github.com/charmbracelet/gum)
+  - Colored output for better readability during installation process 
 - Separate user specific config and setup from the rest, and make it available as a final optional step
 - Add full pre-config support to enable unattended setup
   - Add support for providing config files for which packages to install
 - Add full documentation of the whole process
-- Colored output for better readability during installation process
-- Move the Oh My Zsh plugin to separate repository?
 - Log errors, and give summary at end of installation
+  - Support for debug logging?
