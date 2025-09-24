@@ -21,6 +21,7 @@ Dotfiles for Manjaro installations
 
 
 # TODO
+- Git Credentials Manager
 - Starship instead of OMZ and Powerlevel10k?
   - Not until transient prompt is supported for zsh
 - Gum for dotfile scripts? (https://github.com/charmbracelet/gum)
