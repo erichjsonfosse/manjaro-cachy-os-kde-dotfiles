@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]
   then
@@ -6,166 +6,180 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
-doRun()
-{
-  filename="RESUME.tmp"
-  if [ ! -f "$filename" ]; then
-    setStep 0;
-  fi
-  
-  if [ -f "tmpConfigFile.tmp" ]; then
-    source ./tmpConfigFile.tmp
-  fi
-  
-  step=$(head -n 1 $filename);
-  
-  chmodScripts;
-  
-  setVariables;
-  
-  if [ $step -lt 3 ]; then
-    requestInput;
-  fi
-  
-  if [ $step -lt 4 ]; then
-    installPackmanPackages;
-  fi
-  
-  if [ $step -lt 5 ]; then
-    enableSnapService;
-  fi
-  
-  if [ $step -lt 6 ]; then
-    installSnapPackages;
-  fi
-  
-  if [ $step -lt 7 ]; then
-    installAurPackages;
-  fi
-  
-  if [ $step -lt 8 ]; then
-    installAppImages;
-  fi
-  
-  if [ $step -lt 9 ]; then
-    configureUfw;
-  fi
-  
-  if [ $step -lt 10 ]; then
-    configureZsh;
-  fi
-  
-  if [ $step -lt 11 ]; then
-    configureGit;
-  fi
-  
-  if [ $step -lt 12 ]; then
-    configureSsh;
-  fi
-  
-  if [ $step -lt 13 ]; then
-    bumpVersion;
-  fi
-  
-  if [ $step -lt 14 ]; then
-    configureSsh;
-  fi
-  
-  if [ $step -lt 15 ]; then
-    removeTemporaryFiles;
-  fi
-}
+steps=(
+[0]="chmodScripts"
+[1]="requestInput"
+[2]="configureGit"
+[3]="installPacmanPackages"
+[4]="enableSnapService"
+[5]="installSnapPackages"
+[6]="installAurPackages"
+[7]="installAppImages"
+[8]="configureDocker"
+[9]="configureZsh"
+[10]="configureNvm"
+[11]="configurePyenv"
+[12]="configureOnefetch"
+[13]="configureNano"
+[14]="configureSsh"
+[15]="bumpVersion"
+[16]="postInstallSshConfig"
+[17]="postInstallGitConfig"
+[18]="postInstallZshConfig"
+[19]="ensureUserOwnershipOfHomeFolder"
+[20]="removeTemporaryFiles"
+)
 
-setStep()
+includeUtilities()
 {
-  filename="RESUME.tmp";
-  rm -f $filename;
-  echo $1 > $filename;
-}
-
-chmodScripts()
-{
-  setStep 1;
-  chmod +x ./*.sh
-  chmod +x ./install/*.sh
-  chmod +x ./config/*.sh
+  source ./utilities.sh
 }
 
 setVariables()
 {
-  setStep 2;
   source ./set-variables.sh
+}
+
+doRun()
+{
+  includeUtilities;
+  setVariables;
+
+  if [ ! -f "$RESUME_FILE_NAME" ]; then
+    step=0;
+    setStep "$step";
+  else
+    step=$(head -n 1 "$RESUME_FILE_NAME");
+  fi
+  
+  if [ -f "$TEMPORARY_CONFIG_FILE_NAME" ]; then
+    source "$TEMPORARY_CONFIG_FILE_NAME"
+  fi
+
+  while true; do
+    runStep "$step";
+    
+    maxKey=$(getMaxKey "${steps[@]}")
+    
+    if [ $(("$step")) -ge $(("$maxKey")) ]; then
+      break;
+    fi
+    
+    step=$(head -n 1 "$RESUME_FILE_NAME");
+  done
+}
+
+runStep()
+{
+  echo "Running step $1 (${steps[$1]})";
+  setStep $(($1 + 1))
+  eval "${steps[$1]}"
+}
+
+setStep()
+{
+  rm -f "$RESUME_FILE_NAME";
+  touch "$RESUME_FILE_NAME";
+  echo $1 > "$RESUME_FILE_NAME";
+}
+
+chmodScripts()
+{
+  chmod +x ./**/*.sh
 }
 
 requestInput()
 {
-  setStep 3;
   source ./request-input.sh
-}
-
-installPackmanPackages()
-{
-  setStep 4;
-  source ./install/pacman-packages.sh
-}
-
-enableSnapService()
-{
-  setStep 5;
-  source ./install/enable-snap-service.sh
-}
-
-installSnapPackages()
-{
-  setStep 6;
-  source ./install/snap-packages.sh
-}
-
-installAurPackages()
-{
-  setStep 7;
-#  source ./install/aur-packages.sh
-}
-
-installAppImages()
-{
-  setStep 8;
-  source ./install/app-images.sh
-}
-
-configureUfw()
-{
-  setStep 9;
-  source ./config/ufw-config.sh
-}
-
-configureZsh()
-{
-  setStep 10;
-  source ./config/zsh-config.sh
 }
 
 configureGit()
 {
-  setStep 11;
-  source ./config/git-config.sh
+  source "$CONFIGDIR/git/git-config.sh"
+}
+
+installPacmanPackages()
+{
+  source "$INSTALLDIR/pacman-packages.sh"
+}
+
+enableSnapService()
+{
+  source "$INSTALLDIR/enable-snap-service.sh"
+}
+
+installSnapPackages()
+{
+  source "$INSTALLDIR/snap-packages.sh"
+}
+
+installAurPackages()
+{
+  source "$INSTALLDIR/aur-packages.sh"
+}
+
+installAppImages()
+{
+  source "$INSTALLDIR/app-images.sh"
+}
+
+configureDocker()
+{
+  source "$CONFIGDIR/docker/docker-config.sh"
+}
+
+configureZsh()
+{
+  source "$CONFIGDIR/zsh/zsh-config.sh"
+}
+
+configureNvm()
+{
+  source "$CONFIGDIR/nvm/nvm-config.sh"
+}
+
+configurePyenv()
+{
+  source "$CONFIGDIR/pyenv/pyenv-config.sh"
+}
+
+configureOnefetch()
+{
+  source "$CONFIGDIR/onefetch/onefetch-config.sh"
+}
+
+configureNano()
+{
+  source "$CONFIGDIR/nano/nano-config.sh"
 }
 
 configureSsh()
 {
-  setStep 12;
-  source ./config/ssh-config.sh
+  source "$CONFIGDIR/ssh/ssh-config.sh"
 }
 
 bumpVersion()
 {
-  setStep 13;
   source ./bump-version.sh
 }
 
-configureSsh()
+postInstallSshConfig()
 {
-  setStep 14;
+  source "$CONFIGDIR/ssh/ssh-post-install.sh"
+}
+
+postInstallGitConfig()
+{
+  source "$CONFIGDIR/git/git-post-install.sh"
+}
+
+postInstallZshConfig()
+{
+  source "$CONFIGDIR/zsh/zsh-post-install.sh"
+}
+
+ensureUserOwnershipOfHomeFolder()
+{
   # Change ownership of home folder files recursively
   echo "Changing ownership of home folder..."
   chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR"
@@ -173,16 +187,15 @@ configureSsh()
 
 removeTemporaryFiles()
 {
-  setStep 15;
-  rm -f "RESUME.tmp";
-  rm -f "tmpConfigFile.tmp";
+  rm -f "$RESUME_FILE_NAME";
+  rm -f "$TEMPORARY_CONFIG_FILE_NAME";
 }
 
 while true; do
-  read -rp "Continue with installation? (y/n)" yn
-  case $yn in
-    [Yy]* ) doRun; break;;
-    [Nn]* ) exit;;
-    * ) echo "Please answer yes or no.";;
-  esac
+ read -rp "Continue with installation? (y/n)" yn
+ case $yn in
+   [Yy]* ) doRun; break;;
+   [Nn]* ) exit;;
+   * ) echo "Please answer yes or no.";;
+ esac
 done

@@ -1,15 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Installing Snap packages..."
 
 ln -s /var/lib/snapd/snap /snap
 
-snap install code --classic
-snap install datagrip --classic
-snap install intellij-idea-ultimate --classic
-snap install pycharm-professional --classic
-snap install rider --classic
-snap install storage-explorer
+declare -a packages=(
+"storage-explorer"
+)
 
+declare -a classicPackages=(
+"code"
+"datagrip"
+"intellij-idea-ultimate"
+"pycharm-professional"
+"rider"
+)
+
+for p in "${packages[@]}"
+do
+  snap install "$p"
+done
+
+for p in "${classicPackages[@]}"
+do
+  snap install "$p" --classic
+done
 
 echo "Snap packages installed"

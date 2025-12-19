@@ -1,17 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ######################### Directories ##########################
-BASEDIR=$(dirname "$0")
+BASEDIR=$(realpath "$0" | sed 's|\(.*\)/.*|\1|')
 export BASEDIR
 
 CONFIGDIR="$BASEDIR/config"
 export CONFIGDIR
-ALIASESDIR="$CONFIGDIR/aliases"
-export ALIASESDIR
+
+ZSHPLUGINDIR="$CONFIGDIR/zsh/zsh-plugin"
+export ZSHPLUGINDIR
 
 INSTALLDIR="$BASEDIR/install"
 export INSTALLDIR
 ######################### Directories ##########################
+
+######################### Files ##########################
+RESUME_FILE_NAME="RESUME.tmp"
+export RESUME_FILE_NAME
+
+TEMPORARY_CONFIG_FILE_NAME="TEMPORARY_CONFIG_FILE.tmp";
+export  TEMPORARY_CONFIG_FILE_NAME
+######################### Files ##########################
 
 ######################### HOMEDIR ##########################
 LOGNAME=$(logname)
@@ -23,10 +32,10 @@ export HOMEDIR
 APP_IMAGE_DIR="$HOMEDIR/Applications"
 export APP_IMAGE_DIR
 
-GITCONFIGFILE="$HOMEDIR/.gitconfig"
-export GITCONFIGFILE
+GIT_CONFIG_FILE="$HOMEDIR/.gitconfig"
+export GIT_CONFIG_FILE
 
-OHMYZSHFOLDER="$HOMEDIR/.oh-my-zsh"
-export OHMYZSHFOLDER
-ZSHRCFILE="$HOMEDIR/.zshrc"
-export ZSHRCFILE
+OHMYZSH_FOLDER="$HOMEDIR/.oh-my-zsh"
+export OHMYZSH_FOLDER
+ZSHRC_FILE="$HOMEDIR/.zshrc"
+export ZSHRC_FILE

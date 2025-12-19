@@ -1,17 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Enabling snap service..."
 
-# Enabling Service
-systemctl enable --now snapd.socket
-systemctl enable --now snapd.service
+startServiceAndWaitUntilItIsRunning "snapd.service" 5
+startServiceAndWaitUntilItIsRunning "snapd.socket" 5
 
-while true; do
-  read -rp "Reboot (recommended)? (y/n)" yn
-  case $yn in
-    [Yy]* ) reboot; exit;;
-    [Nn]* ) break;;
-    * ) echo "Please answer yes or no.";;
-  esac
-done
-
+askForReboot

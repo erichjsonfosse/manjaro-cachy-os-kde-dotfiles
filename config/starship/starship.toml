@@ -1,0 +1,186 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+### Symbols ###
+#### General ####
+#     ▶  󰌾
+#### General ####
+#### Directory ####
+# 󰈙  󰝚  󰲋
+#### Directory ####
+#### OS ####
+#  󰕈  󰐿 󰣭 󰀵  󰌽 󰣨 󰣛    󰣇  󰣚 󱄛
+#### OS ####
+#### Dev stuff ####
+#            
+#### Dev stuff ####
+### Symbols ###
+
+format = """
+$os\
+[](bg:blue_clr fg:white)\
+$username\
+[](bg:peach_clr fg:prev_bg)\
+$directory\
+[](bg:yellow_clr fg:prev_bg)\
+$git_branch\
+$git_status\
+[](bg:sapphire_clr fg:prev_bg)\
+$package\
+[](bg:green_clr fg:prev_bg)\
+$nodejs\
+$php\
+[](fg:prev_bg)\
+$line_break\
+"""
+
+right_format="""
+$character\
+[](fg:yellow_clr)\
+$cmd_duration\
+[](bg:prev_fg fg:lavender_clr)\
+$time
+"""
+
+continuation_prompt = "▶▶ "
+
+palette = "catppuccin_mocha"
+
+### General ###
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+format = "[ $path ]($style)"
+style = "bg:peach_clr fg:text_clr"
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"projects" = "󰲋 "
+
+[package]
+disabled = false
+
+[time]
+format = "[ $time  ]($style)"
+time_format = "%T"
+style = "bg:lavender_clr fg:text_clr"
+disabled = false
+
+[line_break]
+disabled = true
+
+[character]
+disabled = false
+success_symbol = "[❯](bold fg:green_clr)"
+error_symbol = "[❯](bold fg:red_clr)"
+
+[cmd_duration]
+min_time = 3000
+show_milliseconds = true
+format = "[ $duration  ]($style)"
+style = "bg:yellow_clr fg:text_clr"
+disabled = false
+show_notifications = true
+
+### General ###
+
+### OS ###
+
+[os]
+format = "[ $symbol ]($style)"
+style = "bg:white fg:text_clr"
+disabled = false
+
+[os.symbols]
+Windows = ""
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+### OS ###
+
+### Username ###
+
+[username]
+style_root = "bg:blue_clr fg:text_red_clr bold"
+style_user = "bg:blue_clr fg:text_clr"
+format = "[ $user ]($style)"
+show_always = true
+
+### Username ###
+
+### Git stuff ###
+
+[git_branch]
+format = "[ $symbol $branch ]($style)"
+symbol = ""
+style = "bg:yellow_clr fg:text_clr"
+
+[git_status]
+format = "[($all_status$ahead_behind )]($style)"
+style = "bg:yellow_clr fg:text_clr"
+
+### Git stuff ###
+
+### Developer tools ###
+
+[nodejs]
+symbol = ""
+style = "bg:green_clr fg:text_clr"
+format = "[ $symbol $version ]($style)"
+
+[php]
+symbol = ""
+style = "bg:green_clr fg:text_clr"
+format = "[ $symbol $version ]($style)"
+
+[java]
+symbol = ""
+style = "bg:green_clr fg:text_clr"
+format = "[ $symbol $version ]($style)"
+
+[kotlin]
+symbol = ""
+style = "bg:green_clr fg:text_clr"
+format = "[ $symbol $version ]($style)"
+
+[python]
+symbol = ""
+style = "bg:green_clr fg:text_clr"
+format = '[ $symbol $version(\(#$virtualenv\)) ]($style)'
+
+### Developer tools ###
+
+### Palettes ###
+
+[palettes.catppuccin_mocha]
+red_clr = "#f38ba8"
+peach_clr = "#fab387"
+yellow_clr = "#f9e2af"
+green_clr = "#a6e3a1"
+sapphire_clr = "#74c7ec"
+blue_clr = "#89b4fa"
+lavender_clr = "#b4befe"
+text_clr = "#11111b"
+text_red_clr = "#f80505"
+
+### Palettes ###
