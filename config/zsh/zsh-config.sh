@@ -30,8 +30,7 @@ sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docke
 sed -i "s/^\# End plugins/\# End plugins\n\n\n\# Agent plugins\nzstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes/" "$ZSHRC_FILE"
 
 # Add aliases
-mkdir "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles"
-cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/manjaro-dotfiles/"
+cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
 sed -i "/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"

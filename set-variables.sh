@@ -7,7 +7,7 @@ export BASEDIR
 CONFIGDIR="$BASEDIR/config"
 export CONFIGDIR
 
-ZSHPLUGINDIR="$CONFIGDIR/zsh/zsh-plugin"
+ZSHPLUGINDIR="$CONFIGDIR/zsh/plugins"
 export ZSHPLUGINDIR
 
 INSTALLDIR="$BASEDIR/install"

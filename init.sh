@@ -17,17 +17,16 @@ steps=(
 [7]="installAppImages"
 [8]="configureDocker"
 [9]="configureZsh"
-[10]="configureNvm"
-[11]="configurePyenv"
-[12]="configureOnefetch"
-[13]="configureNano"
-[14]="configureSsh"
-[15]="bumpVersion"
-[16]="postInstallSshConfig"
-[17]="postInstallGitConfig"
-[18]="postInstallZshConfig"
-[19]="ensureUserOwnershipOfHomeFolder"
-[20]="removeTemporaryFiles"
+[10]="configurePyenv"
+[11]="configureOnefetch"
+[12]="configureNano"
+[13]="configureSsh"
+[14]="bumpVersion"
+[15]="postInstallSshConfig"
+[16]="postInstallGitConfig"
+[17]="postInstallZshConfig"
+[18]="ensureUserOwnershipOfHomeFolder"
+[19]="removeTemporaryFiles"
 )
 
 includeUtilities()
@@ -51,20 +50,20 @@ doRun()
   else
     step=$(head -n 1 "$RESUME_FILE_NAME");
   fi
-  
+
   if [ -f "$TEMPORARY_CONFIG_FILE_NAME" ]; then
     source "$TEMPORARY_CONFIG_FILE_NAME"
   fi
 
   while true; do
     runStep "$step";
-    
+
     maxKey=$(getMaxKey "${steps[@]}")
-    
+
     if [ $(("$step")) -ge $(("$maxKey")) ]; then
       break;
     fi
-    
+
     step=$(head -n 1 "$RESUME_FILE_NAME");
   done
 }
@@ -131,11 +130,6 @@ configureDocker()
 configureZsh()
 {
   source "$CONFIGDIR/zsh/zsh-config.sh"
-}
-
-configureNvm()
-{
-  source "$CONFIGDIR/nvm/nvm-config.sh"
 }
 
 configurePyenv()
