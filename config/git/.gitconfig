@@ -7,6 +7,7 @@
 [alias]
 	last = log -1 --stat
 	tl = "for-each-ref --sort=v:tag --format '%(refname:strip=2) - (%(objectname:short)) - %(*objectname:short) - %(subject) - %(taggerdate)' refs/tags"
+	trace = log --graph --decorate --oneline --all
 [core]
 	editor = nano
 [pull]
