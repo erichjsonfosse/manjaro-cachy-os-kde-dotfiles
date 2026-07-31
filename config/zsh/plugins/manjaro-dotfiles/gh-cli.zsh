@@ -16,6 +16,7 @@ gh-cli-get-pr-review-comments() {
         reviewThreads(first: 100) {
           nodes {
             isResolved
+            path
             comments(first: 1) {
               nodes {
                 author { login }
@@ -27,5 +28,5 @@ gh-cli-get-pr-review-comments() {
         }
       }
     }
-  }' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .comments.nodes[0] | "[\(.author.login)] \(.url)\n\(.body)\n"'
+  }' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | "File: \(.path)\n[\(.comments.nodes[0].author.login)] \(.comments.nodes[0].url)\n\(.comments.nodes[0].body)\n"'
 }
