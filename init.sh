@@ -6,27 +6,31 @@ if [ "$EUID" -ne 0 ]
     exit
 fi
 
+if ! command -v gum &> /dev/null; then
+    echo "gum could not be found, installing it..."
+    pacman -S --needed --noconfirm gum
+fi
+
 steps=(
 [0]="chmodScripts"
 [1]="requestInput"
 [2]="configureGit"
 [3]="installPacmanPackages"
-[4]="enableSnapService"
-[5]="installSnapPackages"
-[6]="installAurPackages"
-[7]="installAppImages"
-[8]="configureDocker"
-[9]="configureZsh"
-[10]="configurePyenv"
-[11]="configureOnefetch"
-[12]="configureNano"
-[13]="configureSsh"
-[14]="bumpVersion"
-[15]="postInstallSshConfig"
-[16]="postInstallGitConfig"
-[17]="postInstallZshConfig"
-[18]="ensureUserOwnershipOfHomeFolder"
-[19]="removeTemporaryFiles"
+[4]="installAurPackages"
+[5]="installAppImages"
+[6]="configureDocker"
+[7]="configureZsh"
+[8]="configurePyenv"
+[9]="configureOnefetch"
+[10]="configureNano"
+[11]="configureSsh"
+[12]="bumpVersion"
+[13]="postInstallSshConfig"
+[14]="postInstallGitConfig"
+[15]="postInstallZshConfig"
+[16]="configureVivaldi"
+[17]="ensureUserOwnershipOfHomeFolder"
+[18]="removeTemporaryFiles"
 )
 
 includeUtilities()
@@ -70,21 +74,20 @@ doRun()
 
 runStep()
 {
-  echo "Running step $1 (${steps[$1]})";
   setStep $(($1 + 1))
-  eval "${steps[$1]}"
+  gum spin --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables ${steps[$1]}); includeUtilities; setVariables; ${steps[$1]}"
 }
 
 setStep()
 {
   rm -f "$RESUME_FILE_NAME";
   touch "$RESUME_FILE_NAME";
-  echo $1 > "$RESUME_FILE_NAME";
+  echo "$1" > "$RESUME_FILE_NAME";
 }
 
 chmodScripts()
 {
-  chmod +x ./**/*.sh
+  find . -type f -name "*.sh" -exec chmod +x {} +
 }
 
 requestInput()
@@ -100,16 +103,6 @@ configureGit()
 installPacmanPackages()
 {
   source "$INSTALLDIR/pacman-packages.sh"
-}
-
-enableSnapService()
-{
-  source "$INSTALLDIR/enable-snap-service.sh"
-}
-
-installSnapPackages()
-{
-  source "$INSTALLDIR/snap-packages.sh"
 }
 
 installAurPackages()
@@ -172,6 +165,11 @@ postInstallZshConfig()
   source "$CONFIGDIR/zsh/zsh-post-install.sh"
 }
 
+configureVivaldi()
+{
+  source "$CONFIGDIR/vivaldi/vivaldi-config.sh"
+}
+
 ensureUserOwnershipOfHomeFolder()
 {
   # Change ownership of home folder files recursively
@@ -185,11 +183,8 @@ removeTemporaryFiles()
   rm -f "$TEMPORARY_CONFIG_FILE_NAME";
 }
 
-while true; do
- read -rp "Continue with installation? (y/n)" yn
- case $yn in
-   [Yy]* ) doRun; break;;
-   [Nn]* ) exit;;
-   * ) echo "Please answer yes or no.";;
- esac
-done
+if gum confirm "Continue with installation?"; then
+  doRun
+else
+  exit
+fi

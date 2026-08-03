@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
+######################### OS Information #########################
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  OS_ID=$ID
+else
+  OS_ID="unknown"
+fi
+export OS_ID
+######################### OS Information #########################
+
 ######################### Directories ##########################
-BASEDIR=$(realpath "$0" | sed 's|\(.*\)/.*|\1|')
+BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export BASEDIR
 
 CONFIGDIR="$BASEDIR/config"

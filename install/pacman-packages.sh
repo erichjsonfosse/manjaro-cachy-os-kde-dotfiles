@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 
-echo "Updating pacman mirrors..."
-pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
+if [ "$OS_ID" = "manjaro" ]; then
+  echo "Updating pacman mirrors..."
+  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
+fi
+
 echo "Upgrading pacman packages..."
 pacman -Syu --noconfirm
 echo "Pacman packages upgraded"
@@ -13,9 +16,10 @@ declare -a packages=(
 # Development
 "aspnet-runtime"
 "azure-cli"
+"code"
 "docker"
-"docker-compose"
 "docker-buildx"
+"docker-compose"
 "dotnet-host"
 "dotnet-runtime"
 "dotnet-sdk"
@@ -30,6 +34,7 @@ declare -a packages=(
 # Office
 "libreoffice-fresh"
 "libreoffice-fresh-nb"
+"obsidian"
 "xournalpp"
 # Utilities
 "curl"
@@ -40,28 +45,34 @@ declare -a packages=(
 "helm"
 "inkscape"
 "jq"
-"keditbookmarks"
 "kubectl"
-"libpamac-flatpak-plugin"
-"libpamac-snap-plugin"
 "make"
 "onefetch"
-"pamac"
 "pkgfile"
 "qbittorrent"
 "shellcheck"
-"snapd"
 "squashfuse"
 "tinyxxd"
 "unzip"
 "xclip"
+"zsh"
+"zsh-autosuggestions"
+"zsh-syntax-highlighting"
 )
 
+if [ "$OS_ID" = "manjaro" ]; then
+  packages+=(
+    "libpamac-flatpak-plugin"
+    "libpamac-snap-plugin"
+    "pamac"
+  )
+elif [ "$OS_ID" = "cachyos" ]; then
+  echo "Removing CachyOS Zsh defaults..."
+  pacman -Rns --noconfirm cachyos-zsh-config || true
+fi
+
 echo "Installing pacman packages..."
-for p in "${packages[@]}"
-do
-  pacman -Sy --noconfirm "$p"
-done
+pacman -S --needed --noconfirm "${packages[@]}"
 
 
 echo "Pacman packages installed"

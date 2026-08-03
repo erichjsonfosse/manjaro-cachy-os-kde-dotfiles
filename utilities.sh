@@ -2,14 +2,10 @@
 
 askForReboot()
 {
-  while true; do
-    read -rp "Reboot (recommended)? (y/n)" yn
-    case $yn in
-      [Yy]* ) reboot; exit;;
-      [Nn]* ) break;;
-      * ) echo "Please answer yes or no.";;
-    esac
-  done
+  if gum confirm "Reboot (recommended)?"; then
+    reboot
+    exit
+  fi
 }
 
 # Takes two arguments
@@ -17,17 +13,15 @@ askForReboot()
 # Second is period to wait after attempting to wait for service (not all services properly report)
 startServiceAndWaitUntilItIsRunning()
 {
-  isActive=$(systemctl status "$1" | grep "Active: active (running)\|Active: active (listening)")
-  systemctl enable --now $1
+  systemctl enable --now "$1"
 
-  while [ -z "$isActive" ] ; do
+  while ! systemctl is-active --quiet "$1"; do
     echo "Waiting for $1 to become active"
     sleep 3
-    isActive=$(systemctl status "$1" | grep "Active: active (running)\|Active: active (listening)")
   done
 
-  if [ ! -z "$2" ]; then
-    sleep $(($2))
+  if [ -n "$2" ]; then
+    sleep $(("$2"))
   fi
 }
 
