@@ -14,7 +14,9 @@ rm -f ./install-ohmyzsh.sh
 
 
 # Oh My Zsh Theme (Powerlevel10k)
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
+if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
+fi
 
 # Activate theme
 sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRC_FILE"
@@ -24,16 +26,20 @@ sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSH
 sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
 sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins" "$ZSHRC_FILE"
 
-# Add aliases
-cp -rf "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
+# Add aliases (using symlinks)
+ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
 sed -i "/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"
 
 # Source Arch system packages for zsh plugins
-echo "" >> "$ZSHRC_FILE"
-echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> "$ZSHRC_FILE"
-echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> "$ZSHRC_FILE"
+if ! grep -q "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" "$ZSHRC_FILE"; then
+  echo "" >> "$ZSHRC_FILE"
+  echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> "$ZSHRC_FILE"
+fi
+if ! grep -q "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" "$ZSHRC_FILE"; then
+  echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> "$ZSHRC_FILE"
+fi
 
 # Preparing PATH config
 uncommentZshrcPath

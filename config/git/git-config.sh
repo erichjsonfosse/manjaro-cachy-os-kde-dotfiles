@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-# Add .gitconfig
-cp -f "$CONFIGDIR/git/.gitconfig" "$GIT_CONFIG_FILE"
+# Symlink the main .gitconfig
+ln -sf "$CONFIGDIR/git/.gitconfig" "$GIT_CONFIG_FILE"
 
-# Replace name and email in the .gitconfig file
-sed -i "s/MANJARO_DOTFILES_GIT_CONFIG_NAME/$MANJARO_DOTFILES_GIT_CONFIG_NAME/g" "$GIT_CONFIG_FILE"
-sed -i "s/MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS/$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS/g" "$GIT_CONFIG_FILE"
+# Create a local gitconfig for user-specific credentials
+cat << EOF > "$HOMEDIR/.gitconfig.local"
+[user]
+	name = $MANJARO_DOTFILES_GIT_CONFIG_NAME
+	email = $MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS
+	signingkey = $MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY
+EOF

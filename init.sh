@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 if [ "$EUID" -ne 0 ]
   then
     echo "Script must be run as root"
@@ -17,20 +19,19 @@ steps=(
 [2]="configureGit"
 [3]="installPacmanPackages"
 [4]="installAurPackages"
-[5]="installAppImages"
-[6]="configureDocker"
-[7]="configureZsh"
-[8]="configurePyenv"
-[9]="configureOnefetch"
-[10]="configureNano"
-[11]="configureSsh"
-[12]="bumpVersion"
-[13]="postInstallSshConfig"
-[14]="postInstallGitConfig"
-[15]="postInstallZshConfig"
-[16]="configureVivaldi"
-[17]="ensureUserOwnershipOfHomeFolder"
-[18]="removeTemporaryFiles"
+[5]="configureDocker"
+[6]="configureZsh"
+[7]="configurePyenv"
+[8]="configureOnefetch"
+[9]="configureNano"
+[10]="configureSsh"
+[11]="bumpVersion"
+[12]="postInstallSshConfig"
+[13]="postInstallGitConfig"
+[14]="postInstallZshConfig"
+[15]="configureVivaldi"
+[16]="ensureUserOwnershipOfHomeFolder"
+[17]="removeTemporaryFiles"
 )
 
 includeUtilities()
@@ -108,11 +109,6 @@ installPacmanPackages()
 installAurPackages()
 {
   source "$INSTALLDIR/aur-packages.sh"
-}
-
-installAppImages()
-{
-  source "$INSTALLDIR/app-images.sh"
 }
 
 configureDocker()

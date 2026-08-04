@@ -1,7 +1,5 @@
-[user]
-	name = MANJARO_DOTFILES_GIT_CONFIG_NAME
-	email = MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS
-	signingkey = MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY
+[include]
+	path = ~/.gitconfig.local
 [push]
 	default = simple
 [alias]

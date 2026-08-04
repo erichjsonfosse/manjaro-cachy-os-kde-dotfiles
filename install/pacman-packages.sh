@@ -47,6 +47,7 @@ declare -a packages=(
 "jq"
 "kubectl"
 "make"
+"mkcert"
 "onefetch"
 "pkgfile"
 "qbittorrent"
