@@ -52,7 +52,6 @@ declare -a packages=(
 "qbittorrent"
 "shellcheck"
 "squashfuse"
-"tinyxxd"
 "unzip"
 "wl-clipboard"
 "xclip"
@@ -67,6 +66,7 @@ if [ "$OS_ID" = "manjaro" ]; then
     "libpamac-flatpak-plugin"
     "libpamac-snap-plugin"
     "pamac"
+    "tinyxxd"
   )
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."

@@ -92,10 +92,10 @@ runStep()
   case "${steps[$1]}" in
     "requestInput" | "promptForReboot")
       echo -e "\nRunning step $1 (${steps[$1]})..."
-      bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      gum spin --show-output --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
   esac
 }
