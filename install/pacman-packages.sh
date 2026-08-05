@@ -71,6 +71,9 @@ if [ "$OS_ID" = "manjaro" ]; then
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."
   pacman -Rns --noconfirm cachyos-zsh-config || true
+  packages+=(
+    "paru"
+  )
 fi
 
 echo "Installing pacman packages..."
