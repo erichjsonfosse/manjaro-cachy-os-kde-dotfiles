@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+trap "echo -e '\nInstallation aborted by user.'; exit 1" SIGINT
+
 if [ "$EUID" -ne 0 ]
   then
     echo "Script must be run as root"
