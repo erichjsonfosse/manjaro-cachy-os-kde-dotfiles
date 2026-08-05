@@ -88,12 +88,15 @@ runStep()
 {
   setStep $(($1 + 1))
   
-  if [ "${steps[$1]}" == "requestInput" ]; then
-    echo "Running step $1 (${steps[$1]})..."
-    bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
-  else
-    gum spin --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
-  fi
+  case "${steps[$1]}" in
+    "requestInput")
+      echo -e "\nRunning step $1 (${steps[$1]})..."
+      bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      ;;
+    *)
+      gum spin --show-output --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      ;;
+  esac
 }
 
 setStep()
