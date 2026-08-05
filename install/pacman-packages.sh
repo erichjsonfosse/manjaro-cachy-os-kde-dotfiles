@@ -78,4 +78,3 @@ pacman -S --needed --noconfirm "${packages[@]}"
 
 
 echo "Pacman packages installed"
-askForReboot

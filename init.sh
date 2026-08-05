@@ -43,6 +43,7 @@ steps=(
 [15]="ensureUserOwnershipOfHomeFolder"
 [16]="bumpVersion"
 [17]="removeTemporaryFiles"
+[18]="promptForReboot"
 )
 
 includeUtilities()
@@ -89,7 +90,7 @@ runStep()
   setStep $(($1 + 1))
   
   case "${steps[$1]}" in
-    "requestInput")
+    "requestInput" | "promptForReboot")
       echo -e "\nRunning step $1 (${steps[$1]})..."
       bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
@@ -197,6 +198,11 @@ removeTemporaryFiles()
 {
   rm -f "$RESUME_FILE_NAME";
   rm -f "$TEMPORARY_CONFIG_FILE_NAME";
+}
+
+promptForReboot()
+{
+  askForReboot
 }
 
 setVariables
