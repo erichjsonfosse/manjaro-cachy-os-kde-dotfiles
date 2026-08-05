@@ -85,7 +85,13 @@ doRun()
 runStep()
 {
   setStep $(($1 + 1))
-  gum spin --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables ${steps[$1]}); includeUtilities; setVariables; ${steps[$1]}"
+  
+  if [ "${steps[$1]}" == "requestInput" ]; then
+    echo "Running step $1 (${steps[$1]})..."
+    bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+  else
+    gum spin --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "$(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+  fi
 }
 
 setStep()
