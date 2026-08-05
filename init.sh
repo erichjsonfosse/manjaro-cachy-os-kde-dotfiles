@@ -190,7 +190,7 @@ removeTemporaryFiles()
 
 setVariables
 
-VERSION_FILE="$HOMEDIR/.config/manjaro-dotfiles/version"
+VERSION_FILE="$HOMEDIR/.config/manjaro-cachy-os-kde-dotfiles/version"
 CURRENT_VERSION=""
 if [ -f "$VERSION_FILE" ]; then
   CURRENT_VERSION=$(cat "$VERSION_FILE")
