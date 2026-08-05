@@ -14,23 +14,32 @@ if ! command -v gum &> /dev/null; then
 fi
 
 steps=(
+# --- 1. Setup ---
 [0]="chmodScripts"
 [1]="requestInput"
-[2]="configureGit"
-[3]="installPacmanPackages"
-[4]="installAurPackages"
-[5]="configureDocker"
-[6]="configureZsh"
+
+# --- 2. Installation ---
+[2]="installPacmanPackages"
+[3]="installAurPackages"
+
+# --- 3. Configuration ---
+[4]="configureGit"
+[5]="configureZsh"
+[6]="configureDocker"
 [7]="configurePyenv"
 [8]="configureOnefetch"
 [9]="configureNano"
 [10]="configureSsh"
-[11]="bumpVersion"
+[11]="configureVivaldi"
+
+# --- 4. Post-Configuration ---
 [12]="postInstallSshConfig"
 [13]="postInstallGitConfig"
 [14]="postInstallZshConfig"
-[15]="configureVivaldi"
-[16]="ensureUserOwnershipOfHomeFolder"
+
+# --- 5. Permissions & Cleanup ---
+[15]="ensureUserOwnershipOfHomeFolder"
+[16]="bumpVersion"
 [17]="removeTemporaryFiles"
 )
 
