@@ -179,8 +179,26 @@ removeTemporaryFiles()
   rm -f "$TEMPORARY_CONFIG_FILE_NAME";
 }
 
-if gum confirm "Continue with installation?"; then
-  doRun
+setVariables
+
+VERSION_FILE="$HOMEDIR/.config/manjaro-dotfiles/version"
+CURRENT_VERSION=""
+if [ -f "$VERSION_FILE" ]; then
+  CURRENT_VERSION=$(cat "$VERSION_FILE")
+fi
+
+LATEST_VERSION=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+
+if [ -n "$CURRENT_VERSION" ] && [ "$CURRENT_VERSION" == "$LATEST_VERSION" ]; then
+  if gum confirm "You are already on the latest version of the dotfiles. Continue with installation anyway?"; then
+    doRun
+  else
+    exit
+  fi
 else
-  exit
+  if gum confirm "Continue with installation?"; then
+    doRun
+  else
+    exit
+  fi
 fi

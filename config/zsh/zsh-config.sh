@@ -19,18 +19,25 @@ if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
 fi
 
 # Activate theme
-sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRC_FILE"
-sed -i "/^\# ZSH_THEME=\(.*\)/a ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$ZSHRC_FILE"
+if ! grep -q '^ZSH_THEME="powerlevel10k/powerlevel10k"' "$ZSHRC_FILE"; then
+  sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRC_FILE"
+  sed -i '/^\# ZSH_THEME=\(.*\)/a ZSH_THEME="powerlevel10k/powerlevel10k"' "$ZSHRC_FILE"
+fi
 
 # Activate plugins
-sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
-sed -i "/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins" "$ZSHRC_FILE"
+if ! grep -q '^plugins=.*manjaro-dotfiles' "$ZSHRC_FILE" && ! awk '/^plugins=\(/,/^\)/' "$ZSHRC_FILE" | grep -q 'manjaro-dotfiles'; then
+  sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
+  sed -i '/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins' "$ZSHRC_FILE"
+fi
 
 # Add aliases (using symlinks)
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
-sed -i "/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"
+if ! grep -q '^HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE" && ! grep -q "^HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"; then
+  sed -i "s/^HIST_STAMPS=\(.*\)/\# HIST_STAMPS=\1/g" "$ZSHRC_FILE"
+  sed -i '/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE"
+fi
 
 # Source Arch system packages for zsh plugins
 if ! grep -q "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" "$ZSHRC_FILE"; then
