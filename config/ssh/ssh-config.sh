@@ -7,7 +7,7 @@ ln -sf "$CONFIGDIR/ssh/config" "$HOMEDIR/.ssh/config"
 chmod 600 "$HOMEDIR/.ssh/config"
 
 echo "Enabling systemd ssh-agent..."
-systemctl --user enable --now ssh-agent.service
+su "$LOGNAME" -c "XDG_RUNTIME_DIR=/run/user/\$(id -u \"\$LOGNAME\") systemctl --user enable --now ssh-agent.service"
 
 if ! grep -q "export SSH_AUTH_SOCK" "$ZSHRC_FILE"; then
   echo "" >> "$ZSHRC_FILE"
