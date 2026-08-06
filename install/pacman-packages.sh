@@ -48,7 +48,6 @@ declare -a packages=(
 "make"
 "mkcert"
 "onefetch"
-"paru"
 "pkgfile"
 "qbittorrent"
 "shellcheck"
@@ -71,6 +70,9 @@ if [ "$OS_ID" = "manjaro" ]; then
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."
   pacman -Rns cachyos-zsh-config || true
+  packages+=(
+    "paru"
+  )
 fi
 
 echo "Installing pacman packages..."

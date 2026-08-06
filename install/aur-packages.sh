@@ -5,6 +5,13 @@ echo "Installing AUR packages..."
 
 #sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
+if [ "$OS_ID" = "manjaro" ]; then
+  if ! command -v paru &> /dev/null; then
+    echo "Bootstrapping paru via pamac..."
+    pamac build paru
+  fi
+fi
+
 declare -a packages=(
 "antigravity"
 "antigravity-cli"
