@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-if [ "$OS_ID" = "manjaro" ]; then
-  echo "Clearing pamac build files cache..."
-  pamac clean --build-files
-fi
 
 echo "Installing AUR packages..."
 
@@ -24,13 +20,7 @@ declare -a packages=(
 "slack-desktop"
 )
 
-if [ "$OS_ID" = "manjaro" ]; then
-  pamac build "${packages[@]}"
-elif [ "$OS_ID" = "cachyos" ]; then
-  sudo -u "$LOGNAME" paru -S "${packages[@]}"
-else
-  echo "Unsupported OS for AUR packages, skipping..."
-fi
+sudo -u "$LOGNAME" paru -S "${packages[@]}"
 
 
 echo "AUR packages installed"

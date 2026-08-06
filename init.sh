@@ -77,7 +77,7 @@ doRun()
 
     maxKey=$(getMaxKey "${steps[@]}")
 
-    if [ $(("$step")) -ge $(("$maxKey")) ]; then
+    if [ $(("$step")) -gt $(("$maxKey")) ]; then
       break;
     fi
 
