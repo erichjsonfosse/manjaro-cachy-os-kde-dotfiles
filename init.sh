@@ -35,20 +35,19 @@ steps=(
 [11]="configureVivaldi"
 
 # --- 4. Post-Configuration ---
-[12]="postInstallSshConfig"
-[13]="postInstallGitConfig"
-[14]="postInstallZshConfig"
+[12]="postInstallGitConfig"
+[13]="postInstallZshConfig"
 
 # --- 5. Permissions & Cleanup ---
-[15]="ensureUserOwnershipOfHomeFolder"
-[16]="bumpVersion"
-[17]="removeTemporaryFiles"
-[18]="promptForReboot"
+[14]="ensureUserOwnershipOfHomeFolder"
+[15]="bumpVersion"
+[16]="removeTemporaryFiles"
+[17]="promptForReboot"
 )
 
 includeUtilities()
 {
-  source ./utilities.sh
+  source ./utilities/during-install/utilities.sh
 }
 
 setVariables()
@@ -90,7 +89,7 @@ runStep()
   setStep $(($1 + 1))
   
   case "${steps[$1]}" in
-    "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages" | "postInstallSshConfig")
+    "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
       echo -e "\nRunning step $1 (${steps[$1]})..."
       bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
@@ -165,11 +164,6 @@ configureSsh()
 bumpVersion()
 {
   source ./bump-version.sh
-}
-
-postInstallSshConfig()
-{
-  source "$CONFIGDIR/ssh/ssh-post-install.sh"
 }
 
 postInstallGitConfig()
