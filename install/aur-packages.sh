@@ -8,7 +8,7 @@ echo "Installing AUR packages..."
 if [ "$OS_ID" = "manjaro" ]; then
   if ! command -v paru &> /dev/null; then
     echo "Bootstrapping paru manually..."
-    sudo pacman -S --needed base-devel git
+    sudo pacman -S --needed --noconfirm base-devel git cargo
     su "$LOGNAME" -c "git clone https://aur.archlinux.org/paru.git /tmp/paru-bootstrap"
     su "$LOGNAME" -c "cd /tmp/paru-bootstrap && makepkg -s"
     pacman -U --noconfirm /tmp/paru-bootstrap/paru-*.pkg.tar.zst
