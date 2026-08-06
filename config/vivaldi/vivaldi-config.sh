@@ -4,7 +4,7 @@ echo "Configuring Vivaldi as default browser..."
 
 # Set as default browser
 if command -v xdg-settings &> /dev/null; then
-  xdg-settings set default-web-browser vivaldi-stable.desktop
+  xdg-settings set default-web-browser vivaldi-stable.desktop || true
 else
   echo "xdg-settings not found, skipping default browser assignment."
 fi

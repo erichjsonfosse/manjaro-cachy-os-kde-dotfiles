@@ -90,7 +90,7 @@ runStep()
   setStep $(($1 + 1))
   
   case "${steps[$1]}" in
-    "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
+    "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages" | "postInstallSshConfig")
       echo -e "\nRunning step $1 (${steps[$1]})..."
       bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;

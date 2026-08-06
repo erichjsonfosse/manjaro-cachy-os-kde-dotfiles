@@ -10,7 +10,8 @@ if [ "$OS_ID" = "manjaro" ]; then
     echo "Bootstrapping paru-bin manually..."
     sudo pacman -S --needed base-devel git
     su "$LOGNAME" -c "git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin-bootstrap"
-    su "$LOGNAME" -c "cd /tmp/paru-bin-bootstrap && makepkg -si"
+    su "$LOGNAME" -c "cd /tmp/paru-bin-bootstrap && makepkg -s"
+    pacman -U --noconfirm /tmp/paru-bin-bootstrap/paru-bin-*.pkg.tar.zst
     rm -rf /tmp/paru-bin-bootstrap
   fi
 fi
