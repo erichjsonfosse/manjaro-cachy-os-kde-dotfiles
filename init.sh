@@ -72,15 +72,18 @@ doRun()
   fi
 
   while true; do
-    runStep "$step";
-
     maxKey=$(getMaxKey "${steps[@]}")
-
-    if [ $(("$step")) -gt $(("$maxKey")) ]; then
+    if [ "$step" -gt "$maxKey" ]; then
       break;
     fi
 
-    step=$(head -n 1 "$RESUME_FILE_NAME");
+    runStep "$step";
+
+    if [ -f "$RESUME_FILE_NAME" ]; then
+      step=$(head -n 1 "$RESUME_FILE_NAME");
+    else
+      break;
+    fi
   done
 }
 
