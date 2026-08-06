@@ -3,11 +3,11 @@
 
 if [ "$OS_ID" = "manjaro" ]; then
   echo "Updating pacman mirrors..."
-  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
+  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
 fi
 
 echo "Upgrading pacman packages..."
-pacman -Syu --noconfirm
+pacman -Syu
 echo "Pacman packages upgraded"
 
 declare -a packages=(
@@ -70,14 +70,14 @@ if [ "$OS_ID" = "manjaro" ]; then
   )
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."
-  pacman -Rns --noconfirm cachyos-zsh-config || true
+  pacman -Rns cachyos-zsh-config || true
   packages+=(
     "paru"
   )
 fi
 
 echo "Installing pacman packages..."
-pacman -S --needed --noconfirm "${packages[@]}"
+pacman -S --needed "${packages[@]}"
 
 
 echo "Pacman packages installed"

@@ -2,7 +2,7 @@
 
 if [ "$OS_ID" = "manjaro" ]; then
   echo "Clearing pamac build files cache..."
-  pamac clean --build-files --no-confirm
+  pamac clean --build-files
 fi
 
 echo "Installing AUR packages..."
@@ -25,9 +25,9 @@ declare -a packages=(
 )
 
 if [ "$OS_ID" = "manjaro" ]; then
-  pamac build --no-confirm "${packages[@]}"
+  pamac build "${packages[@]}"
 elif [ "$OS_ID" = "cachyos" ]; then
-  sudo -u "$LOGNAME" paru -S --noconfirm "${packages[@]}"
+  sudo -u "$LOGNAME" paru -S "${packages[@]}"
 else
   echo "Unsupported OS for AUR packages, skipping..."
 fi
