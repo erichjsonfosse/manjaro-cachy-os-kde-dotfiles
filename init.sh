@@ -82,7 +82,7 @@ doRun()
     if [ -f "$RESUME_FILE_NAME" ]; then
       step=$(head -n 1 "$RESUME_FILE_NAME");
     else
-      break;
+      step=$((step + 1));
     fi
   done
 }
