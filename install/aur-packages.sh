@@ -12,7 +12,6 @@ echo "Installing AUR packages..."
 declare -a packages=(
 "antigravity"
 "antigravity-cli"
-"ferdium-bin"
 "google-chrome"
 "hyphen-nb"
 "insomnia-bin"
@@ -22,6 +21,7 @@ declare -a packages=(
 "openlens-bin"
 "postman-bin"
 "powershell-bin"
+"slack-desktop"
 )
 
 if [ "$OS_ID" = "manjaro" ]; then
