@@ -48,6 +48,33 @@ if ! grep -q "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-h
   echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> "$ZSHRC_FILE"
 fi
 
+# Sourcing local overrides if they exist
+if ! grep -q "source \$HOME/.zshrc.local" "$ZSHRC_FILE" && ! grep -q "source ~/.zshrc.local" "$ZSHRC_FILE"; then
+  {
+    echo ""
+    echo "# User-specific overrides"
+    echo "if [ -f \"\$HOME/.zshrc.local\" ]; then"
+    echo "  source \"\$HOME/.zshrc.local\""
+    echo "fi"
+  } >> "$ZSHRC_FILE"
+fi
+
+# Create a template .zshrc.local if it doesn't exist
+if [ ! -f "$HOMEDIR/.zshrc.local" ]; then
+  {
+    echo "# =========================================================="
+    echo "#                ZSH Local Overrides (Untracked)            "
+    echo "# =========================================================="
+    echo "# Put your custom environment variables, aliases, and functions here."
+    echo "# These will persist across dotfile installations/updates."
+    echo ""
+    echo "# Example alias:"
+    echo "# alias ll='ls -lah'"
+    echo ""
+  } > "$HOMEDIR/.zshrc.local"
+  chown "$LOGNAME":"$LOGNAME" "$HOMEDIR/.zshrc.local"
+fi
+
 # Preparing PATH config
 uncommentZshrcPath
 
