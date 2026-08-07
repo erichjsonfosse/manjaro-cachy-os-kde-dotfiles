@@ -56,6 +56,7 @@ declare -a packages=(
 "wl-clipboard"
 "xclip"
 "yakuake"
+"zellij"
 "zsh"
 "zsh-autosuggestions"
 "zsh-syntax-highlighting"
