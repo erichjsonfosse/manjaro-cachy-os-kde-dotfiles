@@ -1,5 +1,3 @@
-[include]
-	path = ~/.gitconfig.local
 [push]
 	default = simple
 [alias]
@@ -22,3 +20,7 @@
 	ui = auto
 [branch]
 	sort = -committerdate
+
+[include]
+	path = ~/.gitconfig.local
+
