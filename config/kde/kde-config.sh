@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 
+# Helper to write KDE config cleanly
+writeKdeConfig() {
+  local file="$1"
+  local group="$2"
+  local key="$3"
+  local value="$4"
+
+  if command -v kwriteconfig6 &> /dev/null; then
+    su "$LOGNAME" -c "kwriteconfig6 --file \"$file\" --group \"$group\" --key \"$key\" \"$value\""
+  elif command -v kwriteconfig5 &> /dev/null; then
+    su "$LOGNAME" -c "kwriteconfig5 --file \"$file\" --group \"$group\" --key \"$key\" \"$value\""
+  fi
+}
+
 echo "Configuring KWin Window Rules..."
 KWIN_RULES_FILE="$HOMEDIR/.config/kwinrulesrc"
+KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 
-# Ensure the config directory exists
+# Ensure config directories exist
 mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 
-# Check if a rule for Yakuake already exists
+# 1. Configure Yakuake Keep Above Rule
 if [ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=yakuake" "$KWIN_RULES_FILE"; then
   echo "KWin window rule for Yakuake already exists. Skipping..."
 else
@@ -53,9 +68,14 @@ else
   chown "$LOGNAME":"$LOGNAME" "$KWIN_RULES_FILE"
 
   echo "KWin window rule for Yakuake successfully added!"
+fi
 
-  # Notify kwin to reload configurations if running
-  if pgrep -x kwin_wayland > /dev/null; then
-    su "$LOGNAME" -c "qdbus org.kde.KWin /KWin reconfigure" || true
-  fi
+# 2. Configure Focus Stealing Prevention to Extreme (4)
+echo "Setting Focus Stealing Prevention to Extreme..."
+writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "4"
+chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
+
+# 3. Notify kwin to reload configurations if running
+if pgrep -x kwin_wayland > /dev/null; then
+  su "$LOGNAME" -c "qdbus org.kde.KWin /KWin reconfigure" || true
 fi
