@@ -33,16 +33,17 @@ steps=(
 [9]="configureNano"
 [10]="configureSsh"
 [11]="configureVivaldi"
+[12]="configureKwin"
 
 # --- 4. Post-Configuration ---
-[12]="postInstallGitConfig"
-[13]="postInstallZshConfig"
+[13]="postInstallGitConfig"
+[14]="postInstallZshConfig"
 
 # --- 5. Permissions & Cleanup ---
-[14]="ensureUserOwnershipOfHomeFolder"
-[15]="bumpVersion"
-[16]="removeTemporaryFiles"
-[17]="promptForReboot"
+[15]="ensureUserOwnershipOfHomeFolder"
+[16]="bumpVersion"
+[17]="removeTemporaryFiles"
+[18]="promptForReboot"
 )
 
 includeUtilities()
@@ -182,6 +183,11 @@ postInstallZshConfig()
 configureVivaldi()
 {
   source "$CONFIGDIR/vivaldi/vivaldi-config.sh"
+}
+
+configureKwin()
+{
+  source "$CONFIGDIR/kde/kde-config.sh"
 }
 
 ensureUserOwnershipOfHomeFolder()
