@@ -30,7 +30,7 @@ declare -a packages=(
 "slack-desktop"
 )
 
-sudo -u "$LOGNAME" paru -S "${packages[@]}"
+sudo -u "$LOGNAME" paru -Syu --needed "${packages[@]}"
 
 
 logSuccess "AUR packages installed"
