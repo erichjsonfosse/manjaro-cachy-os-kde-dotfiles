@@ -75,7 +75,12 @@ echo "Setting Focus Stealing Prevention to Extreme..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "4"
 chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
 
-# 3. Notify kwin to reload configurations if running
+# 3. Configure Fcitx 5 as the active Wayland Input Method (Virtual Keyboard)
+# This enables global 'ctrl + shift + u' unicode entry support across applications
+echo "Setting active Input Method to Fcitx 5..."
+writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
+
+# 4. Notify kwin to reload configurations if running
 if pgrep -x kwin_wayland > /dev/null; then
   su "$LOGNAME" -c "qdbus org.kde.KWin /KWin reconfigure" || true
 fi
