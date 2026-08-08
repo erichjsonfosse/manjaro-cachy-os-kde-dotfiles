@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 
 
+echo "Optimizing pacman settings..."
+# Enable ParallelDownloads (default to 5)
+if grep -q "^#ParallelDownloads" /etc/pacman.conf; then
+  sed -i "s/^#ParallelDownloads.*/ParallelDownloads = 5/" /etc/pacman.conf
+elif ! grep -q "^ParallelDownloads" /etc/pacman.conf; then
+  sed -i "/\[options\]/a ParallelDownloads = 5" /etc/pacman.conf
+fi
+
+# Enable Color
+if grep -q "^#Color" /etc/pacman.conf; then
+  sed -i "s/^#Color/Color/" /etc/pacman.conf
+fi
+
+# Enable ILoveCandy progress bar (Pacman eating dots)
+if ! grep -q "ILoveCandy" /etc/pacman.conf; then
+  sed -i "/^Color/a ILoveCandy" /etc/pacman.conf
+fi
+
 if [ "$OS_ID" = "manjaro" ]; then
   echo "Updating pacman mirrors..."
   pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom

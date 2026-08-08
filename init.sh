@@ -32,19 +32,20 @@ steps=(
 [8]="configurePyenv"
 [9]="configureOnefetch"
 [10]="configureNano"
-[11]="configureSsh"
-[12]="configureVivaldi"
-[13]="configureKwin"
+[11]="configureParu"
+[12]="configureSsh"
+[13]="configureVivaldi"
+[14]="configureKwin"
 
 # --- 4. Post-Configuration ---
-[14]="postInstallGitConfig"
-[15]="postInstallZshConfig"
+[15]="postInstallGitConfig"
+[16]="postInstallZshConfig"
 
 # --- 5. Permissions & Cleanup ---
-[16]="ensureUserOwnershipOfHomeFolder"
-[17]="bumpVersion"
-[18]="removeTemporaryFiles"
-[19]="promptForReboot"
+[17]="ensureUserOwnershipOfHomeFolder"
+[18]="bumpVersion"
+[19]="removeTemporaryFiles"
+[20]="promptForReboot"
 )
 
 includeUtilities()
@@ -171,6 +172,11 @@ configureOnefetch()
 configureNano()
 {
   source "$CONFIGDIR/nano/nano-config.sh"
+}
+
+configureParu()
+{
+  source "$CONFIGDIR/paru/paru-config.sh"
 }
 
 configureSsh()
