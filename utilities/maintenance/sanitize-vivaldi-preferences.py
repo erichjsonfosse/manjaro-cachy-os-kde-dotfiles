@@ -6,12 +6,107 @@ import argparse
 
 # Keys we absolutely want to strip out of the Preferences file
 BLACKLIST_KEYS = {
-    'account_info', 'google_services', 'signin', 'tokens', 'sync',
-    'window_placement', 'exited_cleanly', 'exit_type', 'session',
-    'session_recovery', 'metrics', 'telemetry', 'background_tracing',
-    'reporting', 'browser.last_redirect_origin', 'media.device_id_salt',
-    'profile_highlight_color', 'client_id', 'last_known_google_url',
-    'autofill'
+    'account_info',
+    'account_store_backup_password_cleaning_last_timestamp',
+    'account_tracker_service_last_update',
+    'active_days',
+    'app_banner',
+    'autocomplete',
+    'autofill',
+    'background_password_check',
+    'background_tracing',
+    'browser.last_redirect_origin',
+    'chained_commands',
+    'client_hints',
+    'client_id',
+    'commerce_daily_metrics_last_update_time',
+    'context_dialogs',
+    'daily_metrics',
+    'device_id_salt',
+    'devtools',
+    'dual_layer_user_pref_store',
+    'enterprise',
+    'enterprise_profile_guid',
+    'events',
+    'exit_type',
+    'exited_cleanly',
+    'expiration_time',
+    'extensions',
+    'fedcm_idp_signin',
+    'filtered_service_worker_events',
+    'first_install_time',
+    'gaia_cookie',
+    'gcm',
+    'geolocation',
+    'google',
+    'google_services',
+    'high_efficiency',
+    'https_upgrade_navigations',
+    'ignored_protocol_handlers',
+    'in_product_help',
+    'keystore_canary',
+    'language_model_counters',
+    'last_chrome_version',
+    'last_known_google_url',
+    'last_open_timestamp',
+    'last_reporting_timestamp',
+    'last_reporting_timestamp_v4',
+    'last_update',
+    'last_update_time',
+    'media',
+    'media_engagement',
+    'media_router',
+    'metrics',
+    'notification_interactions',
+    'notifications',
+    'ntp',
+    'oauth_signed_in_origins',
+    'password_hash_data_list',
+    'password_manager',
+    'permission_autoblocking_data',
+    'persistent_notifications',
+    'pinned_tabs',
+    'printing',
+    'privacy_sandbox',
+    'profile',
+    'profile_highlight_color',
+    'profile_network_context_service',
+    'profile_store_backup_password_cleaning_last_timestamp',
+    'protection',
+    'registered_protocol_handlers',
+    'reporting',
+    'safebrowsing',
+    'safety_hub',
+    'safe_browsing',
+    'saved_tab_groups',
+    'schedule_to_flush_to_disk',
+    'session',
+    'session_recovery',
+    'sessions',
+    'signin',
+    'size',
+    'ssl_cert_decisions',
+    'startup',
+    'storage_computation_last_update',
+    'sync',
+    'syncing_theme_prefs_migrated_to_non_syncing',
+    'tab_search',
+    'telemetry',
+    'timestamp',
+    'tokens',
+    'total_passwords_available_for_account',
+    'total_passwords_available_for_profile',
+    'translate_accepted_count',
+    'translate_denied_count_for_language',
+    'updateclientdata',
+    'updateclientlastupdatecheckerror',
+    'updateclientlastupdatecheckerrorcategory',
+    'updateclientlastupdatecheckerrorextracode1',
+    'webkit',
+    'web_apps',
+    'welcome',
+    'window_placement',
+    'window_placement_popup',
 }
 
 def sanitize_node(node, home_dir, placeholder):
@@ -20,7 +115,11 @@ def sanitize_node(node, home_dir, placeholder):
         for key, value in node.items():
             if key in BLACKLIST_KEYS:
                 continue
-            cleaned[key] = sanitize_node(value, home_dir, placeholder)
+            child_cleaned = sanitize_node(value, home_dir, placeholder)
+            # Omit empty dictionary objects
+            if isinstance(child_cleaned, dict) and not child_cleaned:
+                continue
+            cleaned[key] = child_cleaned
         return cleaned
     
     elif isinstance(node, list):
@@ -60,6 +159,18 @@ def main():
         except Exception as e:
             sys.stderr.write(f"Error reading file '{args.input}': {e}\n")
             sys.exit(1)
+
+    # Pre-purge specific configuration blocks
+    if 'vivaldi' in data and 'workspaces' in data['vivaldi']:
+        del data['vivaldi']['workspaces']
+
+    if 'extensions' in data:
+        if 'settings' in data['extensions']:
+            for ext_id in list(data['extensions']['settings'].keys()):
+                if ext_id != 'ahfgeienlihckogmohjhadlkjgocpleb':
+                    del data['extensions']['settings'][ext_id]
+        if 'commands' in data['extensions']:
+            data['extensions']['commands'] = {}
             
     # 2. Sanitize Node
     # Normalize home_dir to make sure it doesn't have trailing slash
