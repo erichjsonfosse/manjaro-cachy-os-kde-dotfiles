@@ -4,14 +4,21 @@ logHeader "Configuring Zsh Shell"
 ZSH="$HOMEDIR/.oh-my-zsh"
 export ZSH
 
-# Oh My Zsh
-curl -fsSL -o install-ohmyzsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-chmod +x install-ohmyzsh.sh
-# Oh My Zsh install options
-su "$LOGNAME" -c "RUNZSH=\"no\" ./install-ohmyzsh.sh --unattended"
-rm -f ./install-ohmyzsh.sh
+# Ensure the .zshrc file exists before running grep/sed on it
+if [ ! -f "$ZSHRC_FILE" ]; then
+  su "$LOGNAME" -c "touch \"$ZSHRC_FILE\""
+fi
 
-
+# Oh My Zsh Installation (only if not already installed)
+if [ ! -d "$ZSH" ]; then
+  logInfo "Oh My Zsh not found. Downloading and installing..."
+  curl -fsSL -o install-ohmyzsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+  chmod +x install-ohmyzsh.sh
+  su "$LOGNAME" -c "RUNZSH=\"no\" ./install-ohmyzsh.sh --unattended"
+  rm -f ./install-ohmyzsh.sh
+else
+  logInfo "Oh My Zsh already installed. Skipping base installation..."
+fi
 
 # Oh My Zsh Theme (Powerlevel10k)
 if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
@@ -30,7 +37,8 @@ if ! grep -q '^plugins=.*manjaro-cachy-os-kde-dotfiles' "$ZSHRC_FILE" && ! awk '
   sed -i '/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-cachy-os-kde-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins' "$ZSHRC_FILE"
 fi
 
-# Add aliases (using symlinks)
+# Add aliases (using symlinks - ensure directory exists first)
+su "$LOGNAME" -c "mkdir -p \"$OHMYZSH_FOLDER/custom/plugins\""
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
@@ -39,7 +47,7 @@ if ! grep -q '^HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE" && ! grep -q "^HIST_STAMP
   sed -i '/^\# HIST_STAMPS=\(.*\)/a HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE"
 fi
 
-# Source Arch system packages for zsh plugins
+# Source Arch system packages for zsh plugins (safeguard paths)
 if ! grep -q "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" "$ZSHRC_FILE"; then
   echo "" >> "$ZSHRC_FILE"
   echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> "$ZSHRC_FILE"

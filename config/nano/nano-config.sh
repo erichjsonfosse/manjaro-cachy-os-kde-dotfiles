@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Configuring Nano..."
+logHeader "Configuring Nano Editor"
 NANORC_FILE="$HOMEDIR/.nanorc"
 touch "$NANORC_FILE"
 
@@ -31,3 +31,5 @@ fi
 
 # Ensure correct ownership
 chown "$LOGNAME:$LOGNAME" "$NANORC_FILE"
+
+logSuccess "Nano editor successfully configured with 2-space tabs!"
