@@ -15,7 +15,7 @@ rm -f ./install-ohmyzsh.sh
 
 # Oh My Zsh Theme (Powerlevel10k)
 if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
+  su "$LOGNAME" -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \"$ZSH/custom/themes/powerlevel10k\""
 fi
 
 # Activate theme

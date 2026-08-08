@@ -222,6 +222,8 @@ ensureUserOwnershipOfHomeFolder()
     "$HOMEDIR/.zshrc.local"
     "$HOMEDIR/.nanorc"
     "$HOMEDIR/.ssh"
+    "$HOMEDIR/.gitconfig"
+    "$HOMEDIR/.gitconfig.local"
   )
 
   for target in "${targets[@]}"; do
