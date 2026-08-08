@@ -130,10 +130,10 @@ runStep()
 
   case "$func" in
     "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
-      bash -c "set -eo pipefail; \$(declare -f includeUtilities setVariables \"\$func\"); includeUtilities; setVariables; \$func"
+      bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "$func"); includeUtilities; setVariables; $func"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; \$(declare -f includeUtilities setVariables \"\$func\"); includeUtilities; setVariables; \$func"
+      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "$func"); includeUtilities; setVariables; $func"
       ;;
   esac
 
