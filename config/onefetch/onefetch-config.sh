@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+logHeader "Configuring Onefetch Greeter"
+
 # Remove existing onefetch block if present
 sed -i '/^# BEGIN ONEFETCH GREETER/,/^# END ONEFETCH GREETER/d' "$ZSHRC_FILE"
 
@@ -15,10 +17,9 @@ sed -i '/^# BEGIN ONEFETCH GREETER/,/^# END ONEFETCH GREETER/d' "$ZSHRC_FILE"
   printf "  fi\n"
   printf "  last_repository=\"\$current_repository\"\n"
   printf "}\n"
-  printf "cd() {\n"
-  printf "  builtin cd \"\$@\"\n"
-  printf "  check_directory_for_new_repository\n"
-  printf "}\n"
+  printf "chpwd_functions+=(check_directory_for_new_repository)\n"
   printf "##### Onefetch Git repository greeter #####\n"
   printf "# END ONEFETCH GREETER\n"
 } >> "$ZSHRC_FILE"
+
+logSuccess "Onefetch configuration applied!"

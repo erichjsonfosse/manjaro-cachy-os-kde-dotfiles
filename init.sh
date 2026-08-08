@@ -211,9 +211,26 @@ configureKwin()
 
 ensureUserOwnershipOfHomeFolder()
 {
-  # Change ownership of home folder files recursively
-  echo "Changing ownership of home folder..."
-  chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR"
+  logHeader "Ensuring correct user file ownership"
+  logInfo "Applying permissions to dotfiles and user configurations..."
+
+  # Target only directories and files we actually touch to be fast and safe
+  local targets=(
+    "$HOMEDIR/.config"
+    "$HOMEDIR/.oh-my-zsh"
+    "$HOMEDIR/.zshrc"
+    "$HOMEDIR/.zshrc.local"
+    "$HOMEDIR/.nanorc"
+    "$HOMEDIR/.ssh"
+  )
+
+  for target in "${targets[@]}"; do
+    if [ -e "$target" ]; then
+      chown -R "$LOGNAME:$LOGNAME" "$target"
+    fi
+  done
+
+  logSuccess "User file ownership successfully verified!"
 }
 
 removeTemporaryFiles()
