@@ -24,6 +24,23 @@ if [ "$OS_ID" = "manjaro" ]; then
   pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
 fi
 
+# Enable Multi-Core Compilation for AUR packages
+total_cores=$(nproc)
+if [ "$total_cores" -gt 2 ]; then
+  cores_to_use=$((total_cores - 2))
+else
+  cores_to_use=1
+fi
+
+logInfo "Configuring AUR builds to use parallel compilation ($cores_to_use/$total_cores cores)..."
+if grep -q "^#MAKEFLAGS=" /etc/makepkg.conf; then
+  sed -i "s/^#MAKEFLAGS=.*/MAKEFLAGS=\"-j$cores_to_use\"/" /etc/makepkg.conf
+elif grep -q "^MAKEFLAGS=" /etc/makepkg.conf; then
+  sed -i "s/^MAKEFLAGS=.*/MAKEFLAGS=\"-j$cores_to_use\"/" /etc/makepkg.conf
+else
+  echo "MAKEFLAGS=\"-j$cores_to_use\"" >> /etc/makepkg.conf
+fi
+
 logHeader "Upgrading pacman packages"
 pacman -Syu
 logSuccess "Pacman packages upgraded"
