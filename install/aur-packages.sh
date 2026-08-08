@@ -27,7 +27,7 @@ declare -a packages=(
 "openlens-bin"
 "postman-bin"
 "powershell-bin"
-"slack-desktop"
+"slack-desktop-wayland"
 )
 
 sudo -u "$LOGNAME" paru -Syu --needed "${packages[@]}"

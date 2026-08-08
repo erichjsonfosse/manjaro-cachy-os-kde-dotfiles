@@ -61,6 +61,7 @@ declare -a packages=(
 "helm"
 "inkscape"
 "jq"
+"kde-cli-tools"
 "kdeconnect"
 "kubectl"
 "make"
