@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1090,SC1091,SC2317,SC2329
 
 set -eo pipefail
 
@@ -64,6 +65,28 @@ doRun()
   includeUtilities;
   setVariables;
 
+  # Keep regular user's sudo timestamp alive in background during entire run
+  # This prevents standard-input timeouts during long AUR compilation steps under 'gum spin'
+  local keepalive_pid=""
+  cleanup_keepalive() {
+    if [ -n "$keepalive_pid" ]; then
+      kill "$keepalive_pid" 2>/dev/null || true
+    fi
+  }
+  trap cleanup_keepalive EXIT INT TERM
+
+  if [ -n "$LOGNAME" ] && [ "$LOGNAME" != "root" ]; then
+    # Initialize the sudo timestamp for the regular user using root authority
+    sudo -u "$LOGNAME" -v 2>/dev/null
+    (
+      while true; do
+        sudo -u "$LOGNAME" -n true 2>/dev/null
+        sleep 45
+      done
+    ) &
+    keepalive_pid=$!
+  fi
+
   if [ ! -f "$RESUME_FILE_NAME" ]; then
     step=0;
     setStep "$step";
@@ -97,18 +120,20 @@ runStep()
   local func="${entry%%|*}"
   local desc="${entry#*|}"
 
-  local styled_step=$(gum style --foreground 99 --bold "➜ Step $1: $func")
-  local styled_desc=$(gum style --foreground 245 --italic " — $desc")
+  local styled_step
+  styled_step=$(gum style --foreground 99 --bold "➜ Step $1: $func")
+  local styled_desc
+  styled_desc=$(gum style --foreground 245 --italic " — $desc")
 
   echo ""
   echo "${styled_step}${styled_desc}"
 
   case "$func" in
     "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
-      bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables $func); includeUtilities; setVariables; $func"
+      bash -c "set -eo pipefail; \$(declare -f includeUtilities setVariables \"\$func\"); includeUtilities; setVariables; \$func"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables $func); includeUtilities; setVariables; $func"
+      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; \$(declare -f includeUtilities setVariables \"\$func\"); includeUtilities; setVariables; \$func"
       ;;
   esac
 
@@ -120,7 +145,8 @@ runStep()
 setStep()
 {
   local next_step=$1
-  local maxKey=$(getMaxKey "${steps[@]}")
+  local maxKey
+  maxKey=$(getMaxKey "${steps[@]}")
 
   if [ "$next_step" -ge "$maxKey" ]; then
     rm -f "$RESUME_FILE_NAME"
