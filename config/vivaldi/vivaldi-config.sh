@@ -4,7 +4,7 @@ logHeader "Configuring Vivaldi Web Browser"
 
 # Set as default browser
 if command -v xdg-settings &> /dev/null; then
-  xdg-settings set default-web-browser vivaldi-stable.desktop || true
+  su "$LOGNAME" -c "xdg-settings set default-web-browser vivaldi-stable.desktop" || true
 else
   logWarning "xdg-settings not found, skipping default browser assignment."
 fi
