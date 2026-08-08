@@ -222,25 +222,5 @@ promptForReboot()
 }
 
 setVariables
-
-VERSION_FILE="$HOMEDIR/.config/manjaro-cachy-os-kde-dotfiles/version"
-CURRENT_VERSION=""
-if [ -f "$VERSION_FILE" ]; then
-  CURRENT_VERSION=$(cat "$VERSION_FILE")
-fi
-
-LATEST_VERSION=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
-
-if [ -n "$CURRENT_VERSION" ] && [ "$CURRENT_VERSION" == "$LATEST_VERSION" ]; then
-  if gum confirm "You are already on the latest version of the dotfiles. Continue with installation anyway?"; then
-    doRun
-  else
-    exit
-  fi
-else
-  if gum confirm "Continue with installation?"; then
-    doRun
-  else
-    exit
-  fi
-fi
+source ./utilities/pre-install/welcome-screen.sh
+showWelcomeScreen
