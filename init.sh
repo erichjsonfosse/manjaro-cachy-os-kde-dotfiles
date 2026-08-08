@@ -70,7 +70,7 @@ doRun()
   cleanup_installer() {
     rm -f /etc/sudoers.d/99-dotfiles-installer
   }
-  trap cleanup_installer EXIT INT TERM
+  trap cleanup_installer EXIT
 
   if [ -n "$LOGNAME" ] && [ "$LOGNAME" != "root" ]; then
     echo "$LOGNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-dotfiles-installer
