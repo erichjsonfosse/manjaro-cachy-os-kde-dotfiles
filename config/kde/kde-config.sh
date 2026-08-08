@@ -14,7 +14,7 @@ writeKdeConfig() {
   fi
 }
 
-echo "Configuring KWin Window Rules..."
+logHeader "Configuring KWin Window Rules"
 KWIN_RULES_FILE="$HOMEDIR/.config/kwinrulesrc"
 KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 
@@ -23,7 +23,7 @@ mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 
 # 1. Configure Yakuake Keep Above Rule
 if [ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=yakuake" "$KWIN_RULES_FILE"; then
-  echo "KWin window rule for Yakuake already exists. Skipping..."
+  logWarning "KWin window rule for Yakuake already exists. Skipping..."
 else
   # Read existing rule count, default to 0 if not present
   count=0
@@ -67,17 +67,17 @@ else
   # Fix ownership
   chown "$LOGNAME":"$LOGNAME" "$KWIN_RULES_FILE"
 
-  echo "KWin window rule for Yakuake successfully added!"
+  logSuccess "KWin window rule for Yakuake successfully added!"
 fi
 
 # 2. Configure Focus Stealing Prevention to Extreme (4)
-echo "Setting Focus Stealing Prevention to Extreme..."
+logInfo "Setting Focus Stealing Prevention to Extreme..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "4"
 chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
 
 # 3. Configure Fcitx 5 as the active Wayland Input Method (Virtual Keyboard)
 # This enables global 'ctrl + shift + u' unicode entry support across applications
-echo "Setting active Input Method to Fcitx 5..."
+logInfo "Setting active Input Method to Fcitx 5 (enables Ctrl+Shift+U globally)..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
 # 4. Notify kwin to reload configurations if running

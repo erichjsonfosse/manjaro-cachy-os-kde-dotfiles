@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Configuring Zsh with Oh My Zsh..."
+logHeader "Configuring Zsh Shell"
 ZSH="$HOMEDIR/.oh-my-zsh"
 export ZSH
 
@@ -81,3 +81,5 @@ uncommentZshrcPath
 # Setting Zsh as shell for root and user
 chsh -s /bin/zsh
 chsh -s /bin/zsh "$LOGNAME"
+
+logSuccess "Zsh configuration applied successfully!"
