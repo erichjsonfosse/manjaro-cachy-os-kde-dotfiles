@@ -17,35 +17,35 @@ fi
 
 steps=(
 # --- 1. Setup ---
-[0]="chmodScripts"
-[1]="checkPacmanLock"
-[2]="requestInput"
+[0]="chmodScripts|Making installer and config scripts executable"
+[1]="checkPacmanLock|Verifying pacman database lock safety"
+[2]="requestInput|Collecting custom Git credentials"
 
 # --- 2. Installation ---
-[3]="installPacmanPackages"
-[4]="installAurPackages"
+[3]="installPacmanPackages|Upgrading system and installing pacman packages"
+[4]="installAurPackages|Compiling and installing AUR packages (via paru)"
 
 # --- 3. Configuration ---
-[5]="configureGit"
-[6]="configureZsh"
-[7]="configureDocker"
-[8]="configurePyenv"
-[9]="configureOnefetch"
-[10]="configureNano"
-[11]="configureParu"
-[12]="configureSsh"
-[13]="configureVivaldi"
-[14]="configureKwin"
+[5]="configureGit|Linking global and local Git configurations"
+[6]="configureZsh|Configuring Zsh shell, plugins, and custom local overrides"
+[7]="configureDocker|Configuring Docker socket permissions and user groups"
+[8]="configurePyenv|Registering Python pyenv shims"
+[9]="configureOnefetch|Setting up native Onefetch Zsh repository greeters"
+[10]="configureNano|Setting up Nano editor options & 2-space tab layouts"
+[11]="configureParu|Syncing optimized paru AUR-helper configurations"
+[12]="configureSsh|Enabling and linking systemd ssh-agent"
+[13]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
+[14]="configureKwin|Configuring KWin rules and Fcitx5 input methods"
 
 # --- 4. Post-Configuration ---
-[15]="postInstallGitConfig"
-[16]="postInstallZshConfig"
+[15]="postInstallGitConfig|Applying final Git signing key templates"
+[16]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
 
 # --- 5. Permissions & Cleanup ---
-[17]="ensureUserOwnershipOfHomeFolder"
-[18]="bumpVersion"
-[19]="removeTemporaryFiles"
-[20]="promptForReboot"
+[17]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
+[18]="bumpVersion|Tagging dotfiles installation version"
+[19]="removeTemporaryFiles|Cleaning up installer temporary files"
+[20]="promptForReboot|Requesting system restart to apply all changes"
 )
 
 includeUtilities()
@@ -92,19 +92,25 @@ doRun()
 
 runStep()
 {
-  echo ""
-  gum style --foreground 99 --bold "➜ Step $1: ${steps[$1]}"
+  local entry="${steps[$1]}"
+  local func="${entry%%|*}"
+  local desc="${entry#*|}"
 
-  case "${steps[$1]}" in
+  echo ""
+  gum style --inline --foreground 99 --bold "➜ Step $1: $func"
+  gum style --inline --foreground 245 --italic " — $desc"
+  echo ""
+
+  case "$func" in
     "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
-      bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables \"$func\"); includeUtilities; setVariables; $func"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables \"$func\"); includeUtilities; setVariables; $func"
       ;;
   esac
 
-  gum style --foreground 82 "✔ Finished step $1: ${steps[$1]}"
+  gum style --foreground 82 "✔ Finished: $desc"
 
   setStep $(($1 + 1))
 }
