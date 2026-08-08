@@ -90,8 +90,6 @@ doRun()
 
 runStep()
 {
-  setStep $(($1 + 1))
-  
   case "${steps[$1]}" in
     "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
       echo -e "\nRunning step $1 (${steps[$1]})..."
@@ -101,13 +99,22 @@ runStep()
       gum spin --show-output --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
   esac
+
+  setStep $(($1 + 1))
 }
 
 setStep()
 {
-  rm -f "$RESUME_FILE_NAME";
-  touch "$RESUME_FILE_NAME";
-  echo "$1" > "$RESUME_FILE_NAME";
+  local next_step=$1
+  local maxKey=$(getMaxKey "${steps[@]}")
+
+  if [ "$next_step" -ge "$maxKey" ]; then
+    rm -f "$RESUME_FILE_NAME"
+  else
+    rm -f "$RESUME_FILE_NAME"
+    touch "$RESUME_FILE_NAME"
+    echo "$next_step" > "$RESUME_FILE_NAME"
+  fi
 }
 
 chmodScripts()
