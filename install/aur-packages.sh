@@ -3,8 +3,6 @@
 
 logHeader "Installing AUR packages"
 
-#sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
-
 if [ "$OS_ID" = "manjaro" ]; then
   if ! command -v paru &> /dev/null; then
     logInfo "Bootstrapping paru manually..."
