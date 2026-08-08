@@ -57,19 +57,19 @@ showWelcomeScreen()
       echo -e "\n⚠️  WARNING: Running individual configurations assumes that all required dependencies are already installed on your system!\n"
 
       local options=(
-        "5: configureGit — Linking global and local Git configurations"
-        "6: configureZsh — Configuring Zsh shell, plugins, and custom local overrides"
-        "7: configureDocker — Configuring Docker socket permissions and user groups"
-        "8: configurePyenv — Registering Python pyenv shims"
-        "9: configureOnefetch — Setting up native Onefetch Zsh repository greeters"
-        "10: configureNano — Setting up Nano editor options & 2-space tab layouts"
-        "11: configureParu — Syncing optimized paru AUR-helper configurations"
-        "12: configureSsh — Enabling and linking systemd ssh-agent"
-        "13: configureVivaldi — Setting default browser and applying sanitized Vivaldi preferences"
-        "14: configureKwin — Configuring KWin rules and Fcitx5 input methods"
-        "15: postInstallGitConfig — Applying final Git signing key templates"
-        "16: postInstallZshConfig — Compiling Oh My Zsh theme assets"
-        "17: ensureUserOwnershipOfHomeFolder — Safely verifying user file ownership and permissions"
+        "configureGit — Linking global and local Git configurations"
+        "configureZsh — Configuring Zsh shell, plugins, and custom local overrides"
+        "configureDocker — Configuring Docker socket permissions and user groups"
+        "configurePyenv — Registering Python pyenv shims"
+        "configureOnefetch — Setting up native Onefetch Zsh repository greeters"
+        "configureNano — Setting up Nano editor options & 2-space tab layouts"
+        "configureParu — Syncing optimized paru AUR-helper configurations"
+        "configureSsh — Enabling and linking systemd ssh-agent"
+        "configureVivaldi — Setting default browser and applying sanitized Vivaldi preferences"
+        "configureKwin — Configuring KWin rules and Fcitx5 input methods"
+        "postInstallGitConfig — Applying final Git signing key templates"
+        "postInstallZshConfig — Compiling Oh My Zsh theme assets"
+        "ensureUserOwnershipOfHomeFolder — Safely verifying user file ownership and permissions"
       )
 
       local selected_options
