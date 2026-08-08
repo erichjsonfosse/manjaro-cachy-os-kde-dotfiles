@@ -250,10 +250,10 @@ ensureUserOwnershipOfHomeFolder()
     fi
   done
 
-  logInfo "Installing 'dotfiles-doctor' utility globally to /usr/local/bin..."
-  ln -sf "$BASEDIR/utilities/post-install/dotfiles-doctor.sh" "/usr/local/bin/dotfiles-doctor"
-  chmod +x "$BASEDIR/utilities/post-install/dotfiles-doctor.sh"
-  chmod +x "/usr/local/bin/dotfiles-doctor"
+  logInfo "Installing 'kde-dotfiles-doctor' utility globally to /usr/local/bin..."
+  ln -sf "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh" "/usr/local/bin/kde-dotfiles-doctor"
+  chmod +x "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh"
+  chmod +x "/usr/local/bin/kde-dotfiles-doctor"
 
   logSuccess "User file ownership and global tools successfully verified!"
 }
