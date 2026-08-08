@@ -18,6 +18,13 @@ if [ -d "$DOTFILES_VIVALDI_CONFIG" ]; then
   mkdir -p "$SYSTEM_VIVALDI_CONFIG"
   cp -r "$DOTFILES_VIVALDI_CONFIG/"* "$SYSTEM_VIVALDI_CONFIG/"
   
+  # Process Preferences.template if present
+  if [ -f "$SYSTEM_VIVALDI_CONFIG/Preferences.template" ]; then
+    echo "Processing Vivaldi Preferences template..."
+    sed "s|__USER_HOME__|$HOMEDIR|g" "$SYSTEM_VIVALDI_CONFIG/Preferences.template" > "$SYSTEM_VIVALDI_CONFIG/Preferences"
+    rm -f "$SYSTEM_VIVALDI_CONFIG/Preferences.template"
+  fi
+
   # Ensure correct ownership
   chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR/.config/vivaldi"
 else
