@@ -17,35 +17,36 @@ fi
 
 steps=(
 # --- 1. Setup ---
-[0]="chmodScripts|Making installer and config scripts executable"
-[1]="checkPacmanLock|Verifying pacman database lock safety"
-[2]="requestInput|Collecting custom Git credentials"
+[0]="backupExistingConfigs|Backing up existing configurations"
+[1]="chmodScripts|Making installer and config scripts executable"
+[2]="checkPacmanLock|Verifying pacman database lock safety"
+[3]="requestInput|Collecting custom Git credentials"
 
 # --- 2. Installation ---
-[3]="installPacmanPackages|Upgrading system and installing pacman packages"
-[4]="installAurPackages|Compiling and installing AUR packages (via paru)"
+[4]="installPacmanPackages|Upgrading system and installing pacman packages"
+[5]="installAurPackages|Compiling and installing AUR packages (via paru)"
 
 # --- 3. Configuration ---
-[5]="configureGit|Linking global and local Git configurations"
-[6]="configureZsh|Configuring Zsh shell, plugins, and custom local overrides"
-[7]="configureDocker|Configuring Docker socket permissions and user groups"
-[8]="configurePyenv|Registering Python pyenv shims"
-[9]="configureOnefetch|Setting up native Onefetch Zsh repository greeters"
-[10]="configureNano|Setting up Nano editor options & 2-space tab layouts"
-[11]="configureParu|Syncing optimized paru AUR-helper configurations"
-[12]="configureSsh|Enabling and linking systemd ssh-agent"
-[13]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
-[14]="configureKwin|Configuring KWin rules and Fcitx5 input methods"
+[6]="configureGit|Linking global and local Git configurations"
+[7]="configureZsh|Configuring Zsh shell, plugins, and custom local overrides"
+[8]="configureDocker|Configuring Docker socket permissions and user groups"
+[9]="configurePyenv|Registering Python pyenv shims"
+[10]="configureOnefetch|Setting up native Onefetch Zsh repository greeters"
+[11]="configureNano|Setting up Nano editor options & 2-space tab layouts"
+[12]="configureParu|Syncing optimized paru AUR-helper configurations"
+[13]="configureSsh|Enabling and linking systemd ssh-agent"
+[14]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
+[15]="configureKwin|Configuring KWin rules and Fcitx5 input methods"
 
 # --- 4. Post-Configuration ---
-[15]="postInstallGitConfig|Applying final Git signing key templates"
-[16]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
+[16]="postInstallGitConfig|Applying final Git signing key templates"
+[17]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
 
 # --- 5. Permissions & Cleanup ---
-[17]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
-[18]="bumpVersion|Tagging dotfiles installation version"
-[19]="removeTemporaryFiles|Cleaning up installer temporary files"
-[20]="promptForReboot|Requesting system restart to apply all changes"
+[18]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
+[19]="bumpVersion|Tagging dotfiles installation version"
+[20]="removeTemporaryFiles|Cleaning up installer temporary files"
+[21]="promptForReboot|Requesting system restart to apply all changes"
 )
 
 includeUtilities()
@@ -129,6 +130,12 @@ setStep()
     echo "$next_step" > "$RESUME_FILE_NAME"
   fi
 }
+
+backupExistingConfigs()
+{
+  source "$BASEDIR/utilities/pre-install/backup-configs.sh"
+}
+
 
 chmodScripts()
 {
@@ -243,7 +250,12 @@ ensureUserOwnershipOfHomeFolder()
     fi
   done
 
-  logSuccess "User file ownership successfully verified!"
+  logInfo "Installing 'dotfiles-doctor' utility globally to /usr/local/bin..."
+  ln -sf "$BASEDIR/utilities/post-install/dotfiles-doctor.sh" "/usr/local/bin/dotfiles-doctor"
+  chmod +x "$BASEDIR/utilities/post-install/dotfiles-doctor.sh"
+  chmod +x "/usr/local/bin/dotfiles-doctor"
+
+  logSuccess "User file ownership and global tools successfully verified!"
 }
 
 removeTemporaryFiles()
