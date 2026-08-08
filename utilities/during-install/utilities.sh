@@ -94,6 +94,33 @@ verifyPacmanLock()
   fi
 }
 
+waitForPacmanLock()
+{
+  local lock_file="/var/lib/pacman/db.lck"
+  if [ -f "$lock_file" ]; then
+    local lock_pid
+    lock_pid=$(cat "$lock_file" 2>/dev/null || true)
+    
+    if [ -n "$lock_pid" ] && ps -p "$lock_pid" &>/dev/null; then
+      local proc_name
+      proc_name=$(ps -p "$lock_pid" -o comm= 2>/dev/null || echo "unknown")
+      logWarning "Pacman database is currently locked by active process: $proc_name (PID: $lock_pid)."
+      
+      # Wait with a gorgeous Gum spinner
+      gum spin --spinner dot --title "Waiting for background process '$proc_name' to release database lock..." -- bash -c "
+        while [ -f '$lock_file' ] && ps -p '$lock_pid' &>/dev/null; do
+          sleep 1
+        done
+      "
+      logSuccess "Pacman lock released! Continuing..."
+    else
+      logWarning "Stale pacman lock file found (/var/lib/pacman/db.lck). Automatically removing..."
+      rm -f "$lock_file"
+    fi
+  fi
+}
+
+
 logInfo()
 {
   gum style --foreground 99 "➜ $1"

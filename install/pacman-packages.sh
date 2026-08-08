@@ -42,6 +42,7 @@ else
 fi
 
 logHeader "Upgrading pacman packages"
+waitForPacmanLock
 pacman -Syu
 logSuccess "Pacman packages upgraded"
 
@@ -106,6 +107,7 @@ if [ "$OS_ID" = "manjaro" ]; then
   )
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."
+  waitForPacmanLock
   pacman -Rns cachyos-zsh-config || true
   packages+=(
     "paru"
@@ -113,6 +115,7 @@ elif [ "$OS_ID" = "cachyos" ]; then
 fi
 
 logHeader "Installing pacman packages"
+waitForPacmanLock
 pacman -S --needed "${packages[@]}"
 
 
