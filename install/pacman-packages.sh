@@ -96,6 +96,7 @@ declare -a packages=(
 "zellij"
 "zsh"
 "zsh-autosuggestions"
+"zsh-completions"
 "zsh-syntax-highlighting"
 )
 
