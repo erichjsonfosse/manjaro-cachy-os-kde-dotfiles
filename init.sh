@@ -251,6 +251,7 @@ ensureUserOwnershipOfHomeFolder()
   done
 
   logInfo "Installing 'kde-dotfiles-doctor' utility globally to /usr/local/bin..."
+  mkdir -p /usr/local/bin
   ln -sf "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh" "/usr/local/bin/kde-dotfiles-doctor"
   chmod +x "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh"
   chmod +x "/usr/local/bin/kde-dotfiles-doctor"
