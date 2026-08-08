@@ -1,6 +1,10 @@
-###> ide ###
+###> IDE ###
 .idea
-###< ide ###
+###< IDE ###
+
+###> Cache ###
+__pycache__
+###< Cache ###
 
 .env
 RESUME.tmp
