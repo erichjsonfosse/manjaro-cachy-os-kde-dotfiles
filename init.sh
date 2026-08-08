@@ -96,10 +96,11 @@ runStep()
   local func="${entry%%|*}"
   local desc="${entry#*|}"
 
+  local styled_step=$(gum style --foreground 99 --bold "➜ Step $1: $func")
+  local styled_desc=$(gum style --foreground 245 --italic " — $desc")
+
   echo ""
-  gum style --inline --foreground 99 --bold "➜ Step $1: $func"
-  gum style --inline --foreground 245 --italic " — $desc"
-  echo ""
+  echo "${styled_step}${styled_desc}"
 
   case "$func" in
     "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
