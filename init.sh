@@ -92,13 +92,15 @@ doRun()
 
 runStep()
 {
+  echo ""
+  gum style --foreground 99 --bold "➜ Step $1: ${steps[$1]}"
+
   case "${steps[$1]}" in
     "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
-      echo -e "\nRunning step $1 (${steps[$1]})..."
       bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Running step $1 (${steps[$1]})..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
+      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
   esac
 
