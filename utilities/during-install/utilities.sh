@@ -66,3 +66,30 @@ getlatesttag()
     tail --lines=1 |
     cut --delimiter='/' --fields=3
 }
+
+verifyPacmanLock()
+{
+  if [ -f "/var/lib/pacman/db.lck" ]; then
+    echo "⚠️  Pacman database lock file exists at /var/lib/pacman/db.lck"
+    
+    local lock_pid
+    lock_pid=$(cat /var/lib/pacman/db.lck 2>/dev/null || true)
+    
+    if [ -n "$lock_pid" ] && ps -p "$lock_pid" &>/dev/null; then
+      local proc_name
+      proc_name=$(ps -p "$lock_pid" -o comm= 2>/dev/null || echo "unknown")
+      echo "It is currently locked by an active process: $proc_name (PID: $lock_pid)."
+      echo "Please wait for that process to finish, or terminate it before continuing."
+      exit 1
+    else
+      echo "The lock file appears to be stale (no active process with PID $lock_pid was found)."
+      if gum confirm "Would you like the installer to remove the stale lock file and continue?"; then
+        rm -f /var/lib/pacman/db.lck
+        echo "Stale lock file removed. Continuing..."
+      else
+        echo "Installation aborted. Please resolve the lock file manually."
+        exit 1
+      fi
+    fi
+  fi
+}

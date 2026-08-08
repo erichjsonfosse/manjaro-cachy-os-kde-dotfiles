@@ -18,32 +18,33 @@ fi
 steps=(
 # --- 1. Setup ---
 [0]="chmodScripts"
-[1]="requestInput"
+[1]="checkPacmanLock"
+[2]="requestInput"
 
 # --- 2. Installation ---
-[2]="installPacmanPackages"
-[3]="installAurPackages"
+[3]="installPacmanPackages"
+[4]="installAurPackages"
 
 # --- 3. Configuration ---
-[4]="configureGit"
-[5]="configureZsh"
-[6]="configureDocker"
-[7]="configurePyenv"
-[8]="configureOnefetch"
-[9]="configureNano"
-[10]="configureSsh"
-[11]="configureVivaldi"
-[12]="configureKwin"
+[5]="configureGit"
+[6]="configureZsh"
+[7]="configureDocker"
+[8]="configurePyenv"
+[9]="configureOnefetch"
+[10]="configureNano"
+[11]="configureSsh"
+[12]="configureVivaldi"
+[13]="configureKwin"
 
 # --- 4. Post-Configuration ---
-[13]="postInstallGitConfig"
-[14]="postInstallZshConfig"
+[14]="postInstallGitConfig"
+[15]="postInstallZshConfig"
 
 # --- 5. Permissions & Cleanup ---
-[15]="ensureUserOwnershipOfHomeFolder"
-[16]="bumpVersion"
-[17]="removeTemporaryFiles"
-[18]="promptForReboot"
+[16]="ensureUserOwnershipOfHomeFolder"
+[17]="bumpVersion"
+[18]="removeTemporaryFiles"
+[19]="promptForReboot"
 )
 
 includeUtilities()
@@ -91,7 +92,7 @@ doRun()
 runStep()
 {
   case "${steps[$1]}" in
-    "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
+    "checkPacmanLock" | "requestInput" | "promptForReboot" | "installPacmanPackages" | "installAurPackages")
       echo -e "\nRunning step $1 (${steps[$1]})..."
       bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "${steps[$1]}"); includeUtilities; setVariables; ${steps[$1]}"
       ;;
@@ -120,6 +121,11 @@ setStep()
 chmodScripts()
 {
   find . -type f -name "*.sh" -exec chmod +x {} +
+}
+
+checkPacmanLock()
+{
+  verifyPacmanLock
 }
 
 requestInput()
