@@ -104,6 +104,8 @@ runStep()
       ;;
   esac
 
+  gum style --foreground 82 "✔ Finished step $1: ${steps[$1]}"
+
   setStep $(($1 + 1))
 }
 
