@@ -65,26 +65,16 @@ doRun()
   includeUtilities;
   setVariables;
 
-  # Keep regular user's sudo timestamp alive in background during entire run
-  # This prevents standard-input timeouts during long AUR compilation steps under 'gum spin'
-  local keepalive_pid=""
-  cleanup_keepalive() {
-    if [ -n "$keepalive_pid" ]; then
-      kill "$keepalive_pid" 2>/dev/null || true
-    fi
+  # Establish a safe, temporary passwordless sudoers rule for the target user during installation.
+  # This completely eliminates tty-association issues and credential timeouts on strict OSes.
+  cleanup_installer() {
+    rm -f /etc/sudoers.d/99-dotfiles-installer
   }
-  trap cleanup_keepalive EXIT INT TERM
+  trap cleanup_installer EXIT INT TERM
 
   if [ -n "$LOGNAME" ] && [ "$LOGNAME" != "root" ]; then
-    # Initialize the sudo timestamp for the regular user using root authority
-    sudo -u "$LOGNAME" -v 2>/dev/null
-    (
-      while true; do
-        sudo -u "$LOGNAME" -n true 2>/dev/null
-        sleep 45
-      done
-    ) &
-    keepalive_pid=$!
+    echo "$LOGNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-dotfiles-installer
+    chmod 440 /etc/sudoers.d/99-dotfiles-installer
   fi
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then

@@ -33,7 +33,11 @@ export  TEMPORARY_CONFIG_FILE_NAME
 ######################### Files ##########################
 
 ######################### HOMEDIR ##########################
-LOGNAME=$(logname)
+if [ -n "$SUDO_USER" ]; then
+  LOGNAME="$SUDO_USER"
+else
+  LOGNAME=$(logname 2>/dev/null || echo "$USER")
+fi
 export LOGNAME
 HOMEDIR=$(eval echo ~"$LOGNAME")
 export HOMEDIR
