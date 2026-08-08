@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-echo "Optimizing pacman settings..."
+logInfo "Optimizing pacman settings..."
 # Enable ParallelDownloads (default to 5)
 if grep -q "^#ParallelDownloads" /etc/pacman.conf; then
   sed -i "s/^#ParallelDownloads.*/ParallelDownloads = 5/" /etc/pacman.conf
@@ -20,13 +20,13 @@ if ! grep -q "ILoveCandy" /etc/pacman.conf; then
 fi
 
 if [ "$OS_ID" = "manjaro" ]; then
-  echo "Updating pacman mirrors..."
+  logInfo "Updating pacman mirrors..."
   pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
 fi
 
-echo "Upgrading pacman packages..."
+logHeader "Upgrading pacman packages"
 pacman -Syu
-echo "Pacman packages upgraded"
+logSuccess "Pacman packages upgraded"
 
 declare -a packages=(
 # Browsers
@@ -94,8 +94,8 @@ elif [ "$OS_ID" = "cachyos" ]; then
   )
 fi
 
-echo "Installing pacman packages..."
+logHeader "Installing pacman packages"
 pacman -S --needed "${packages[@]}"
 
 
-echo "Pacman packages installed"
+logSuccess "Pacman packages installed"

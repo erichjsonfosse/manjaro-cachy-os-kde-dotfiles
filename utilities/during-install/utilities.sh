@@ -93,3 +93,29 @@ verifyPacmanLock()
     fi
   fi
 }
+
+logInfo()
+{
+  gum style --foreground 99 "➜ $1"
+}
+
+logSuccess()
+{
+  gum style --foreground 82 "✔ $1"
+}
+
+logWarning()
+{
+  gum style --foreground 214 "⚠ $1"
+}
+
+logError()
+{
+  gum style --foreground 196 "✖ $1"
+}
+
+logHeader()
+{
+  echo ""
+  gum style --foreground 99 --bold "━━━ $1 ━━━"
+}

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 
-echo "Installing AUR packages..."
+logHeader "Installing AUR packages"
 
 #sed -Ei '/EnableAUR/s/^#//' /etc/pamac.conf
 
 if [ "$OS_ID" = "manjaro" ]; then
   if ! command -v paru &> /dev/null; then
-    echo "Bootstrapping paru manually..."
+    logInfo "Bootstrapping paru manually..."
     sudo pacman -S --needed --noconfirm base-devel git cargo
     rm -rf /tmp/paru-bootstrap
     su "$LOGNAME" -c "git clone https://aur.archlinux.org/paru.git /tmp/paru-bootstrap"
@@ -35,4 +35,4 @@ declare -a packages=(
 sudo -u "$LOGNAME" paru -S "${packages[@]}"
 
 
-echo "AUR packages installed"
+logSuccess "AUR packages installed"
