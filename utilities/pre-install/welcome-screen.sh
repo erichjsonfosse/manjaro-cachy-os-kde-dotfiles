@@ -56,28 +56,25 @@ showWelcomeScreen()
       gum style --foreground 99 --bold "🛠️ Advanced Modular Mode 🛠️"
       echo -e "\n⚠️  WARNING: Running individual configurations assumes that all required dependencies are already installed on your system!\n"
 
-      local options=(
-        "configureGit — Linking global and local Git configurations"
-        "configureZsh — Configuring Zsh shell, plugins, and custom local overrides"
-        "configureDocker — Configuring Docker socket permissions and user groups"
-        "configurePyenv — Registering Python pyenv shims"
-        "configureOnefetch — Setting up native Onefetch Zsh repository greeters"
-        "configureNano — Setting up Nano editor options & 2-space tab layouts"
-        "configureParu — Syncing optimized paru AUR-helper configurations"
-        "configureSsh — Enabling and linking systemd ssh-agent"
-        "configureVivaldi — Setting default browser and applying sanitized Vivaldi preferences"
-        "configureKwin — Configuring KWin rules and Fcitx5 input methods"
-        "postInstallGitConfig — Applying final Git signing key templates"
-        "postInstallZshConfig — Compiling Oh My Zsh theme assets"
-        "ensureUserOwnershipOfHomeFolder — Safely verifying user file ownership and permissions"
-      )
+      local options=()
+      # Build options dynamically from steps array with step indices
+      for idx in $(echo "${!steps[@]}" | tr ' ' '\n' | sort -n); do
+        local entry="${steps[$idx]}"
+        local func="${entry%%|*}"
+        local desc="${entry#*|}"
+        if [[ "$func" =~ ^(configure|postInstall|ensureUserOwnership) ]]; then
+          options+=("$idx: $func — $desc")
+        fi
+      done
 
       local selected_options
-      selected_options=$(printf "%s\n" "${options[@]}" | gum choose --no-limit --cursor.foreground 99 --header "Select configurations to execute (Space to select, Enter to confirm):")
+      selected_options=$(printf "%s\n" "${options[@]}" | gum choose --no-limit --cursor.foreground 99 --header "Select configurations to execute (Press SPACE to toggle selection, ENTER to confirm):")
 
       if [ -z "$selected_options" ]; then
-        echo "No configurations selected. Returning to main menu..."
-        sleep 1.5
+        echo ""
+        gum style --foreground 214 "⚠️  No configurations selected."
+        echo "Tip: Use the arrow keys to navigate, press SPACE to select/toggle items, and press ENTER to confirm."
+        sleep 2.5
         showWelcomeScreen
         return 0
       fi
