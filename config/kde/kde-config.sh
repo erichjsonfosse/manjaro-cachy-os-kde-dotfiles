@@ -109,6 +109,13 @@ chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
 logInfo "Setting active Input Method to Fcitx 5..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
+logInfo "Configuring Fcitx 5 environment variables in /etc/environment..."
+for env_var in "GTK_IM_MODULE=fcitx" "QT_IM_MODULE=fcitx" "XMODIFIERS=@im=fcitx"; do
+  if ! grep -q "^$env_var" /etc/environment 2>/dev/null; then
+    echo "$env_var" >> /etc/environment
+  fi
+done
+
 # 4. Configure Keyboard Layouts ('us', 'no'), Per-Application SwitchMode, and Meta+Space Shortcut
 logInfo "Configuring keyboard layouts ('us', 'no') with per-application switching..."
 KXKB_CONFIG_FILE="$HOMEDIR/.config/kxkbrc"

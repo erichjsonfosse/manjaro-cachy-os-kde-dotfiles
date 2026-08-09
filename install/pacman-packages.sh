@@ -74,6 +74,10 @@ declare -a packages=(
 "xournalpp"
 # Utilities
 "curl"
+"fcitx5"
+"fcitx5-configtool"
+"fcitx5-gtk"
+"fcitx5-qt"
 "filezilla"
 "gum"
 "helm"
