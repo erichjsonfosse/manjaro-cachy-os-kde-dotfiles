@@ -75,6 +75,15 @@ else
   logSuccess "KWin window rule for Yakuake successfully added!"
 fi
 
+# Dismiss Yakuake First Run / Welcome Dialog
+YAKUAKE_CONFIG_FILE="$HOMEDIR/.config/yakuakerc"
+logInfo "Configuring Yakuake..."
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Behavior" "RememberFullscreen" "true"
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Dialogs" "FirstRun" "false"
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "Height" "60"
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "Width" "100"
+chown "$LOGNAME:$LOGNAME" "$YAKUAKE_CONFIG_FILE" 2>/dev/null || true
+
 # 2. Configure Focus Stealing Prevention to Extreme (4)
 logInfo "Setting Focus Stealing Prevention to Extreme..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "4"
