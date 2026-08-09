@@ -8,11 +8,11 @@ writeKdeConfig() {
   local value="$4"
 
   if command -v kwriteconfig6 &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig6 --file "$file" --group "$group" --key "$key" "$value"
+    sudo -H -u "$LOGNAME" kwriteconfig6 --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
   elif command -v kwriteconfig5 &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value"
+    sudo -H -u "$LOGNAME" kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
   elif command -v kwriteconfig &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig --file "$file" --group "$group" --key "$key" "$value"
+    sudo -H -u "$LOGNAME" kwriteconfig --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
   else
     logWarning "KDE config utility (kwriteconfig) not found. Skipping config update for: $key"
   fi
@@ -27,13 +27,13 @@ KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 
 # 1. Configure Yakuake Keep Above Rule
-if [ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=yakuake" "$KWIN_RULES_FILE"; then
+if [ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
   logWarning "KWin window rule for Yakuake already exists. Skipping..."
 else
   # Read existing rule count, default to 0 if not present
   count=0
   if [ -f "$KWIN_RULES_FILE" ]; then
-    count=$(grep -E "^count=" "$KWIN_RULES_FILE" | cut -d'=' -f2)
+    count=$(grep -E "^count=" "$KWIN_RULES_FILE" 2>/dev/null | cut -d'=' -f2 || echo "0")
     count=${count:-0}
   fi
 
@@ -45,11 +45,11 @@ else
     echo -e "[General]\ncount=1\n" > "$KWIN_RULES_FILE"
   else
     # Update the count in General section
-    if grep -q "^count=" "$KWIN_RULES_FILE"; then
+    if grep -q "^count=" "$KWIN_RULES_FILE" 2>/dev/null; then
       sed -i "s/^count=.*/count=$new_count/" "$KWIN_RULES_FILE"
     else
       # If count line is missing but General section exists, insert it
-      if grep -q "\[General\]" "$KWIN_RULES_FILE"; then
+      if grep -q "\[General\]" "$KWIN_RULES_FILE" 2>/dev/null; then
         sed -i "/\[General\]/a count=$new_count" "$KWIN_RULES_FILE"
       else
         # If General section doesn't exist at all

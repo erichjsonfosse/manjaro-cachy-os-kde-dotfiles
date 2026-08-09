@@ -123,26 +123,46 @@ waitForPacmanLock()
 
 logInfo()
 {
-  gum style --foreground 99 "➜ $1"
+  if command -v gum &>/dev/null; then
+    gum style --foreground 99 "➜ $1"
+  else
+    echo "➜ $1"
+  fi
 }
 
 logSuccess()
 {
-  gum style --foreground 82 "✔ $1"
+  if command -v gum &>/dev/null; then
+    gum style --foreground 82 "✔ $1"
+  else
+    echo "✔ $1"
+  fi
 }
 
 logWarning()
 {
-  gum style --foreground 214 "⚠ $1"
+  if command -v gum &>/dev/null; then
+    gum style --foreground 214 "⚠ $1"
+  else
+    echo "⚠ $1"
+  fi
 }
 
 logError()
 {
-  gum style --foreground 196 "✖ $1"
+  if command -v gum &>/dev/null; then
+    gum style --foreground 196 "✖ $1"
+  else
+    echo "✖ $1"
+  fi
 }
 
 logHeader()
 {
   echo ""
-  gum style --foreground 99 --bold "━━━ $1 ━━━"
+  if command -v gum &>/dev/null; then
+    gum style --foreground 99 --bold "━━━ $1 ━━━"
+  else
+    echo "━━━ $1 ━━━"
+  fi
 }
