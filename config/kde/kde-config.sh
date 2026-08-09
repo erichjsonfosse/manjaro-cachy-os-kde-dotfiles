@@ -26,52 +26,44 @@ KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 # Ensure config directories exist
 mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 
-# 1. Configure Yakuake Keep Above Rule
-if [ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
+# 1. Configure Yakuake Keep Above Rule (KDE Plasma 6 & Plasma 5 compatible)
+existing_rules=""
+if command -v kreadconfig6 &>/dev/null; then
+  existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig6 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
+elif command -v kreadconfig5 &>/dev/null; then
+  existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig5 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
+fi
+
+if [[ "$existing_rules" == *"yakuake"* ]] || ([ -f "$KWIN_RULES_FILE" ] && grep -q "wmclass=org.kde.yakuake" "$KWIN_RULES_FILE" 2>/dev/null); then
   logWarning "KWin window rule for Yakuake already exists. Skipping..."
 else
-  # Read existing rule count, default to 0 if not present
-  count=0
-  if [ -f "$KWIN_RULES_FILE" ]; then
-    count=$(grep -E "^count=" "$KWIN_RULES_FILE" 2>/dev/null | cut -d'=' -f2 || echo "0")
-    count=${count:-0}
-  fi
-
-  # Increment count for new rule
-  new_count=$((count + 1))
-
-  # If file doesn't exist or is empty, initialize it
-  if [ ! -f "$KWIN_RULES_FILE" ] || [ ! -s "$KWIN_RULES_FILE" ]; then
-    echo -e "[General]\ncount=1\n" > "$KWIN_RULES_FILE"
+  # KDE Plasma 6 rules list format
+  if [ -n "$existing_rules" ]; then
+    new_rules="${existing_rules},yakuake-always-on-top"
   else
-    # Update the count in General section
-    if grep -q "^count=" "$KWIN_RULES_FILE" 2>/dev/null; then
-      sed -i "s/^count=.*/count=$new_count/" "$KWIN_RULES_FILE"
-    else
-      # If count line is missing but General section exists, insert it
-      if grep -q "\[General\]" "$KWIN_RULES_FILE" 2>/dev/null; then
-        sed -i "/\[General\]/a count=$new_count" "$KWIN_RULES_FILE"
-      else
-        # If General section doesn't exist at all
-        sed -i "1i [General]\ncount=$new_count\n" "$KWIN_RULES_FILE"
-      fi
-    fi
+    new_rules="yakuake-always-on-top"
   fi
 
-  # Append the new Yakuake keep-above rule at the end of the file
-  {
-    echo ""
-    echo "[Rule-$new_count]"
-    echo "Description=Yakuake always on top"
-    echo "above=true"
-    echo "aboveRule=2"
-    echo "wmclass=org.kde.yakuake"
-    echo "wmclassmatch=1"
-  } >> "$KWIN_RULES_FILE"
+  writeKdeConfig "$KWIN_RULES_FILE" "General" "rules" "$new_rules"
+  writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "Description" "Yakuake always on top"
+  writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "above" "true"
+  writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "aboveRule" "2"
+  writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclass" "org.kde.yakuake"
+  writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclassmatch" "1"
 
-  # Fix ownership
-  chown "$LOGNAME":"$LOGNAME" "$KWIN_RULES_FILE"
+  # Legacy Plasma 5 count format fallback
+  count=$(grep -E "^count=" "$KWIN_RULES_FILE" 2>/dev/null | cut -d'=' -f2 || echo "0")
+  count=${count:-0}
+  new_count=$((count + 1))
+  writeKdeConfig "$KWIN_RULES_FILE" "General" "count" "$new_count"
 
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "Description" "Yakuake always on top"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "above" "true"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "aboveRule" "2"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclass" "org.kde.yakuake"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclassmatch" "1"
+
+  chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
   logSuccess "KWin window rule for Yakuake successfully added!"
 fi
 
