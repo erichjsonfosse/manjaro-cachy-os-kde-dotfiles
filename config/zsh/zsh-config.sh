@@ -6,7 +6,20 @@ export ZSH
 
 # Ensure the .zshrc file exists before running grep/sed on it
 if [ ! -f "$ZSHRC_FILE" ]; then
-  su "$LOGNAME" -c "touch \"$ZSHRC_FILE\""
+  sudo -H -u "$LOGNAME" touch "$ZSHRC_FILE"
+fi
+
+# Copy Powerlevel10k configuration file (.p10k.zsh)
+P10K_TEMPLATE="$CONFIGDIR/zsh/.p10k.zsh"
+if [ -f "$P10K_TEMPLATE" ]; then
+  logInfo "Copying Powerlevel10k theme configuration (.p10k.zsh)..."
+  cp "$P10K_TEMPLATE" "$HOMEDIR/.p10k.zsh"
+  chown "$LOGNAME:$LOGNAME" "$HOMEDIR/.p10k.zsh"
+fi
+
+# Add Powerlevel10k Instant Prompt to top of .zshrc if not present
+if ! grep -q 'p10k-instant-prompt' "$ZSHRC_FILE"; then
+  sed -i '1i # Enable Powerlevel10k instant prompt.\nif [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then\n  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"\nfi\n' "$ZSHRC_FILE"
 fi
 
 # Oh My Zsh Installation (only if not already installed)
@@ -14,7 +27,7 @@ if [ ! -d "$ZSH" ]; then
   logInfo "Oh My Zsh not found. Downloading and installing..."
   curl -fsSL -o install-ohmyzsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
   chmod +x install-ohmyzsh.sh
-  su "$LOGNAME" -c "RUNZSH=\"no\" ./install-ohmyzsh.sh --unattended"
+  sudo -H -u "$LOGNAME" env RUNZSH="no" ./install-ohmyzsh.sh --unattended
   rm -f ./install-ohmyzsh.sh
 else
   logInfo "Oh My Zsh already installed. Skipping base installation..."
@@ -22,7 +35,7 @@ fi
 
 # Oh My Zsh Theme (Powerlevel10k)
 if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
-  su "$LOGNAME" -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \"$ZSH/custom/themes/powerlevel10k\""
+  sudo -H -u "$LOGNAME" git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
 fi
 
 # Activate theme
@@ -38,7 +51,7 @@ if ! grep -q '^plugins=.*manjaro-cachy-os-kde-dotfiles' "$ZSHRC_FILE" && ! awk '
 fi
 
 # Add aliases (using symlinks - ensure directory exists first)
-su "$LOGNAME" -c "mkdir -p \"$OHMYZSH_FOLDER/custom/plugins\""
+sudo -H -u "$LOGNAME" mkdir -p "$OHMYZSH_FOLDER/custom/plugins"
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
@@ -54,6 +67,15 @@ if ! grep -q "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggesti
 fi
 if ! grep -q "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" "$ZSHRC_FILE"; then
   echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> "$ZSHRC_FILE"
+fi
+
+# Source ~/.p10k.zsh at the end of .zshrc if not present
+if ! grep -q 'source ~/.p10k.zsh' "$ZSHRC_FILE" && ! grep -q 'source "$HOME/.p10k.zsh"' "$ZSHRC_FILE"; then
+  {
+    echo ""
+    echo "# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh."
+    echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
+  } >> "$ZSHRC_FILE"
 fi
 
 # Sourcing local overrides if they exist

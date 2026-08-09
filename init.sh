@@ -254,6 +254,7 @@ ensureUserOwnershipOfHomeFolder()
     "$HOMEDIR/.oh-my-zsh"
     "$HOMEDIR/.zshrc"
     "$HOMEDIR/.zshrc.local"
+    "$HOMEDIR/.p10k.zsh"
     "$HOMEDIR/.nanorc"
     "$HOMEDIR/.ssh"
     "$HOMEDIR/.gitconfig"
