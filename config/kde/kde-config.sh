@@ -112,7 +112,11 @@ writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applicati
 logInfo "Configuring Fcitx 5 environment variables in /etc/environment..."
 for env_var in "GTK_IM_MODULE=fcitx" "QT_IM_MODULE=fcitx" "XMODIFIERS=@im=fcitx"; do
   if ! grep -q "^$env_var" /etc/environment 2>/dev/null; then
-    echo "$env_var" >> /etc/environment
+    if [ -w "/etc/environment" ]; then
+      echo "$env_var" >> /etc/environment
+    else
+      echo "$env_var" | sudo tee -a /etc/environment >/dev/null 2>&1 || true
+    fi
   fi
 done
 
@@ -129,6 +133,20 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
 
 logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Space,Switch to Next Keyboard Layout"
+
+logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."
+# Application Launcher -> Meta+S
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.plasmashell" "activate application launcher" "Meta+S,none,Activate Application Launcher"
+
+# Overview -> Meta
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Overview" "Meta,none,Toggle Overview"
+
+# Bare Meta key modifier -> Overview in kwinrc
+writeKdeConfig "$KWIN_CONFIG_FILE" "ModifierOnlyShortcuts" "Meta" "org.kde.kwin,/KWin,org.kde.KWin,toggleOverview"
+
+# Clear conflicting shortcuts
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "GridScene" "none,none,Toggle Grid"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "ShowDesktopGrid" "none,none,Show Desktop Grid"
 
 # 5. Configure Fcitx 5 layout profile & shortcut alignment if present
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
