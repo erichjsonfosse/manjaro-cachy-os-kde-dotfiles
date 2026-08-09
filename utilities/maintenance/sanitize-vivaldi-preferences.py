@@ -77,6 +77,7 @@ BLACKLIST_KEYS = {
     'profile_network_context_service',
     'profile_store_backup_password_cleaning_last_timestamp',
     'protection',
+    'protocol_handler',
     'registered_protocol_handlers',
     'reporting',
     'safebrowsing',
