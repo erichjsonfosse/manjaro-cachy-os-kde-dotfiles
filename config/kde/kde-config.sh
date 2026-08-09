@@ -8,11 +8,11 @@ writeKdeConfig() {
   local value="$4"
 
   if command -v kwriteconfig6 &> /dev/null; then
-    su "$LOGNAME" -c "kwriteconfig6 --file \"$file\" --group \"$group\" --key \"$key\" \"$value\""
+    sudo -H -u "$LOGNAME" kwriteconfig6 --file "$file" --group "$group" --key "$key" "$value"
   elif command -v kwriteconfig5 &> /dev/null; then
-    su "$LOGNAME" -c "kwriteconfig5 --file \"$file\" --group \"$group\" --key \"$key\" \"$value\""
+    sudo -H -u "$LOGNAME" kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value"
   elif command -v kwriteconfig &> /dev/null; then
-    su "$LOGNAME" -c "kwriteconfig --file \"$file\" --group \"$group\" --key \"$key\" \"$value\""
+    sudo -H -u "$LOGNAME" kwriteconfig --file "$file" --group "$group" --key "$key" "$value"
   else
     logWarning "KDE config utility (kwriteconfig) not found. Skipping config update for: $key"
   fi
@@ -84,9 +84,52 @@ chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
 logInfo "Setting active Input Method to Fcitx 5..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
-# 4. Notify kwin to reload configurations if running
-if pgrep -x kwin_wayland > /dev/null; then
-  su "$LOGNAME" -c "qdbus org.kde.KWin /KWin reconfigure" || true
+# 4. Configure Keyboard Layouts ('us', 'no'), Per-Application SwitchMode, and Meta+Space Shortcut
+logInfo "Configuring keyboard layouts ('us', 'no') with per-application switching..."
+KXKB_CONFIG_FILE="$HOMEDIR/.config/kxkbrc"
+SHORTCUTS_CONFIG_FILE="$HOMEDIR/.config/kglobalshortcutsrc"
+
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "LayoutList" "us,no"
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Use" "true"
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "VariantList" ","
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "application"
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
+
+logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Space,Switch to Next Keyboard Layout"
+
+# 5. Configure Fcitx 5 layout profile & shortcut alignment if present
+FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
+FCITX5_PROFILE_FILE="$FCITX5_PROFILE_DIR/profile"
+FCITX5_CONFIG_FILE="$FCITX5_PROFILE_DIR/config"
+
+if [ -d "$HOMEDIR/.config" ]; then
+  mkdir -p "$FCITX5_PROFILE_DIR"
+  cat << 'EOF' > "$FCITX5_PROFILE_FILE"
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=keyboard-us
+
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=
+
+[Groups/0/Items/1]
+Name=keyboard-no
+Layout=
+
+[GroupOrder]
+0=Default
+EOF
+
+  writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey/TriggerKeys" "0" "Super+space"
+  chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
 fi
 
-logSuccess "KWin configurations successfully finalized!"
+# 6. Notify kwin to reload configurations if running
+if pgrep -x kwin_wayland > /dev/null; then
+  sudo -H -u "$LOGNAME" qdbus org.kde.KWin /KWin reconfigure 2>/dev/null || true
+fi
+
+logSuccess "KWin and Keyboard configurations successfully finalized!"
