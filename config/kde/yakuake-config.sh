@@ -7,6 +7,8 @@ writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Behavior" "RememberFullscreen" "true"
 writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Dialogs" "FirstRun" "false"
 writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "Height" "60"
 writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "Width" "100"
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "KeepAbove" "true"
+writeKdeConfig "$YAKUAKE_CONFIG_FILE" "Window" "KeepOpen" "true"
 chown "$LOGNAME:$LOGNAME" "$YAKUAKE_CONFIG_FILE" 2>/dev/null || true
 
 # Enable Yakuake autostart on login

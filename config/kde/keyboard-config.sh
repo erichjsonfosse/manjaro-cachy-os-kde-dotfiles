@@ -11,6 +11,7 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Use" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "VariantList" ","
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "application"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" "grp:win_space_toggle"
 
 logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Space,Switch to Next Keyboard Layout"
