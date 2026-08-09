@@ -8,11 +8,13 @@ writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applicati
 
 if [ -w "/etc/environment" ]; then
   logInfo "Configuring Fcitx 5 environment variables in /etc/environment..."
-  for env_var in "GTK_IM_MODULE=fcitx" "QT_IM_MODULE=fcitx" "XMODIFIERS=@im=fcitx"; do
-    if ! grep -q "^$env_var" /etc/environment 2>/dev/null; then
-      echo "$env_var" >> /etc/environment
-    fi
-  done
+  # On KDE Wayland, KWin handles GTK & Qt input natively via Wayland text-input protocols.
+  # We clean up legacy GTK_IM_MODULE/QT_IM_MODULE and set XMODIFIERS for XWayland.
+  sed -i '/^GTK_IM_MODULE=fcitx/d' /etc/environment 2>/dev/null || true
+  sed -i '/^QT_IM_MODULE=fcitx/d' /etc/environment 2>/dev/null || true
+  if ! grep -q "^XMODIFIERS=@im=fcitx" /etc/environment 2>/dev/null; then
+    echo "XMODIFIERS=@im=fcitx" >> /etc/environment
+  fi
 fi
 
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
@@ -40,5 +42,6 @@ Layout=
 EOF
 
   writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey/TriggerKeys" "0" "Super+space"
+  writeKdeConfig "$FCITX5_CONFIG_FILE" "Behavior" "WarnAboutImModule" "False"
   chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
 fi
