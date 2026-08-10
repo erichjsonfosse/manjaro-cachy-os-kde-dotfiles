@@ -14,8 +14,17 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" "grp:win_space_toggle"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ResetOldOptions" "true"
 
+# Apply live XKB keymap options if setxkbmap is available
+if command -v setxkbmap &>/dev/null; then
+  sudo -H -u "$LOGNAME" DISPLAY="${DISPLAY:-:0}" setxkbmap -layout us,no -option grp:win_space_toggle 2>/dev/null || true
+fi
+
 logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Alt+K,Switch to Next Keyboard Layout"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch Keyboard Layout" "Meta+Space,none,Switch Keyboard Layout"
+
+# Prevent KRunner from intercepting Meta+Space
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
 
 logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."
 # Application Launcher -> Meta+S
