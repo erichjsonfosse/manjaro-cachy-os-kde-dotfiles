@@ -9,14 +9,15 @@ logInfo "Configuring keyboard layouts ('us', 'no') with per-application switchin
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "LayoutList" "us,no"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Use" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "VariantList" ","
-writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "application"
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "WinClass"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
-writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" ""
+writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" "grp:win_space_toggle"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ResetOldOptions" "true"
 
-logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
+logInfo "Setting Meta+Space XKB layout shortcut and clearing KWin shortcut collision..."
 for group in "kwin" "org.kde.kwin"; do
-  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$group" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Alt+K,Switch to Next Keyboard Layout"
+  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$group" "Switch to Next Keyboard Layout" "none,Meta+Alt+K,Switch to Next Keyboard Layout"
+  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$group" "Switch Keyboard Layout" "none,none,Switch Keyboard Layout"
 done
 
 # Prevent KRunner from intercepting Meta+Space
