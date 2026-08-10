@@ -46,4 +46,11 @@ EOF
   writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey/EnumerateForwardKeys" "0" "Super+space"
   writeKdeConfig "$FCITX5_CONFIG_FILE" "Behavior" "WarnAboutImModule" "False"
   chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
+
+  # Reload Fcitx 5 daemon if currently running
+  if pgrep -x fcitx5 > /dev/null; then
+    USER_UID=$(id -u "$LOGNAME" 2>/dev/null || echo "1000")
+    DBUS_ADDR="unix:path=/run/user/$USER_UID/bus"
+    sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" fcitx5-remote -r 2>/dev/null || true
+  fi
 fi
