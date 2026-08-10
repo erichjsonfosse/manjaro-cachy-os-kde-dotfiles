@@ -15,7 +15,7 @@ elif command -v kreadconfig5 &>/dev/null; then
   existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig5 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
 fi
 
-if [[ "$existing_rules" != *"yakuake"* ]]; then
+if [[ "$existing_rules" != *"yakuake-always-on-top"* ]]; then
   if [ -n "$existing_rules" ]; then
     new_rules="${existing_rules},yakuake-always-on-top"
   else
@@ -24,38 +24,23 @@ if [[ "$existing_rules" != *"yakuake"* ]]; then
   writeKdeConfig "$KWIN_RULES_FILE" "General" "rules" "$new_rules"
 fi
 
-# Always update rule parameters (Plasma 6 & 5 format)
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "Description" "Yakuake always on top and focused"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "above" "true"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "aboveRule" "3"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focus" "true"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusrule" "3"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusstealing" "0"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusstealingrule" "3"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "types" "1"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclass" "yakuake"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclasscomplete" "false"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclassmatch" "2"
-
-# Legacy Plasma 5 count format fallback
-if ! grep -q "wmclass=yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
-  count=$(grep -E "^count=" "$KWIN_RULES_FILE" 2>/dev/null | cut -d'=' -f2 || echo "0")
-  count=${count:-0}
-  new_count=$((count + 1))
-  writeKdeConfig "$KWIN_RULES_FILE" "General" "count" "$new_count"
-
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "Description" "Yakuake always on top and focused"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "above" "true"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "aboveRule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focus" "true"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusrule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusstealing" "0"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusstealingrule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "types" "1"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclass" "yakuake"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclasscomplete" "false"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclassmatch" "2"
-fi
+# Always update rule parameters for both Plasma 6 (yakuake-always-on-top) and Plasma 5 (Rule-1)
+for sec in "yakuake-always-on-top" "Rule-1"; do
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "Description" "Yakuake always on top and focused"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "above" "true"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "aboverule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "aboveRule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focus" "true"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusrule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusRule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealing" "0"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealingrule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealingRule" "3"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "types" "1"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclass" "yakuake"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclasscomplete" "false"
+  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclassmatch" "2"
+done
 
 chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
 logSuccess "KWin window rule for Yakuake successfully configured!"
