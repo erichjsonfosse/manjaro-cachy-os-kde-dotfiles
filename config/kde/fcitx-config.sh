@@ -3,13 +3,14 @@
 # Configure Fcitx 5 Wayland Virtual Keyboard, /etc/environment variables, and layout profile
 KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 
-logInfo "Configuring KWin to use native KDE Plasma 6 keyboard layout switcher (kxkb)..."
-writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" ""
+logInfo "Configuring KWin Wayland to use Fcitx 5 input method..."
+writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
 if [ -w "/etc/environment" ]; then
-  # On KDE Wayland, KWin handles GTK & Qt input natively via Wayland text-input protocols.
-  sed -i '/^GTK_IM_MODULE=/d' /etc/environment 2>/dev/null || true
-  sed -i '/^QT_IM_MODULE=/d' /etc/environment 2>/dev/null || true
+  # Ensure XMODIFIERS is set for Fcitx 5
+  if ! grep -q "^XMODIFIERS=" /etc/environment 2>/dev/null; then
+    echo "XMODIFIERS=@im=fcitx" >> /etc/environment
+  fi
 fi
 
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
@@ -38,7 +39,7 @@ EOF
 
   cat << 'EOF' > "$FCITX5_CONFIG_FILE"
 [Hotkey]
-TriggerKeys=Super+space
+TriggerKeys=
 EnumerateForwardKeys=Super+space
 EnumerateSkipFirst=False
 
