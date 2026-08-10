@@ -6,12 +6,14 @@ KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 logInfo "Configuring KWin Wayland to use Fcitx 5 input method..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
-if [ -w "/etc/environment" ]; then
+if [ -f "/etc/environment" ]; then
   # On KDE Plasma Wayland, KWin handles GTK & Qt input natively via Wayland text-input protocols.
   # Do NOT set GTK_IM_MODULE or QT_IM_MODULE on Wayland, as it triggers Fcitx 5 Wayland Diagnose warnings.
-  sed -i '/^GTK_IM_MODULE=/d' /etc/environment 2>/dev/null || true
-  sed -i '/^QT_IM_MODULE=/d' /etc/environment 2>/dev/null || true
-  grep -q "^XMODIFIERS=" /etc/environment 2>/dev/null || echo "XMODIFIERS=@im=fcitx" >> /etc/environment
+  sudo sed -i '/^GTK_IM_MODULE=/d' /etc/environment 2>/dev/null || true
+  sudo sed -i '/^QT_IM_MODULE=/d' /etc/environment 2>/dev/null || true
+  if ! grep -q "^XMODIFIERS=" /etc/environment 2>/dev/null; then
+    echo "XMODIFIERS=@im=fcitx" | sudo tee -a /etc/environment >/dev/null || true
+  fi
 fi
 
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
@@ -55,9 +57,9 @@ EOF
 
   cat << 'EOF' > "$FCITX5_CONFIG_FILE"
 [Hotkey]
-TriggerKeys=Control+Space
+TriggerKeys=Super+Space
 AltTriggerKeys=Alt+Shift
-EnumerateForwardKeys=Super+space
+EnumerateForwardKeys=Super+Space
 EnumerateSkipFirst=False
 
 [Behavior]
