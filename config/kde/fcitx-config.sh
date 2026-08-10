@@ -41,7 +41,9 @@ Layout=
 0=Default
 EOF
 
+  writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey" "TriggerKeys" "Super+space"
   writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey/TriggerKeys" "0" "Super+space"
+  writeKdeConfig "$FCITX5_CONFIG_FILE" "Hotkey/EnumerateForwardKeys" "0" "Super+space"
   writeKdeConfig "$FCITX5_CONFIG_FILE" "Behavior" "WarnAboutImModule" "False"
   chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
 fi
