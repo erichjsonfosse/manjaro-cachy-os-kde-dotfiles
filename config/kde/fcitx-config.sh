@@ -16,6 +16,7 @@ fi
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
 FCITX5_PROFILE_FILE="$FCITX5_PROFILE_DIR/profile"
 FCITX5_CONFIG_FILE="$FCITX5_PROFILE_DIR/config"
+SHORTCUTS_CONFIG_FILE="$HOMEDIR/.config/kglobalshortcutsrc"
 
 if [ -d "$HOMEDIR/.config" ]; then
   mkdir -p "$FCITX5_PROFILE_DIR"
@@ -27,11 +28,11 @@ DefaultIM=keyboard-us
 
 [Groups/0/Items/0]
 Name=keyboard-us
-Layout=
+Layout=us
 
 [Groups/0/Items/1]
 Name=keyboard-no
-Layout=
+Layout=no
 
 [GroupOrder]
 0=Default
@@ -39,13 +40,17 @@ EOF
 
   cat << 'EOF' > "$FCITX5_CONFIG_FILE"
 [Hotkey]
-TriggerKeys=
+TriggerKeys=Super+space
 EnumerateForwardKeys=Super+space
 EnumerateSkipFirst=False
 
 [Behavior]
 WarnAboutImModule=False
 EOF
+
+  # Register Meta+Space for Fcitx 5 in KDE Plasma global shortcuts
+  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.fcitx.Fcitx5.desktop" "ToggleIM" "Meta+Space,none,Toggle Input Method"
+  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.fcitx.Fcitx5.desktop" "SwitchForward" "Meta+Space,none,Switch to Next Input Method"
 
   chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
 
