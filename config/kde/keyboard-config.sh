@@ -18,7 +18,8 @@ for group in "kwin" "org.kde.kwin" "kglobalaccel"; do
   writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$group" "Switch to Next Keyboard Layout" "none,none,Switch to Next Keyboard Layout"
 done
 
-# Prevent KRunner from intercepting Meta+Space
+# Prevent KRunner from intercepting Meta+Space in Plasma 5 & 6
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
 
 logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."

@@ -7,19 +7,33 @@ logInfo "Configuring KWin Wayland to use Fcitx 5 input method..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Wayland" "InputMethod" "/usr/share/applications/org.fcitx.Fcitx5.desktop"
 
 if [ -w "/etc/environment" ]; then
-  # Ensure XMODIFIERS is set for Fcitx 5
-  if ! grep -q "^XMODIFIERS=" /etc/environment 2>/dev/null; then
-    echo "XMODIFIERS=@im=fcitx" >> /etc/environment
-  fi
+  # Set environment variables for GTK, Qt, and X11 / Wayland IM support
+  grep -q "^XMODIFIERS=" /etc/environment 2>/dev/null || echo "XMODIFIERS=@im=fcitx" >> /etc/environment
+  grep -q "^GTK_IM_MODULE=" /etc/environment 2>/dev/null || echo "GTK_IM_MODULE=fcitx" >> /etc/environment
+  grep -q "^QT_IM_MODULE=" /etc/environment 2>/dev/null || echo "QT_IM_MODULE=fcitx" >> /etc/environment
 fi
 
 FCITX5_PROFILE_DIR="$HOMEDIR/.config/fcitx5"
 FCITX5_PROFILE_FILE="$FCITX5_PROFILE_DIR/profile"
 FCITX5_CONFIG_FILE="$FCITX5_PROFILE_DIR/config"
+AUTOSTART_DIR="$HOMEDIR/.config/autostart"
 SHORTCUTS_CONFIG_FILE="$HOMEDIR/.config/kglobalshortcutsrc"
 
 if [ -d "$HOMEDIR/.config" ]; then
-  mkdir -p "$FCITX5_PROFILE_DIR"
+  mkdir -p "$FCITX5_PROFILE_DIR" "$AUTOSTART_DIR"
+
+  # Ensure Fcitx 5 autostart desktop entry exists
+  cat << 'EOF' > "$AUTOSTART_DIR/org.fcitx.Fcitx5.desktop"
+[Desktop Entry]
+Name=Fcitx 5
+Exec=fcitx5
+Icon=org.fcitx.Fcitx5
+Type=Application
+Categories=Utility;
+X-KDE-StartupNotify=false
+X-KDE-autostart-after=panel
+EOF
+
   cat << 'EOF' > "$FCITX5_PROFILE_FILE"
 [Groups/0]
 Name=Default
@@ -40,7 +54,8 @@ EOF
 
   cat << 'EOF' > "$FCITX5_CONFIG_FILE"
 [Hotkey]
-TriggerKeys=Super+space
+TriggerKeys=Control+Space
+AltTriggerKeys=Alt+Shift
 EnumerateForwardKeys=Super+space
 EnumerateSkipFirst=False
 
@@ -49,10 +64,12 @@ WarnAboutImModule=False
 EOF
 
   # Register Meta+Space for Fcitx 5 in KDE Plasma global shortcuts
-  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.fcitx.Fcitx5.desktop" "ToggleIM" "Meta+Space,none,Toggle Input Method"
-  writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.fcitx.Fcitx5.desktop" "SwitchForward" "Meta+Space,none,Switch to Next Input Method"
+  for desktop_id in "org.fcitx.Fcitx5.desktop" "fcitx5.desktop" "fcitx5"; do
+    writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$desktop_id" "ToggleIM" "Meta+Space,none,Toggle Input Method"
+    writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "$desktop_id" "SwitchForward" "Meta+Space,none,Switch to Next Input Method"
+  done
 
-  chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" 2>/dev/null || true
+  chown -R "$LOGNAME:$LOGNAME" "$FCITX5_PROFILE_DIR" "$AUTOSTART_DIR" 2>/dev/null || true
 
   # Reload Fcitx 5 daemon if currently running
   if pgrep -x fcitx5 > /dev/null; then
