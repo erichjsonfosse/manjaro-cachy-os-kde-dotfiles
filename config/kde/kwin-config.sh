@@ -24,7 +24,7 @@ if [[ "$existing_rules" != *"yakuake"* ]]; then
   writeKdeConfig "$KWIN_RULES_FILE" "General" "rules" "$new_rules"
 fi
 
-# Always update rule parameters (Plasma 6 format)
+# Always update rule parameters (Plasma 6 & 5 format)
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "Description" "Yakuake always on top and focused"
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "above" "true"
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "aboveRule" "3"
@@ -32,11 +32,13 @@ writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focus" "true"
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusrule" "3"
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusstealing" "0"
 writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "focusstealingrule" "3"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclass" "org.kde.yakuake"
-writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclassmatch" "1"
+writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "types" "1"
+writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclass" "yakuake"
+writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclasscomplete" "false"
+writeKdeConfig "$KWIN_RULES_FILE" "yakuake-always-on-top" "wmclassmatch" "2"
 
 # Legacy Plasma 5 count format fallback
-if ! grep -q "wmclass=org.kde.yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
+if ! grep -q "wmclass=yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
   count=$(grep -E "^count=" "$KWIN_RULES_FILE" 2>/dev/null | cut -d'=' -f2 || echo "0")
   count=${count:-0}
   new_count=$((count + 1))
@@ -49,8 +51,10 @@ if ! grep -q "wmclass=org.kde.yakuake" "$KWIN_RULES_FILE" 2>/dev/null; then
   writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusrule" "3"
   writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusstealing" "0"
   writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "focusstealingrule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclass" "org.kde.yakuake"
-  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclassmatch" "1"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "types" "1"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclass" "yakuake"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclasscomplete" "false"
+  writeKdeConfig "$KWIN_RULES_FILE" "Rule-$new_count" "wmclassmatch" "2"
 fi
 
 chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
