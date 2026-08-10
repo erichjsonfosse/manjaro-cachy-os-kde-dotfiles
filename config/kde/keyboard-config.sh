@@ -15,7 +15,7 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" "grp:win_space_toggle"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ResetOldOptions" "true"
 
 logInfo "Setting Meta+Space shortcut for toggling keyboard layouts..."
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,none,Switch to Next Keyboard Layout"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Alt+K,Switch to Next Keyboard Layout"
 
 logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."
 # Application Launcher -> Meta+S
