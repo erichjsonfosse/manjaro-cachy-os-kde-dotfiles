@@ -37,7 +37,7 @@ steps=(
 [12]="configureParu|Syncing optimized paru AUR-helper configurations"
 [13]="configureSsh|Enabling and linking systemd ssh-agent"
 [14]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
-[15]="configureKwin|Configuring KWin rules and Fcitx5 input methods"
+[15]="configureKwin|Configuring KWin rules and native keyboard layouts"
 
 # --- 4. Post-Configuration ---
 [16]="postInstallGitConfig|Applying final Git signing key templates"

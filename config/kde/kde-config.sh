@@ -10,7 +10,16 @@ source "$KDE_CONFIG_DIR/kde-helpers.sh"
 source "$KDE_CONFIG_DIR/kwin-config.sh"
 source "$KDE_CONFIG_DIR/yakuake-config.sh"
 source "$KDE_CONFIG_DIR/keyboard-config.sh"
-source "$KDE_CONFIG_DIR/fcitx-config.sh"
+# Ensure KWin Wayland InputMethod is empty (using native KDE kxkb layout switcher)
+writeKdeConfig "$HOMEDIR/.config/kwinrc" "Wayland" "InputMethod" ""
+
+# Clean up any residual Fcitx5 user configs and environment variables
+rm -rf "$HOMEDIR/.config/fcitx5" "$HOMEDIR/.config/autostart/org.fcitx.Fcitx5.desktop" "$HOMEDIR/.config/autostart/fcitx5.desktop" 2>/dev/null || true
+if [ -f "/etc/environment" ]; then
+  sudo sed -i '/^GTK_IM_MODULE=/d' /etc/environment 2>/dev/null || true
+  sudo sed -i '/^QT_IM_MODULE=/d' /etc/environment 2>/dev/null || true
+  sudo sed -i '/^XMODIFIERS=/d' /etc/environment 2>/dev/null || true
+fi
 
 # Notify kwin and kglobalaccel to reload configurations if running
 if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
