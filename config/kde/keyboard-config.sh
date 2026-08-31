@@ -21,6 +21,11 @@ done
 # Prevent KRunner from intercepting Meta+Space in Plasma 6
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
 
+logInfo "Setting F12 shortcut for Yakuake drop-down toggle..."
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "yakuake" "toggle-window-state" "F12,F12,Open/Retract Yakuake"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.yakuake.desktop" "_launch" "F12,F12,Open/Retract Yakuake"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.yakuake.desktop" "toggle-window-state" "F12,F12,Open/Retract Yakuake"
+
 logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."
 # Application Launcher -> Meta+S
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.plasmashell" "activate application launcher" "Meta+S,none,Activate Application Launcher"
