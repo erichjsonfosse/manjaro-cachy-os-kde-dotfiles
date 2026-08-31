@@ -21,10 +21,30 @@ fi
 
 if [ "$OS_ID" = "manjaro" ]; then
   logInfo "Updating pacman mirrors for Manjaro..."
-  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
-elif [ "$OS_ID" = "cachyos" ] && command -v cachyos-rate-mirrors &>/dev/null; then
-  logInfo "Updating and ranking pacman mirrors for Cachy OS..."
-  cachyos-rate-mirrors || true
+  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
+elif [ "$OS_ID" = "cachyos" ]; then
+  logInfo "Updating and filtering pacman mirrors for Cachy OS..."
+
+  # 1. Update Arch Linux base mirrorlist with explicit countries via reflector if available
+  if command -v reflector &>/dev/null; then
+    reflector --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
+  fi
+
+  # 2. Filter CachyOS mirrorlist using strict whitelist (approved countries + official CDN)
+  if [ -f "/etc/pacman.d/cachyos-mirrorlist" ]; then
+    trusted_pattern="(\.cachyos\.org|\.no\b|\.se\b|\.dk\b|\.de\b|\.at\b|\.nl\b|\.fr\b|\.ch\b|\.uk\b|\.it\b|\.gr\b|\.jp\b|\.ca\b|no\.mirror|se\.mirror|de\.mirror|nl\.mirror|fr\.mirror|uk\.mirror)"
+    awk -v pat="$trusted_pattern" '/^Server/ { if ($0 ~ pat) print; next } { print }' /etc/pacman.d/cachyos-mirrorlist > /tmp/cachyos-mirrorlist.tmp && mv /tmp/cachyos-mirrorlist.tmp /etc/pacman.d/cachyos-mirrorlist
+  fi
+
+  # 3. Rate remaining whitelisted mirrors
+  if command -v cachyos-rate-mirrors &>/dev/null; then
+    cachyos-rate-mirrors || true
+    # Enforce strict whitelist filter after ranking
+    if [ -f "/etc/pacman.d/cachyos-mirrorlist" ]; then
+      trusted_pattern="(\.cachyos\.org|\.no\b|\.se\b|\.dk\b|\.de\b|\.at\b|\.nl\b|\.fr\b|\.ch\b|\.uk\b|\.it\b|\.gr\b|\.jp\b|\.ca\b|no\.mirror|se\.mirror|de\.mirror|nl\.mirror|fr\.mirror|uk\.mirror)"
+      awk -v pat="$trusted_pattern" '/^Server/ { if ($0 ~ pat) print; next } { print }' /etc/pacman.d/cachyos-mirrorlist > /tmp/cachyos-mirrorlist.tmp && mv /tmp/cachyos-mirrorlist.tmp /etc/pacman.d/cachyos-mirrorlist
+    fi
+  fi
 fi
 
 # Enable Multi-Core Compilation for AUR packages
@@ -90,6 +110,7 @@ declare -a packages=(
 "onefetch"
 "pkgfile"
 "qbittorrent"
+"reflector"
 "shellcheck"
 "squashfuse"
 "unzip"
