@@ -25,12 +25,9 @@ fi
 if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
   USER_UID=$(id -u "$LOGNAME" 2>/dev/null || echo "1000")
   DBUS_ADDR="unix:path=/run/user/$USER_UID/bus"
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || \
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus org.kde.KWin /KWin reconfigure 2>/dev/null || true
+  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
   sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
   sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.kglobalaccel /kglobalaccel reloadConfig >/dev/null 2>&1 || true
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus org.kde.kglobalaccel /kglobalaccel reloadConfig >/dev/null 2>&1 || true
 fi
 
 logSuccess "KDE, KWin, and Keyboard configurations successfully finalized!"

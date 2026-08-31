@@ -9,12 +9,8 @@ writeKdeConfig() {
 
   if command -v kwriteconfig6 &> /dev/null; then
     sudo -H -u "$LOGNAME" kwriteconfig6 --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
-  elif command -v kwriteconfig5 &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
-  elif command -v kwriteconfig &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
   else
-    logWarning "KDE config utility (kwriteconfig) not found. Skipping config update for: $key"
+    logWarning "kwriteconfig6 not found. Skipping config update for: $key"
   fi
   return 0
 }

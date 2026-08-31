@@ -7,12 +7,10 @@ KWIN_CONFIG_FILE="$HOMEDIR/.config/kwinrc"
 
 mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 
-# 1. Configure Yakuake Keep Above and Focus Rules (KDE Plasma 6 & Plasma 5 compatible)
+# 1. Configure Yakuake Keep Above and Focus Rules (KDE Plasma 6)
 existing_rules=""
 if command -v kreadconfig6 &>/dev/null; then
   existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig6 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
-elif command -v kreadconfig5 &>/dev/null; then
-  existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig5 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
 fi
 
 if [[ "$existing_rules" != *"yakuake-always-on-top"* ]]; then
@@ -24,23 +22,18 @@ if [[ "$existing_rules" != *"yakuake-always-on-top"* ]]; then
   writeKdeConfig "$KWIN_RULES_FILE" "General" "rules" "$new_rules"
 fi
 
-# Always update rule parameters for both Plasma 6 (yakuake-always-on-top) and Plasma 5 (Rule-1)
-for sec in "yakuake-always-on-top" "Rule-1"; do
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "Description" "Yakuake always on top and focused"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "above" "true"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "aboverule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "aboveRule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focus" "true"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusrule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusRule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealing" "0"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealingrule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealingRule" "3"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "types" "1"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclass" "yakuake"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclasscomplete" "false"
-  writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclassmatch" "2"
-done
+sec="yakuake-always-on-top"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "Description" "Yakuake always on top and focused"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "above" "true"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "aboverule" "3"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focus" "true"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusrule" "3"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealing" "0"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "focusstealingrule" "3"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "types" "1"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclass" "yakuake"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclasscomplete" "false"
+writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclassmatch" "2"
 
 chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
 logSuccess "KWin window rule for Yakuake successfully configured!"
