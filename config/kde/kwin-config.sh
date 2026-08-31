@@ -38,7 +38,7 @@ writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclassmatch" "2"
 chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
 logSuccess "KWin window rule for Yakuake successfully configured!"
 
-# 2. Configure Focus Stealing Prevention to Extreme (4)
-logInfo "Setting Focus Stealing Prevention to Extreme..."
-writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "4"
+# 2. Configure Focus Stealing Prevention to Medium (2)
+logInfo "Setting Focus Stealing Prevention to Medium (2)..."
+writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "2"
 chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true
