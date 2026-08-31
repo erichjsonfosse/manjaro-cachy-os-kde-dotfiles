@@ -20,8 +20,11 @@ if ! grep -q "ILoveCandy" /etc/pacman.conf; then
 fi
 
 if [ "$OS_ID" = "manjaro" ]; then
-  logInfo "Updating pacman mirrors..."
+  logInfo "Updating pacman mirrors for Manjaro..."
   pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
+elif [ "$OS_ID" = "cachyos" ] && command -v cachyos-rate-mirrors &>/dev/null; then
+  logInfo "Updating and ranking pacman mirrors for Cachy OS..."
+  cachyos-rate-mirrors || true
 fi
 
 # Enable Multi-Core Compilation for AUR packages

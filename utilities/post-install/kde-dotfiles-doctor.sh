@@ -10,7 +10,7 @@ fi
 # Locate gum
 if ! command -v gum &>/dev/null; then
   echo "gum could not be found, installing it..."
-  sudo pacman -S --needed --noconfirm gum
+  sudo pacman -Sy --needed --noconfirm gum
 fi
 
 clear

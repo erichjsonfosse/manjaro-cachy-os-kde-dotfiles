@@ -12,8 +12,8 @@ if [ "$EUID" -ne 0 ]
 fi
 
 if ! command -v gum &> /dev/null; then
-    echo "gum could not be found, installing it..."
-    pacman -S --needed --noconfirm gum
+    echo "gum could not be found, updating package database and installing it..."
+    pacman -Sy --needed --noconfirm gum
 fi
 
 steps=(
