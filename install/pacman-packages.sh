@@ -110,7 +110,6 @@ declare -a packages=(
 "onefetch"
 "pkgfile"
 "qbittorrent"
-"reflector"
 "shellcheck"
 "squashfuse"
 "unzip"
@@ -136,6 +135,7 @@ elif [ "$OS_ID" = "cachyos" ]; then
   pacman -Rns cachyos-zsh-config || true
   packages+=(
     "paru"
+    "reflector"
   )
 fi
 
