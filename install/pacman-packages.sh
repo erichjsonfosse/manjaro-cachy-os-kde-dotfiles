@@ -21,13 +21,13 @@ fi
 
 if [ "$OS_ID" = "manjaro" ]; then
   logInfo "Updating pacman mirrors for Manjaro..."
-  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom
+  pacman-mirrors --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom
 elif [ "$OS_ID" = "cachyos" ]; then
   logInfo "Updating and filtering pacman mirrors for Cachy OS..."
 
   # 1. Update Arch Linux base mirrorlist with explicit countries via reflector if available
   if command -v reflector &>/dev/null; then
-    reflector --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Norway,Sweden,Switzerland,United_Kingdom --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
+    reflector --country Austria,Canada,Denmark,France,Germany,Greece,Italy,Japan,Netherlands,Sweden,Switzerland,United_Kingdom --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
   fi
 
   # 2. Filter CachyOS mirrorlist using strict whitelist (approved countries + official CDN)
