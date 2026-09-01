@@ -28,6 +28,14 @@ if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
   sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
   sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
   sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.kglobalaccel /kglobalaccel reloadConfig >/dev/null 2>&1 || true
+
+  # Restart Yakuake if already running so it re-reads configuration
+  if pgrep -x yakuake > /dev/null; then
+    pkill -x yakuake 2>/dev/null || true
+    sleep 0.3
+    sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" yakuake &>/dev/null &
+    disown
+  fi
 fi
 
 logSuccess "KDE, KWin, and Keyboard configurations successfully finalized!"
