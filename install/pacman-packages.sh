@@ -99,6 +99,7 @@ declare -a packages=(
 # Utilities
 "bat"
 "curl"
+"eza"
 "filezilla"
 "fzf"
 "gum"

@@ -10,4 +10,9 @@ if command -v fzf &>/dev/null; then
   if command -v bat &>/dev/null; then
     export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :300 {} 2>/dev/null || cat {}'"
   fi
+
+  # Directory tree preview via eza when pressing Alt+C
+  if command -v eza &>/dev/null; then
+    export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons --color=always {} 2>/dev/null'"
+  fi
 fi

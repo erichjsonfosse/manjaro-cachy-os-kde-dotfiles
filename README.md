@@ -39,7 +39,8 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 
 ### 🐚 Shell & Terminal Workflow
 * **Zsh & Powerlevel10k:** Fast, beautiful prompt powered by Oh My Zsh, Powerlevel10k, syntax highlighting, and auto-suggestions.
-* **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation.
+* **Eza Modern Directory Listings:** Replaces `ls` with `eza` featuring icons, Git status indicators, and tree hierarchy views.
+* **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation with live `eza` tree previews.
 * **Bat Syntax Highlighting:** Replaces `cat` with `bat` (unpaged) and provides syntax-highlighted manual pages (`man <command>`).
 * **Direnv Integration:** Automatic per-directory environment loading and `.envrc` evaluation.
 * **Zellij Workspace Integration:** Drop-down terminal automatically manages and attaches to persistent Zellij sessions.
@@ -71,11 +72,16 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 | `uuidtohex`    | Strips hyphens to convert a UUID into a raw hexadecimal string  | `uuidtohex ade75aee-69ce-41e3-88ea-048124776ca1` |
 
 ### Shell Aliases & Shortcuts
+* `ls` ➔ `eza --icons --group-directories-first` (Modern directory listing with icons)
+* `ll` ➔ `eza --icons --group-directories-first -l --git` (Long format with Git statuses)
+* `la` ➔ `eza --icons --group-directories-first -la --git` (Long format including hidden files)
+* `lt` ➔ `eza --icons --group-directories-first --tree` (Tree hierarchy view)
+* `lta` ➔ `eza --icons --group-directories-first --tree -la` (Complete tree view with hidden files)
 * `cat` ➔ `bat --paging=never` (Syntax-highlighted file viewer)
 * `glt` ➔ `getlatesttag`
 * `Ctrl+R` ➔ Fuzzy search command history (fzf)
 * `Ctrl+T` ➔ Fuzzy search files with live syntax preview (fzf + bat)
-* `Alt+C` ➔ Fuzzy search and `cd` into subdirectories (fzf)
+* `Alt+C` ➔ Fuzzy search and `cd` into subdirectories with tree preview (fzf + eza)
 
 ### Git Aliases
 * `git last` ➔ Shows the most recent commit log entry.
@@ -85,5 +91,4 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 
 ## 📋 Roadmap / TODO
 
-- [ ] `eza` directory listing utility and aliases
 - [ ] `herdr` and possibly plugins (possibly replacement for `zellij`)
