@@ -66,7 +66,7 @@ fi
 
 logHeader "Upgrading pacman packages"
 waitForPacmanLock
-pacman -Syu
+pacman -Syu --noconfirm
 logSuccess "Pacman packages upgraded"
 
 declare -a packages=(
@@ -136,7 +136,7 @@ if [ "$OS_ID" = "manjaro" ]; then
 elif [ "$OS_ID" = "cachyos" ]; then
   echo "Removing CachyOS Zsh defaults..."
   waitForPacmanLock
-  pacman -Rns cachyos-zsh-config || true
+  pacman -Rns --noconfirm cachyos-zsh-config || true
   packages+=(
     "paru"
     "reflector"
@@ -145,7 +145,7 @@ fi
 
 logHeader "Installing pacman packages"
 waitForPacmanLock
-pacman -S --needed "${packages[@]}"
+pacman -S --needed --noconfirm "${packages[@]}"
 
 
 logSuccess "Pacman packages installed"

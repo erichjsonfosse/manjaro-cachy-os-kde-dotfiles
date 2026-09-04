@@ -143,7 +143,10 @@ verifyPacmanLock()
       exit 1
     else
       echo "The lock file appears to be stale (no active process with PID $lock_pid was found)."
-      if gum confirm "Would you like the installer to remove the stale lock file and continue?"; then
+      if [ "${UNATTENDED:-false}" = "true" ]; then
+        rm -f /var/lib/pacman/db.lck
+        logWarning "Stale lock file automatically removed for unattended installation."
+      elif gum confirm "Would you like the installer to remove the stale lock file and continue?"; then
         rm -f /var/lib/pacman/db.lck
         echo "Stale lock file removed. Continuing..."
       else
