@@ -14,12 +14,18 @@ cd manjaro-cachy-os-kde-dotfiles
 sudo ./init.sh
 ```
 
-### 🎛️ Interactive Installation Modes
+### 🎛️ Installation Modes
 
-The installer features a clean, interactive TUI powered by **[Gum](https://github.com/charmbracelet/gum)**:
+The installer features an interactive TUI powered by **[Gum](https://github.com/charmbracelet/gum)** as well as a fully automated unattended mode:
 
-* **Standard (Full Run):** Automatically runs the complete end-to-end configuration pipeline (system backups, package upgrades, shell environment, and desktop settings).
-* **Advanced (Modular Mode):** Allows you to select and run specific configuration steps individually (e.g. selectively re-running only `configureKwin`, `configureZsh`, `installPackages`, or `configureGit`).
+* **Interactive (Standard):** Automatically runs the complete end-to-end configuration pipeline with interactive prompts for Git credentials and confirmation checks.
+* **Interactive (Modular / Advanced):** Allows you to select and run specific configuration steps individually (e.g., selectively re-running only `configureKwin`, `configureZsh`, `installPackages`, or `configureGit`).
+* **Unattended Mode:** Place a validated `.dotfiles.unattended` file in the root of the repository (template provided via `.dotfiles.unattended.example`). The installer will validate required settings, skip all interactive prompts, and run end-to-end automatically:
+  ```bash
+  cp .dotfiles.unattended.example .dotfiles.unattended
+  # Edit .dotfiles.unattended with your credentials and reboot preference
+  sudo ./init.sh
+  ```
 
 ---
 
@@ -33,6 +39,9 @@ The installer features a clean, interactive TUI powered by **[Gum](https://githu
 
 ### 🐚 Shell & Terminal Workflow
 * **Zsh & Powerlevel10k:** Fast, beautiful prompt powered by Oh My Zsh, Powerlevel10k, syntax highlighting, and auto-suggestions.
+* **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation.
+* **Bat Syntax Highlighting:** Replaces `cat` with `bat` (unpaged) and provides syntax-highlighted manual pages (`man <command>`).
+* **Direnv Integration:** Automatic per-directory environment loading and `.envrc` evaluation.
 * **Zellij Workspace Integration:** Drop-down terminal automatically manages and attaches to persistent Zellij sessions.
 * **Node Version Manager (NVM):** Automatic NVM hooks and Angular CLI autocompletion support.
 
@@ -40,7 +49,11 @@ The installer features a clean, interactive TUI powered by **[Gum](https://githu
 * **Fast Parallel Downloads:** Automatically enables `ParallelDownloads = 5` and custom pacman progress styling.
 * **Secure & Rated Mirrors:** Automated mirror updating and benchmarking via `pacman-mirrors` (Manjaro), `reflector`, and `cachyos-rate-mirrors` (CachyOS), strictly filtered through a curated country whitelist.
 * **Multi-Core AUR Compilation:** Automatically configures `makepkg` to compile packages in parallel across available CPU cores.
-* **Modern AUR Helper:** Bootstraps `paru` for fast AUR package management.
+* **Modern AUR Helper:** Bootstraps `paru` for fast AUR package management (including Google Cloud CLI tools).
+
+### 🔧 Git & Secrets Hygiene
+* **Global Git Ignore (`~/.gitignore.global`):** Automatically ignores sensitive environment files across all projects (e.g., `.envrc.local` and `.env*.local`).
+* **Modular Git Config:** Maintains separation between tracked global `.gitconfig` and machine-local `.gitconfig.local`.
 
 ### 🩺 System Diagnostics
 * **KDE Dotfiles Doctor:** Includes `utilities/post-install/kde-dotfiles-doctor.sh` to verify system health, package dependencies, and configuration integrity after installation.
@@ -57,8 +70,12 @@ The installer features a clean, interactive TUI powered by **[Gum](https://githu
 | `hextouuid`    | Converts a 32-character hexadecimal string into a standard UUID | `hextouuid 9CE4F1095C05422CB261AAAAE2F04476`     |
 | `uuidtohex`    | Strips hyphens to convert a UUID into a raw hexadecimal string  | `uuidtohex ade75aee-69ce-41e3-88ea-048124776ca1` |
 
-### Shell Aliases
+### Shell Aliases & Shortcuts
+* `cat` ➔ `bat --paging=never` (Syntax-highlighted file viewer)
 * `glt` ➔ `getlatesttag`
+* `Ctrl+R` ➔ Fuzzy search command history (fzf)
+* `Ctrl+T` ➔ Fuzzy search files with live syntax preview (fzf + bat)
+* `Alt+C` ➔ Fuzzy search and `cd` into subdirectories (fzf)
 
 ### Git Aliases
 * `git last` ➔ Shows the most recent commit log entry.
@@ -68,8 +85,5 @@ The installer features a clean, interactive TUI powered by **[Gum](https://githu
 
 ## 📋 Roadmap / TODO
 
-- [ ] Git Credentials Manager integration
 - [ ] `eza` directory listing utility and aliases
-- [ ] `bat` and `fzf` terminal enhancements
-- [ ] Starship prompt exploration
-- [ ] Unattended setup CLI flags for automated CI/VM deployments
+- [ ] `herdr` and possibly plugins (possibly replacement for `zellij`)
