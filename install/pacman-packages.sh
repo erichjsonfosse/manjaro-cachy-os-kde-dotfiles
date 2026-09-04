@@ -97,8 +97,10 @@ declare -a packages=(
 "obsidian"
 "xournalpp"
 # Utilities
+"bat"
 "curl"
 "filezilla"
+"fzf"
 "gum"
 "helm"
 "inkscape"
