@@ -289,5 +289,33 @@ promptForReboot()
 }
 
 setVariables
-source ./utilities/pre-install/welcome-screen.sh
-showWelcomeScreen
+includeUtilities
+
+UNATTENDED_FILE="$BASEDIR/.dotfiles.unattended"
+if [ -f "$UNATTENDED_FILE" ]; then
+  validateUnattendedConfig "$UNATTENDED_FILE"
+
+  # Source unattended configuration
+  # shellcheck disable=SC1090
+  source "$UNATTENDED_FILE"
+  export UNATTENDED="true"
+  export AUTO_REBOOT="${AUTO_REBOOT:-false}"
+
+  # Pre-populate temporary config file with credentials
+  echo "MANJARO_DOTFILES_GIT_CONFIG_NAME=\"$GIT_NAME\"" > "$TEMPORARY_CONFIG_FILE_NAME"
+  echo "MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS=\"$GIT_EMAIL_ADDRESS\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
+  if [ -n "${GIT_SIGNING_KEY:-}" ]; then
+    echo "MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY=\"$GIT_SIGNING_KEY\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
+  fi
+
+  logHeader "Running in Unattended Installation Mode"
+  logInfo "Configuration loaded from .dotfiles.unattended"
+  logInfo "Git User: $GIT_NAME <$GIT_EMAIL_ADDRESS>"
+  logInfo "Auto Reboot: $AUTO_REBOOT"
+  echo ""
+
+  doRun
+else
+  source ./utilities/pre-install/welcome-screen.sh
+  showWelcomeScreen
+fi

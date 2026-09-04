@@ -35,7 +35,7 @@ declare -a packages=(
 )
 
 waitForPacmanLock
-sudo -u "$LOGNAME" paru -Syu --needed "${packages[@]}"
+sudo -u "$LOGNAME" paru -Syu --needed --noconfirm "${packages[@]}"
 
 
 logSuccess "AUR packages installed"

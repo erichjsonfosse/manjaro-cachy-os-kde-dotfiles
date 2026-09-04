@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# In unattended mode, credentials are pre-populated from .dotfiles.unattended
+if [ "${UNATTENDED:-false}" = "true" ]; then
+  return 0 2>/dev/null || exit 0
+fi
+
 ######################### Git Config ##########################
 MANJARO_DOTFILES_GIT_CONFIG_NAME=$(gum input --prompt "Name for Git Config: ")
 MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS=$(gum input --prompt "Email address for Git Config: ")

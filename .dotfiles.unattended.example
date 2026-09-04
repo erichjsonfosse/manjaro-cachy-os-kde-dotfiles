@@ -1,0 +1,16 @@
+# ==============================================================================
+# Manjaro & CachyOS KDE Dotfiles - Unattended Configuration Template
+# ==============================================================================
+# To use: Copy this file to '.dotfiles.unattended' in the root of the repository
+# and set your configuration values below before running 'sudo ./init.sh'.
+# ==============================================================================
+
+# Required: Git user credentials
+GIT_NAME="Your Name"
+GIT_EMAIL_ADDRESS="your.email@example.com"
+
+# Optional: GPG/SSH Signing key (leave empty if none)
+GIT_SIGNING_KEY=""
+
+# Required: Automatically reboot when installation is complete (true | false)
+AUTO_REBOOT=false
