@@ -6,6 +6,7 @@
 	trace = log --graph --decorate --oneline --all
 [core]
 	editor = nano
+	excludesfile = ~/.gitignore.global
 [pull]
 	ff = only
 [gpg]

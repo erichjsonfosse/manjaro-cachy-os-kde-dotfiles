@@ -31,6 +31,7 @@ files_to_backup=(
   "$HOMEDIR/.ssh/config"
   "$HOMEDIR/.gitconfig"
   "$HOMEDIR/.gitconfig.local"
+  "$HOMEDIR/.gitignore.global"
 )
 
 backed_up=0

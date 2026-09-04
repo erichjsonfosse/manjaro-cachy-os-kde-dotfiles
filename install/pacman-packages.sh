@@ -76,6 +76,7 @@ declare -a packages=(
 "aspnet-runtime"
 "azure-cli"
 "code"
+"direnv"
 "docker"
 "docker-buildx"
 "docker-compose"

@@ -259,6 +259,7 @@ ensureUserOwnershipOfHomeFolder()
     "$HOMEDIR/.ssh"
     "$HOMEDIR/.gitconfig"
     "$HOMEDIR/.gitconfig.local"
+    "$HOMEDIR/.gitignore.global"
   )
 
   for target in "${targets[@]}"; do

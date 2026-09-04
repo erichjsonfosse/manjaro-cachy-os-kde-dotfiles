@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Symlink the main .gitconfig (run as user to preserve permissions)
+# Symlink the main .gitconfig and .gitignore.global (run as user to preserve permissions)
 su "$LOGNAME" -c "ln -sf \"$CONFIGDIR/git/.gitconfig\" \"$GIT_CONFIG_FILE\""
+su "$LOGNAME" -c "ln -sf \"$CONFIGDIR/git/.gitignore.global\" \"$HOMEDIR/.gitignore.global\""
 
 # Create a local gitconfig for user-specific credentials (run as user)
 if [ -n "$MANJARO_DOTFILES_GIT_CONFIG_NAME" ]; then
