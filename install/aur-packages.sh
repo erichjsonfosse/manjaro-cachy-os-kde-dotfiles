@@ -23,6 +23,7 @@ declare -a packages=(
 "google-chrome"
 "google-cloud-cli"
 "google-cloud-cli-gsutil"
+"herdr-bin"
 "hyphen-nb"
 "insomnia-bin"
 "jetbrains-toolbox"

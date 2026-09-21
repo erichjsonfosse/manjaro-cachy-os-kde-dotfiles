@@ -107,6 +107,7 @@ fi
 
 # Preparing PATH config
 uncommentZshrcPath
+addToZshrcPath '$HOME/.local/bin'
 
 # Setting Zsh as shell for root and user
 chsh -s /bin/zsh

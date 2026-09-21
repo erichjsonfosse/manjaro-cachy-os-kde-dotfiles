@@ -43,7 +43,7 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation with live `eza` tree previews.
 * **Bat Syntax Highlighting:** Replaces `cat` with `bat` (unpaged) and provides syntax-highlighted manual pages (`man <command>`).
 * **Direnv Integration:** Automatic per-directory environment loading and `.envrc` evaluation.
-* **Zellij Workspace Integration:** Drop-down terminal automatically manages and attaches to persistent Zellij sessions.
+* **Herdr Workspace & HUD Integration:** Drop-down terminal automatically manages AI agent workspaces and terminal sessions via `herdr-bin`. Includes the [herdr-hud](https://github.com/erichjsonfosse/herdr-hud) plugin with top tab bar shortcut info (`herdr-hud line`) and interactive command palette modal (`prefix Space`), supporting seamless machine-local overrides in `~/.config/herdr/config.local.toml`.
 * **Node Version Manager (NVM):** Automatic NVM hooks and Angular CLI autocompletion support.
 
 ### 📦 Package Management & System Tuning
@@ -91,4 +91,3 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 
 ## 📋 Roadmap / TODO
 
-- [ ] `herdr` and possibly plugins (possibly replacement for `zellij`)

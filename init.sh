@@ -38,16 +38,17 @@ steps=(
 [13]="configureSsh|Enabling and linking systemd ssh-agent"
 [14]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
 [15]="configureKwin|Configuring KWin rules and native keyboard layouts"
+[16]="configureHerdr|Setting up Herdr workspace manager and local overrides"
 
 # --- 4. Post-Configuration ---
-[16]="postInstallGitConfig|Applying final Git signing key templates"
-[17]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
+[17]="postInstallGitConfig|Applying final Git signing key templates"
+[18]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
 
 # --- 5. Permissions & Cleanup ---
-[18]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
-[19]="bumpVersion|Tagging dotfiles installation version"
-[20]="removeTemporaryFiles|Cleaning up installer temporary files"
-[21]="promptForReboot|Requesting system restart to apply all changes"
+[19]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
+[20]="bumpVersion|Tagging dotfiles installation version"
+[21]="removeTemporaryFiles|Cleaning up installer temporary files"
+[22]="promptForReboot|Requesting system restart to apply all changes"
 )
 
 includeUtilities()
@@ -243,6 +244,11 @@ configureKwin()
   source "$CONFIGDIR/kde/kde-config.sh"
 }
 
+configureHerdr()
+{
+  source "$CONFIGDIR/herdr/herdr-config.sh"
+}
+
 ensureUserOwnershipOfHomeFolder()
 {
   logHeader "Ensuring correct user file ownership"
@@ -260,6 +266,7 @@ ensureUserOwnershipOfHomeFolder()
     "$HOMEDIR/.gitconfig"
     "$HOMEDIR/.gitconfig.local"
     "$HOMEDIR/.gitignore.global"
+    "$HOMEDIR/.local"
   )
 
   for target in "${targets[@]}"; do

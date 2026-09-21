@@ -1,0 +1,41 @@
+# Herdr Base Configuration
+# Machine-local overrides can be placed in ~/.config/herdr/config.local.toml
+onboarding = false
+
+[experimental]
+# Restores previous pane screen contents and scrollback history across full reboots/server restarts
+pane_history = true
+
+[keys]
+split_vertical = "prefix+v"
+split_horizontal = "prefix+-"
+close_pane = "prefix+x"
+fullscreen = "prefix+f"
+
+[[keys.command]]
+key = "prefix+space"
+type = "popup"
+command = "herdr-hud menu"
+width = "75%"
+height = 22
+description = "Herdr Command Palette & Shortcuts"
+
+[session]
+# Resumes AI agent sessions (Antigravity CLI, Claude, Codex, etc.) into their active conversations
+resume_agents_on_restore = true
+
+[theme]
+name = "dracula"
+auto_switch = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+status_indicators = "symbols"
+
+tab_bar_position = "top"
+tab_bar_right = [
+  { type = "command", command = "herdr-hud line", interval_seconds = 1, timeout_seconds = 2 }
+]
+
+[ui.toast]
+delivery = "system"

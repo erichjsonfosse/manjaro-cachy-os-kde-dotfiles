@@ -75,6 +75,7 @@ declare -a packages=(
 # Development
 "aspnet-runtime"
 "azure-cli"
+"cargo"
 "code"
 "direnv"
 "docker"
@@ -120,7 +121,6 @@ declare -a packages=(
 "wl-clipboard"
 "xclip"
 "yakuake"
-"zellij"
 "zsh"
 "zsh-autosuggestions"
 "zsh-completions"

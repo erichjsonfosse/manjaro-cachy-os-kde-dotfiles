@@ -8,6 +8,6 @@ source "${0:A:h}"/eza.zsh
 source "${0:A:h}"/fzf.zsh
 source "${0:A:h}"/gh-cli.zsh
 source "${0:A:h}"/git.zsh
+source "${0:A:h}"/herdr.zsh
 source "${0:A:h}"/uuid.zsh
-source "${0:A:h}"/zellij.zsh
 

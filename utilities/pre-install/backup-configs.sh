@@ -23,6 +23,8 @@ logHeader "Creating Configuration Backups"
 backup_dir="$HOMEDIR/.manjaro-cachy-os-kde-dotfiles-backup/$(date +"%Y-%m-%d-%H-%M")"
 
 files_to_backup=(
+  "$HOMEDIR/.config/herdr/config.toml"
+  "$HOMEDIR/.config/herdr/config.local.toml"
   "$HOMEDIR/.config/kwinrulesrc"
   "$HOMEDIR/.config/kwinrc"
   "$HOMEDIR/.zshrc"
