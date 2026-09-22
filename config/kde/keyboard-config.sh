@@ -14,8 +14,7 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" ""
 
 logInfo "Setting Meta+Space shortcut for toggling native KDE keyboard layouts..."
-deleteKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.kwin" "Switch to Next Keyboard Layout"
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Space,Switch to Next Keyboard Layout"
+writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "KDE Keyboard Layout Switcher" "Switch to Next Keyboard Layout" "Meta+Space,Meta+Alt+K,Switch to Next Keyboard Layout"
 
 # Prevent KRunner from intercepting Meta+Space in Plasma 6
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
