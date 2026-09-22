@@ -28,7 +28,7 @@ if command -v herdr &>/dev/null; then
   logInfo "Checking Herdr plugin: herdr-hud (erichjsonfosse/herdr-hud)..."
   if ! sudo -H -u "$LOGNAME" herdr plugin list 2>/dev/null | grep -q "herdr-hud"; then
     logInfo "Installing herdr-hud plugin from GitHub..."
-    sudo -H -u "$LOGNAME" env PATH="$HOMEDIR/.local/bin:$PATH" herdr plugin install erichjsonfosse/herdr-hud 2>/dev/null || logWarning "Could not install herdr-hud plugin (offline or build skipped)"
+    sudo -H -u "$LOGNAME" env PATH="$HOMEDIR/.local/bin:$PATH" herdr plugin install --yes erichjsonfosse/herdr-hud 2>/dev/null || logWarning "Could not install herdr-hud plugin (offline or build skipped)"
   else
     logInfo "herdr-hud plugin is already installed"
   fi
