@@ -2,10 +2,9 @@
 
 logHeader "Applying Git Signing Key Configuration"
 
-if [ -f "$GIT_CONFIG_FILE" ]; then
-  # Replace signingkey placeholder in the .gitconfig file
-  sed -i "s~MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY~$MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY~g" "$GIT_CONFIG_FILE"
+if [ -n "$DOTFILES_GIT_SIGNING_KEY" ]; then
+  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.signingkey \"$DOTFILES_GIT_SIGNING_KEY\""
   logSuccess "Git signing key successfully synchronized!"
 else
-  logWarning "Git configuration file ($GIT_CONFIG_FILE) not found. Skipping key replacement..."
+  logInfo "No Git signing key specified (skipping)..."
 fi

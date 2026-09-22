@@ -91,7 +91,7 @@ showWelcomeScreen()
 
       # Check if any selected option is a Git configuration
       if echo "$selected_options" | grep -Eq "configureGit|postInstallGitConfig"; then
-        if [ -z "$MANJARO_DOTFILES_GIT_CONFIG_NAME" ] && [ -z "$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS" ]; then
+        if [ -z "$DOTFILES_GIT_NAME" ] && [ -z "$DOTFILES_GIT_EMAIL" ]; then
           echo ""
           gum style --foreground 208 "⚠️ Git configurations selected, but no credentials were found in the environment."
           if gum confirm "Would you like to collect Git credentials now?"; then

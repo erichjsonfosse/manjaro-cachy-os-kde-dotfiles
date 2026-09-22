@@ -38,9 +38,9 @@ elif [ -f "TEMPORARY_CONFIG_FILE.tmp" ]; then
   # shellcheck disable=SC1090
   source "TEMPORARY_CONFIG_FILE.tmp"
 fi
-export MANJARO_DOTFILES_GIT_CONFIG_NAME
-export MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS
-export MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY
+export DOTFILES_GIT_NAME
+export DOTFILES_GIT_EMAIL
+export DOTFILES_GIT_SIGNING_KEY
 ######################### Files ##########################
 
 ######################### HOMEDIR ##########################

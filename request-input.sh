@@ -6,9 +6,9 @@ if [ "${UNATTENDED:-false}" = "true" ]; then
 fi
 
 ######################### Git Config ##########################
-MANJARO_DOTFILES_GIT_CONFIG_NAME=$(gum input --prompt "Name for Git Config: ")
-MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS=$(gum input --prompt "Email address for Git Config: ")
+DOTFILES_GIT_NAME=$(gum input --prompt "Name for Git Config: ")
+DOTFILES_GIT_EMAIL=$(gum input --prompt "Email address for Git Config: ")
 
-echo "MANJARO_DOTFILES_GIT_CONFIG_NAME=\"$MANJARO_DOTFILES_GIT_CONFIG_NAME\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
-echo "MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS=\"$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
+echo "DOTFILES_GIT_NAME=\"$DOTFILES_GIT_NAME\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
+echo "DOTFILES_GIT_EMAIL=\"$DOTFILES_GIT_EMAIL\"" >> "$TEMPORARY_CONFIG_FILE_NAME"
 ######################### Git Config ##########################

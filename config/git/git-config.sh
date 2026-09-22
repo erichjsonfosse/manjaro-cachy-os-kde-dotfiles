@@ -8,14 +8,14 @@ su "$LOGNAME" -c "ln -sf \"$CONFIGDIR/git/.gitignore.global\" \"$HOMEDIR/.gitign
 su "$LOGNAME" -c "touch \"$HOMEDIR/.gitconfig.local\""
 
 # Create a local gitconfig for user-specific credentials (run as user)
-if [ -n "$MANJARO_DOTFILES_GIT_CONFIG_NAME" ]; then
-  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.name \"$MANJARO_DOTFILES_GIT_CONFIG_NAME\""
+if [ -n "$DOTFILES_GIT_NAME" ]; then
+  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.name \"$DOTFILES_GIT_NAME\""
 fi
 
-if [ -n "$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS" ]; then
-  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.email \"$MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS\""
+if [ -n "$DOTFILES_GIT_EMAIL" ]; then
+  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.email \"$DOTFILES_GIT_EMAIL\""
 fi
 
-if [ -n "$MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY" ]; then
-  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.signingkey \"$MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY\""
+if [ -n "$DOTFILES_GIT_SIGNING_KEY" ]; then
+  su "$LOGNAME" -c "git config --file \"$HOMEDIR/.gitconfig.local\" user.signingkey \"$DOTFILES_GIT_SIGNING_KEY\""
 fi
