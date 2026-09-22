@@ -48,7 +48,7 @@ steps=(
 [19]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
 [20]="bumpVersion|Tagging dotfiles installation version"
 [21]="removeTemporaryFiles|Cleaning up installer temporary files"
-[22]="promptForReboot|Requesting system restart to apply all changes"
+[22]="promptForReboot|Finalizing installation and managing system restart"
 )
 
 includeUtilities()

@@ -23,7 +23,7 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Unattended Mode:** Place a validated `.dotfiles.unattended` file in the root of the repository (template provided via `.dotfiles.unattended.example`). The installer will validate required settings, skip all interactive prompts, and run end-to-end automatically:
   ```bash
   cp .dotfiles.unattended.example .dotfiles.unattended
-  # Edit .dotfiles.unattended with your credentials and reboot preference
+  # Edit .dotfiles.unattended with credentials and reboot mode (ask, true, or false)
   sudo ./init.sh
   ```
 

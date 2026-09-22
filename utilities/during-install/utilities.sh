@@ -27,9 +27,9 @@ validateUnattendedConfig()
   fi
 
   if [ -z "$val_reboot" ]; then
-    errors+=("AUTO_REBOOT is required in .dotfiles.unattended (must be 'true' or 'false')")
-  elif [ "$val_reboot" != "true" ] && [ "$val_reboot" != "false" ]; then
-    errors+=("AUTO_REBOOT must be set to 'true' or 'false' (got: '$val_reboot')")
+    errors+=("AUTO_REBOOT is required in .dotfiles.unattended (must be 'true', 'false', or 'ask')")
+  elif [ "$val_reboot" != "true" ] && [ "$val_reboot" != "false" ] && [ "$val_reboot" != "ask" ]; then
+    errors+=("AUTO_REBOOT must be set to 'true', 'false', or 'ask' (got: '$val_reboot')")
   fi
 
   if [ ${#errors[@]} -gt 0 ]; then
@@ -55,9 +55,18 @@ askForReboot()
       echo ""
       reboot
       exit 0
+    elif [ "${AUTO_REBOOT:-false}" = "ask" ]; then
+      if gum confirm "Reboot (recommended)?"; then
+        reboot
+        exit 0
+      else
+        echo ""
+        logSuccess "Installation completed successfully! (A reboot is recommended to apply all changes)"
+        exit 0
+      fi
     else
       echo ""
-      logSuccess "Installation completed successfully! (A reboot is recommended to apply all changes)"
+      logSuccess "Installation completed successfully! (Reboot deferred)"
       exit 0
     fi
   fi

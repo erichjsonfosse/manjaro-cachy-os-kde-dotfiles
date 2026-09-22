@@ -12,5 +12,8 @@ GIT_EMAIL_ADDRESS="your.email@example.com"
 # Optional: GPG/SSH Signing key (leave empty if none)
 GIT_SIGNING_KEY=""
 
-# Required: Automatically reboot when installation is complete (true | false)
-AUTO_REBOOT=false
+# Required: System restart behavior upon completion:
+#   - "ask"   : Prompt interactively with a confirmation dialog at the very end (Recommended)
+#   - "true"  : Automatically reboot system with a 5-second countdown
+#   - "false" : Cleanly exit without rebooting or prompting
+AUTO_REBOOT="ask"
