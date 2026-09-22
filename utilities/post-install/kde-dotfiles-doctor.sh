@@ -53,13 +53,15 @@ root_owned_files=()
 
 # Paths to scan for root ownership
 scan_paths=(
+  "$HOME/.agents"
   "$HOME/.config"
+  "$HOME/.gemini"
+  "$HOME/.local"
+  "$HOME/.nanorc"
   "$HOME/.oh-my-zsh"
   "$HOME/.ssh"
   "$HOME/.zshrc"
   "$HOME/.zshrc.local"
-  "$HOME/.nanorc"
-  "$HOME/.local"
 )
 
 for path in "${scan_paths[@]}"; do

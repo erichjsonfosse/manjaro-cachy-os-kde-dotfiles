@@ -39,16 +39,17 @@ steps=(
 [14]="configureVivaldi|Setting default browser and applying sanitized Vivaldi preferences"
 [15]="configureKwin|Configuring KWin rules and native keyboard layouts"
 [16]="configureHerdr|Setting up Herdr workspace manager and local overrides"
+[17]="configureAgents|Setting up AI agent skills and workspace directories"
 
 # --- 4. Post-Configuration ---
-[17]="postInstallGitConfig|Applying final Git signing key templates"
-[18]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
+[18]="postInstallGitConfig|Applying final Git signing key templates"
+[19]="postInstallZshConfig|Compiling Oh My Zsh theme assets"
 
 # --- 5. Permissions & Cleanup ---
-[19]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
-[20]="bumpVersion|Tagging dotfiles installation version"
-[21]="removeTemporaryFiles|Cleaning up installer temporary files"
-[22]="promptForReboot|Finalizing installation and managing system restart"
+[20]="ensureUserOwnershipOfHomeFolder|Verifying user file ownership and permissions"
+[21]="bumpVersion|Tagging dotfiles installation version"
+[22]="removeTemporaryFiles|Cleaning up installer temporary files"
+[23]="promptForReboot|Finalizing installation and managing system restart"
 )
 
 includeUtilities()
@@ -249,6 +250,11 @@ configureHerdr()
   source "$CONFIGDIR/herdr/herdr-config.sh"
 }
 
+configureAgents()
+{
+  source "$CONFIGDIR/agents/agents-config.sh"
+}
+
 ensureUserOwnershipOfHomeFolder()
 {
   logHeader "Ensuring correct user file ownership"
@@ -256,17 +262,19 @@ ensureUserOwnershipOfHomeFolder()
 
   # Target only directories and files we actually touch to be fast and safe
   local targets=(
+    "$HOMEDIR/.agents"
     "$HOMEDIR/.config"
-    "$HOMEDIR/.oh-my-zsh"
-    "$HOMEDIR/.zshrc"
-    "$HOMEDIR/.zshrc.local"
-    "$HOMEDIR/.p10k.zsh"
-    "$HOMEDIR/.nanorc"
-    "$HOMEDIR/.ssh"
+    "$HOMEDIR/.gemini"
     "$HOMEDIR/.gitconfig"
     "$HOMEDIR/.gitconfig.local"
     "$HOMEDIR/.gitignore.global"
     "$HOMEDIR/.local"
+    "$HOMEDIR/.nanorc"
+    "$HOMEDIR/.oh-my-zsh"
+    "$HOMEDIR/.p10k.zsh"
+    "$HOMEDIR/.ssh"
+    "$HOMEDIR/.zshrc"
+    "$HOMEDIR/.zshrc.local"
   )
 
   for target in "${targets[@]}"; do
