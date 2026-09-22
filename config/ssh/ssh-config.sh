@@ -24,4 +24,23 @@ if ! grep -q "export SSH_AUTH_SOCK" "$ZSHRC_FILE"; then
   echo "export SSH_AUTH_SOCK=\"\$XDG_RUNTIME_DIR/ssh-agent.socket\"" >> "$ZSHRC_FILE"
 fi
 
-logSuccess "SSH and SSH-Agent configuration applied!"
+logInfo "Configuring ksshaskpass and OpenSSH askpass symlink..."
+mkdir -p /usr/lib/ssh
+if [ -x /usr/bin/ksshaskpass ] || [ -f /usr/bin/ksshaskpass ]; then
+  ln -sf /usr/bin/ksshaskpass /usr/lib/ssh/ssh-askpass
+fi
+
+# Ensure GUI applications (Obsidian, IDEs) inherit SSH_ASKPASS across Plasma 6
+mkdir -p "$HOMEDIR/.config/environment.d"
+cat << 'EOF' > "$HOMEDIR/.config/environment.d/ssh-askpass.conf"
+SSH_ASKPASS="/usr/bin/ksshaskpass"
+SSH_ASKPASS_REQUIRE="prefer"
+EOF
+chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR/.config/environment.d"
+
+if ! grep -q "export SSH_ASKPASS" "$ZSHRC_FILE"; then
+  echo "export SSH_ASKPASS=\"/usr/bin/ksshaskpass\"" >> "$ZSHRC_FILE"
+  echo "export SSH_ASKPASS_REQUIRE=\"prefer\"" >> "$ZSHRC_FILE"
+fi
+
+logSuccess "SSH, SSH-Agent, and ksshaskpass configuration applied!"

@@ -55,6 +55,7 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 ### 🔧 Git & Secrets Hygiene
 * **Global Git Ignore (`~/.gitignore.global`):** Automatically ignores sensitive environment files across all projects (e.g., `.envrc.local` and `.env*.local`).
 * **Modular Git Config:** Maintains separation between tracked global `.gitconfig` and machine-local `.gitconfig.local`.
+* **KDE SSH Askpass (`ksshaskpass`):** Symlinks `/usr/lib/ssh/ssh-askpass` to `/usr/bin/ksshaskpass` and exports `SSH_ASKPASS` across Plasma 6 environment, providing native graphical passphrase dialogs for GUI tools (Obsidian, IDEs).
 
 ### 🩺 System Diagnostics
 * **KDE Dotfiles Doctor:** Includes `utilities/post-install/kde-dotfiles-doctor.sh` to verify system health, package dependencies, and configuration integrity after installation.

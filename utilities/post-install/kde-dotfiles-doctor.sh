@@ -59,6 +59,7 @@ scan_paths=(
   "$HOME/.zshrc"
   "$HOME/.zshrc.local"
   "$HOME/.nanorc"
+  "$HOME/.local"
 )
 
 for path in "${scan_paths[@]}"; do

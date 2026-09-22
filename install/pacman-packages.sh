@@ -109,6 +109,7 @@ declare -a packages=(
 "jq"
 "kde-cli-tools"
 "kdeconnect"
+"ksshaskpass"
 "kubectl"
 "make"
 "mkcert"
