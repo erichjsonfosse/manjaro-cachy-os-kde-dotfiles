@@ -44,24 +44,42 @@ echo "Configuring Git to use this key for signing commits..."
 
 SSH_PUBLIC_KEY_FILE="$SSH_KEY_FILE.pub"
 SSH_PUBLIC_KEY_FILE_CONTENT=$(cat "$SSH_PUBLIC_KEY_FILE")
+GIT_LOCAL_CONFIG="$HOME/.gitconfig.local"
 
-# Configure Git globally for the user
+# Configure Git commit signing
 git config --global gpg.format ssh
-git config --global user.signingkey "$SSH_PUBLIC_KEY_FILE"
 git config --global commit.gpgsign true
 
+if [ -f "$GIT_LOCAL_CONFIG" ]; then
+  git config --file "$GIT_LOCAL_CONFIG" user.signingkey "$SSH_PUBLIC_KEY_FILE"
+else
+  git config --global user.signingkey "$SSH_PUBLIC_KEY_FILE"
+fi
+
 # Extract the user's Git email to use in allowed_signers
-GIT_EMAIL=$(git config --global user.email)
+GIT_EMAIL=$(git config --global --includes user.email 2>/dev/null || git config user.email 2>/dev/null)
 
 if [ -z "$GIT_EMAIL" ]; then
-  echo "⚠️  Warning: No global Git email found. Please enter the email address you use for Git:"
+  echo "⚠️  Warning: No Git email found. Please enter the email address you use for Git:"
   read -rp "Email: " GIT_EMAIL
+  if [ -f "$GIT_LOCAL_CONFIG" ]; then
+    git config --file "$GIT_LOCAL_CONFIG" user.email "$GIT_EMAIL"
+  else
+    git config --global user.email "$GIT_EMAIL"
+  fi
 fi
 
 # Add the key to allowed_signers
 ALLOWED_SIGNERS_FILE="$HOME/.ssh/allowed_signers"
+mkdir -p "$HOME/.ssh"
 echo "$GIT_EMAIL namespaces=\"git\" $SSH_PUBLIC_KEY_FILE_CONTENT" >> "$ALLOWED_SIGNERS_FILE"
-git config --global gpg.ssh.allowedSignersFile "$ALLOWED_SIGNERS_FILE"
+chmod 600 "$ALLOWED_SIGNERS_FILE"
+
+if [ -f "$GIT_LOCAL_CONFIG" ]; then
+  git config --file "$GIT_LOCAL_CONFIG" gpg.ssh.allowedSignersFile "$ALLOWED_SIGNERS_FILE"
+else
+  git config --global gpg.ssh.allowedSignersFile "$ALLOWED_SIGNERS_FILE"
+fi
 
 echo "✅ Git commit signing configured successfully!"
 echo ""

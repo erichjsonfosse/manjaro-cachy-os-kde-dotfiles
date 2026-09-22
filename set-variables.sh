@@ -28,8 +28,19 @@ export INSTALLDIR
 RESUME_FILE_NAME="RESUME.tmp"
 export RESUME_FILE_NAME
 
-TEMPORARY_CONFIG_FILE_NAME="TEMPORARY_CONFIG_FILE.tmp";
-export  TEMPORARY_CONFIG_FILE_NAME
+TEMPORARY_CONFIG_FILE_NAME="$BASEDIR/TEMPORARY_CONFIG_FILE.tmp"
+export TEMPORARY_CONFIG_FILE_NAME
+
+if [ -f "$TEMPORARY_CONFIG_FILE_NAME" ]; then
+  # shellcheck disable=SC1090
+  source "$TEMPORARY_CONFIG_FILE_NAME"
+elif [ -f "TEMPORARY_CONFIG_FILE.tmp" ]; then
+  # shellcheck disable=SC1090
+  source "TEMPORARY_CONFIG_FILE.tmp"
+fi
+export MANJARO_DOTFILES_GIT_CONFIG_NAME
+export MANJARO_DOTFILES_GIT_CONFIG_EMAIL_ADDRESS
+export MANJARO_DOTFILES_GIT_CONFIG_SIGNING_KEY
 ######################### Files ##########################
 
 ######################### HOMEDIR ##########################
