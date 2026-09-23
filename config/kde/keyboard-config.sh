@@ -13,6 +13,13 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "WinClass"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" ""
 
+# Stop running kglobalaccel so in-memory state doesn't overwrite kglobalshortcutsrc on exit
+USER_UID=$(id -u "$LOGNAME" 2>/dev/null || echo "1000")
+if command -v systemctl &>/dev/null; then
+  sudo -H -u "$LOGNAME" XDG_RUNTIME_DIR="/run/user/$USER_UID" systemctl --user stop plasma-kglobalaccel.service 2>/dev/null || true
+fi
+killall -9 kglobalacceld 2>/dev/null || true
+
 logInfo "Setting Meta+Space shortcut for toggling native KDE keyboard layouts..."
 writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "KDE Keyboard Layout Switcher" "Switch to Next Keyboard Layout" "Meta+Space,none,Switch to Next Keyboard Layout"
 
