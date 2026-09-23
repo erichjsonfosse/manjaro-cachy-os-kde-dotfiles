@@ -30,7 +30,7 @@ if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
 
   # Restart kglobalaccel so it loads the updated shortcuts into memory
   if command -v systemctl &>/dev/null; then
-    sudo -H -u "$LOGNAME" XDG_RUNTIME_DIR="/run/user/$USER_UID" systemctl --user restart plasma-kglobalaccel.service 2>/dev/null || true
+    sudo -H -u "$LOGNAME" XDG_RUNTIME_DIR="/run/user/$USER_UID" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" systemctl --user restart plasma-kglobalaccel.service 2>/dev/null || true
   fi
 
   # Launch or restart Yakuake so it is active immediately in the live session
