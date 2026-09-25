@@ -8,7 +8,7 @@ writeKdeConfig() {
   local value="$4"
 
   if command -v kwriteconfig6 &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig6 --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
+    sudo -H -u "$LOGNAME" kwriteconfig6 --notify --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
   else
     logWarning "kwriteconfig6 not found. Skipping config update for: $key"
   fi
