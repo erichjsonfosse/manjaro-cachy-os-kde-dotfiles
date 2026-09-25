@@ -6,12 +6,12 @@ Modern, streamlined, and automated dotfiles and system configurations tailored f
 
 ## 🚀 Quickstart
 
-Clone the repository and run the setup script with administrative privileges:
+Clone the repository and run the setup script as your regular user (it prompts for `sudo` only when executing tasks that require administrative privileges):
 
 ```bash
 git clone https://github.com/erichjsonfosse/manjaro-cachy-os-kde-dotfiles.git
 cd manjaro-cachy-os-kde-dotfiles
-sudo ./init.sh
+./init.sh
 ```
 
 ### 🎛️ Installation Modes
@@ -19,12 +19,12 @@ sudo ./init.sh
 The installer features an interactive TUI powered by **[Gum](https://github.com/charmbracelet/gum)** as well as a fully automated unattended mode:
 
 * **Interactive (Standard):** Automatically runs the complete end-to-end configuration pipeline with interactive prompts for Git credentials and confirmation checks.
-* **Interactive (Modular / Advanced):** Allows you to select and run specific configuration steps individually (e.g., selectively re-running only `configureKwin`, `configureZsh`, `installPackages`, or `configureGit`).
+* **Interactive (Modular / Advanced):** Allows you to select and run specific configuration steps individually (e.g., selectively re-running only `configureKwin`, `configureZsh`, `installPackages`, or `configureGit`). Unprivileged steps run with zero root elevation.
 * **Unattended Mode:** Place a validated `.dotfiles.unattended` file in the root of the repository (template provided via `.dotfiles.unattended.example`). The installer will validate required settings, skip all interactive prompts, and run end-to-end automatically:
   ```bash
   cp .dotfiles.unattended.example .dotfiles.unattended
   # Edit .dotfiles.unattended with credentials and reboot mode (ask, true, or false)
-  sudo ./init.sh
+  ./init.sh
   ```
 
 ---
