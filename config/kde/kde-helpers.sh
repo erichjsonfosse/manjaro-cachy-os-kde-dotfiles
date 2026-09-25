@@ -70,6 +70,85 @@ kwrite_config() {
   writeKdeConfig "$@"
 }
 
+# Helper to set a KDE global shortcut both in config and in-memory via D-Bus (Plasma 6)
+# Usage: setKdeShortcut <component> <action> <shortcut> [default] [description]
+setKdeShortcut() {
+  local component="$1"
+  local action="$2"
+  local shortcut="$3"
+  local default="${4:-$shortcut}"
+  local description="${5:-$action}"
+  local config_file="${SHORTCUTS_CONFIG_FILE:-${HOMEDIR:-$HOME}/.config/kglobalshortcutsrc}"
+
+  if [[ -z "$component" || -z "$action" || -z "$shortcut" ]]; then
+    if declare -f logError &>/dev/null; then
+      logError "setKdeShortcut requires component, action, and shortcut."
+    else
+      echo "Error: setKdeShortcut requires component, action, and shortcut." >&2
+    fi
+    return 1
+  fi
+
+  # 1. Persist to ~/.config/kglobalshortcutsrc
+  writeKdeConfig "$config_file" "$component" "$action" "$shortcut,$default,$description"
+
+  # 2. If KDE Plasma session (KWin) is running, notify KGlobalAccel immediately via D-Bus
+  # This updates KWin's in-memory shortcut map immediately and prevents KWin from overwriting
+  # our changes with stale in-memory state on shutdown/reboot.
+  if pgrep -x kwin_wayland &>/dev/null || pgrep -x kwin_x11 &>/dev/null; then
+    if [[ -z "$DBUS_SESSION_BUS_ADDRESS" && -S "/run/user/$UID/bus" ]]; then
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UID/bus"
+    fi
+
+    if command -v busctl &>/dev/null && command -v python3 &>/dev/null; then
+      local keycode
+      keycode=$(python3 -c '
+import sys
+s = sys.argv[1].strip()
+if not s or s.lower() == "none":
+    sys.exit(0)
+mods = 0
+key = 0
+special_keys = {
+    "space": 0x20, "escape": 0x01000000, "tab": 0x01000001,
+    "backtab": 0x01000002, "backspace": 0x01000003, "return": 0x01000004,
+    "enter": 0x01000004, "insert": 0x01000006, "delete": 0x01000007,
+    "home": 0x01000010, "end": 0x01000011, "left": 0x01000012,
+    "up": 0x01000013, "right": 0x01000014, "down": 0x01000015,
+    "pageup": 0x01000016, "pagedown": 0x01000017
+}
+for p in s.split("+"):
+    p_lower = p.lower()
+    if p_lower == "meta":
+        mods |= 0x10000000
+    elif p_lower in ("ctrl", "control"):
+        mods |= 0x04000000
+    elif p_lower == "alt":
+        mods |= 0x08000000
+    elif p_lower == "shift":
+        mods |= 0x02000000
+    elif p_lower in special_keys:
+        key = special_keys[p_lower]
+    elif p_lower.startswith("f") and p_lower[1:].isdigit():
+        n = int(p_lower[1:])
+        if 1 <= n <= 35:
+            key = 0x01000030 + (n - 1)
+    elif len(p) == 1:
+        key = ord(p.upper())
+print(mods | key)
+' "$shortcut" 2>/dev/null || echo "")
+
+      if [[ -z "$keycode" || "$keycode" -eq 0 ]]; then
+        busctl --user call org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel setForeignShortcut asai 4 "$component" "$action" "$component" "$description" 0 &>/dev/null || true
+      else
+        busctl --user call org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel setForeignShortcut asai 4 "$component" "$action" "$component" "$description" 1 "$keycode" &>/dev/null || true
+      fi
+    fi
+  fi
+
+  return 0
+}
+
 # Reload live KDE Plasma 6 session components
 # Usage: reloadKdeSession [all|kwin|shortcuts|yakuake]
 reloadKdeSession() {

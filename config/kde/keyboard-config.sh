@@ -13,27 +13,32 @@ writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "SwitchMode" "WinClass"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "ShowOSD" "true"
 writeKdeConfig "$KXKB_CONFIG_FILE" "Layout" "Options" ""
 
+# Reconfigure KWin if running so layout switcher action collection is initialized with the new layout list
+if pgrep -x kwin_wayland &>/dev/null || pgrep -x kwin_x11 &>/dev/null; then
+  qdbus6 org.kde.KWin /KWin reconfigure &>/dev/null || true
+fi
+
 logInfo "Setting Meta+Space shortcut for toggling native KDE keyboard layouts..."
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "KDE Keyboard Layout Switcher" "Switch to Next Keyboard Layout" "Meta+Space,none,Switch to Next Keyboard Layout"
+setKdeShortcut "KDE Keyboard Layout Switcher" "Switch to Next Keyboard Layout" "Meta+Space" "Meta+Alt+K" "Switch to Next Keyboard Layout"
 
 # Prevent KRunner from intercepting Meta+Space in Plasma 6
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.krunner.desktop" "_launch" "Alt+Space,Alt+F2,KRunner"
+setKdeShortcut "org.kde.krunner.desktop" "_launch" "Alt+Space" "Alt+F2" "KRunner"
 
 logInfo "Setting F12 shortcut for Yakuake drop-down toggle..."
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "yakuake" "toggle-window-state" "F12,F12,Open/Retract Yakuake"
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.yakuake.desktop" "_launch" "F12,F12,Open/Retract Yakuake"
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.yakuake.desktop" "toggle-window-state" "F12,F12,Open/Retract Yakuake"
+setKdeShortcut "yakuake" "toggle-window-state" "F12" "F12" "Open/Retract Yakuake"
+setKdeShortcut "org.kde.yakuake.desktop" "_launch" "F12" "F12" "Open/Retract Yakuake"
+setKdeShortcut "org.kde.yakuake.desktop" "toggle-window-state" "F12" "F12" "Open/Retract Yakuake"
 
 logInfo "Setting Meta+S shortcut for Application Launcher and Meta for Overview..."
 # Application Launcher -> Meta+S
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "org.kde.plasmashell" "activate application launcher" "Meta+S,none,Activate Application Launcher"
+setKdeShortcut "org.kde.plasmashell" "activate application launcher" "Meta+S" "none" "Activate Application Launcher"
 
 # Overview -> Meta
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "Overview" "Meta,none,Toggle Overview"
+setKdeShortcut "kwin" "Overview" "Meta" "none" "Toggle Overview"
 
 # Bare Meta key modifier -> Overview in kwinrc
 writeKdeConfig "$KWIN_CONFIG_FILE" "ModifierOnlyShortcuts" "Meta" "org.kde.kwin,/KWin,org.kde.KWin,toggleOverview"
 
 # Clear conflicting shortcuts
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "GridScene" "none,none,Toggle Grid"
-writeKdeConfig "$SHORTCUTS_CONFIG_FILE" "kwin" "ShowDesktopGrid" "none,none,Show Desktop Grid"
+setKdeShortcut "kwin" "GridScene" "none" "none" "Toggle Grid"
+setKdeShortcut "kwin" "ShowDesktopGrid" "none" "none" "Show Desktop Grid"
