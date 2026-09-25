@@ -21,23 +21,7 @@ if [ -f "/etc/environment" ]; then
   sudo sed -i '/^XMODIFIERS=/d' /etc/environment 2>/dev/null || true
 fi
 
-# Notify kwin and kglobalaccel to reload configurations if running
-if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
-  qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
-  qdbus6 org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
-
-  # Restart kglobalaccel so it loads the updated shortcuts into memory
-  if command -v systemctl &>/dev/null; then
-    systemctl --user restart plasma-kglobalaccel.service 2>/dev/null || true
-  fi
-
-  # Launch or restart Yakuake so it is active immediately in the live session
-  if command -v yakuake &>/dev/null; then
-    pkill -x yakuake 2>/dev/null || true
-    sleep 0.3
-    yakuake &>/dev/null &
-    disown
-  fi
-fi
+# Reload live KDE session components if running
+reloadKdeSession all
 
 logSuccess "KDE, KWin, and Keyboard configurations successfully finalized!"
