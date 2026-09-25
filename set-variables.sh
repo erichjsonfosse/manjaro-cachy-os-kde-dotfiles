@@ -44,13 +44,9 @@ export DOTFILES_GIT_SIGNING_KEY
 ######################### Files ##########################
 
 ######################### HOMEDIR ##########################
-if [ -n "$SUDO_USER" ]; then
-  LOGNAME="$SUDO_USER"
-else
-  LOGNAME=$(logname 2>/dev/null || echo "$USER")
-fi
+LOGNAME="${USER:-$(id -un)}"
 export LOGNAME
-HOMEDIR=$(eval echo ~"$LOGNAME")
+HOMEDIR="${HOME:-$(eval echo ~"$LOGNAME")}"
 export HOMEDIR
 ######################### HOMEDIR ##########################
 

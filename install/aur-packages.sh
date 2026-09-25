@@ -9,10 +9,10 @@ if [ "$OS_ID" = "manjaro" ]; then
     waitForPacmanLock
     sudo pacman -S --needed --noconfirm base-devel git cargo
     rm -rf /tmp/paru-bootstrap
-    su "$LOGNAME" -c "git clone https://aur.archlinux.org/paru.git /tmp/paru-bootstrap"
-    su "$LOGNAME" -c "cd /tmp/paru-bootstrap && makepkg -s"
+    git clone https://aur.archlinux.org/paru.git /tmp/paru-bootstrap
+    (cd /tmp/paru-bootstrap && makepkg -s --noconfirm)
     waitForPacmanLock
-    pacman -U --noconfirm /tmp/paru-bootstrap/paru-*.pkg.tar.zst
+    sudo pacman -U --noconfirm /tmp/paru-bootstrap/paru-*.pkg.tar.zst
     rm -rf /tmp/paru-bootstrap
   fi
 fi
@@ -36,7 +36,7 @@ declare -a packages=(
 )
 
 waitForPacmanLock
-sudo -u "$LOGNAME" paru -Syu --needed --noconfirm "${packages[@]}"
+paru -Syu --needed --noconfirm "${packages[@]}"
 
 
 logSuccess "AUR packages installed"
