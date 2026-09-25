@@ -238,3 +238,57 @@ logHeader()
     echo "━━━ $1 ━━━"
   fi
 }
+
+SUDO_KEEPALIVE_PID=""
+
+startSudoKeepalive()
+{
+  # If already active and verified, do not re-prompt
+  if sudo -n true 2>/dev/null && [ -n "$SUDO_KEEPALIVE_PID" ] && kill -0 "$SUDO_KEEPALIVE_PID" 2>/dev/null; then
+    return 0
+  fi
+
+  logInfo "Administrative privileges (sudo) required for this task."
+  if ! sudo -v; then
+    logError "Sudo authentication failed. Aborting."
+    exit 1
+  fi
+
+  # Launch background keepalive loop
+  (
+    while true; do
+      sudo -n true 2>/dev/null
+      sleep 45
+      kill -0 "$$" 2>/dev/null || exit
+    done
+  ) 2>/dev/null &
+  SUDO_KEEPALIVE_PID=$!
+
+  # Ensure cleanup on exit
+  trap stopSudoKeepalive EXIT INT TERM
+}
+
+stopSudoKeepalive()
+{
+  if [ -n "$SUDO_KEEPALIVE_PID" ]; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    wait "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    SUDO_KEEPALIVE_PID=""
+  fi
+}
+
+stepRequiresRoot()
+{
+  local func="$1"
+  case "$func" in
+    checkPacmanLock | installPacmanPackages | installAurPackages | \
+    configureDocker | configureKwin | postInstallZshConfig | \
+    ensureUserOwnershipOfHomeFolder | promptForReboot)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
