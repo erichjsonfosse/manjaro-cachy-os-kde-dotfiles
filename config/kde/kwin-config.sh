@@ -10,7 +10,7 @@ mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 # 1. Configure Yakuake Keep Above and Focus Rules (KDE Plasma 6)
 existing_rules=""
 if command -v kreadconfig6 &>/dev/null; then
-  existing_rules=$(sudo -H -u "$LOGNAME" kreadconfig6 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
+  existing_rules=$(kreadconfig6 --file "$KWIN_RULES_FILE" --group "General" --key "rules" 2>/dev/null || echo "")
 fi
 
 if [[ "$existing_rules" != *"yakuake-always-on-top"* ]]; then
@@ -32,10 +32,8 @@ writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclass" "yakuake"
 writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclasscomplete" "false"
 writeKdeConfig "$KWIN_RULES_FILE" "$sec" "wmclassmatch" "2"
 
-chown "$LOGNAME:$LOGNAME" "$KWIN_RULES_FILE" 2>/dev/null || true
 logSuccess "KWin window rule for Yakuake successfully configured!"
 
 # 2. Configure Focus Stealing Prevention to Medium (2)
 logInfo "Setting Focus Stealing Prevention to Medium (2)..."
 writeKdeConfig "$KWIN_CONFIG_FILE" "Windows" "FocusStealingPreventionLevel" "2"
-chown "$LOGNAME":"$LOGNAME" "$KWIN_CONFIG_FILE" 2>/dev/null || true

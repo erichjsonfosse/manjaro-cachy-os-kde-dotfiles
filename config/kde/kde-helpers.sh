@@ -8,7 +8,12 @@ writeKdeConfig() {
   local value="$4"
 
   if command -v kwriteconfig6 &> /dev/null; then
-    sudo -H -u "$LOGNAME" kwriteconfig6 --notify --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
+    kwriteconfig6 --notify --file "$file" --group "$group" --key "$key" "$value" 2>/dev/null || true
+    # Reload KWin shortcut engine (Plasma 6)
+    qdbus6 org.kde.KWin /KWin org.kde.KWin.reconfigure 2>/dev/null || true
+
+    # Signal Global Settings update
+    dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:3 int32:5 2>/dev/null || true
   else
     logWarning "kwriteconfig6 not found. Skipping config update for: $key"
   fi

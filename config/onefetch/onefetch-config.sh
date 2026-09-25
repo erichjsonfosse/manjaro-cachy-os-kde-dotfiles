@@ -4,7 +4,7 @@ logHeader "Configuring Onefetch Greeter"
 
 # Ensure the .zshrc file exists before running grep/sed on it
 if [ ! -f "$ZSHRC_FILE" ]; then
-  su "$LOGNAME" -c "touch \"$ZSHRC_FILE\""
+  touch "$ZSHRC_FILE"
 fi
 
 # Remove existing onefetch block if present

@@ -5,17 +5,17 @@ logHeader "Configuring Vivaldi Web Browser"
 # Set as default browser natively in KDE Plasma 6 and freedesktop mimeapps.list
 logInfo "Setting Vivaldi as default web browser..."
 if command -v kwriteconfig6 &> /dev/null; then
-  sudo -H -u "$LOGNAME" kwriteconfig6 --file "$HOMEDIR/.config/kdeglobals" --group "General" --key "BrowserApplication" "vivaldi-stable.desktop" 2>/dev/null || true
+  kwriteconfig6 --file "$HOMEDIR/.config/kdeglobals" --group "General" --key "BrowserApplication" "vivaldi-stable.desktop" 2>/dev/null || true
 elif command -v kwriteconfig5 &> /dev/null; then
-  sudo -H -u "$LOGNAME" kwriteconfig5 --file "$HOMEDIR/.config/kdeglobals" --group "General" --key "BrowserApplication" "vivaldi-stable.desktop" 2>/dev/null || true
+  kwriteconfig5 --file "$HOMEDIR/.config/kdeglobals" --group "General" --key "BrowserApplication" "vivaldi-stable.desktop" 2>/dev/null || true
 fi
 
 if command -v xdg-mime &> /dev/null; then
-  sudo -H -u "$LOGNAME" xdg-mime default vivaldi-stable.desktop x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml 2>/dev/null || true
+  xdg-mime default vivaldi-stable.desktop x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml 2>/dev/null || true
 fi
 
 if command -v xdg-settings &> /dev/null; then
-  sudo -H -u "$LOGNAME" xdg-settings set default-web-browser vivaldi-stable.desktop 2>/dev/null || true
+  xdg-settings set default-web-browser vivaldi-stable.desktop 2>/dev/null || true
 fi
 
 # Copy Vivaldi config if it exists in the dotfiles repo
@@ -34,8 +34,6 @@ if [ -d "$DOTFILES_VIVALDI_CONFIG" ]; then
     rm -f "$SYSTEM_VIVALDI_CONFIG/Preferences.template"
   fi
 
-  # Ensure correct ownership
-  chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR/.config/vivaldi"
   logSuccess "Vivaldi configuration successfully applied!"
 else
   logWarning "No Vivaldi profile template found in dotfiles at $DOTFILES_VIVALDI_CONFIG. Skipping config sync."

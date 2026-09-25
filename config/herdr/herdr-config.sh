@@ -20,15 +20,12 @@ else
   ln -sf "$HERDR_CONFIG_DIR/config.toml" "$HERDR_CONFIG_FILE"
 fi
 
-chown -R "$LOGNAME:$LOGNAME" "$HERDR_USER_DIR" 2>/dev/null || true
-chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR/.local" 2>/dev/null || true
-
 # Install Herdr plugins
 if command -v herdr &>/dev/null; then
   logInfo "Checking Herdr plugin: herdr-hud (erichjsonfosse/herdr-hud)..."
-  if ! sudo -H -u "$LOGNAME" herdr plugin list 2>/dev/null | grep -q "herdr-hud"; then
+  if ! herdr plugin list 2>/dev/null | grep -q "herdr-hud"; then
     logInfo "Installing herdr-hud plugin from GitHub..."
-    sudo -H -u "$LOGNAME" env PATH="$HOMEDIR/.local/bin:$PATH" herdr plugin install erichjsonfosse/herdr-hud --yes || logWarning "Could not install herdr-hud plugin (offline or build skipped)"
+    env PATH="$HOMEDIR/.local/bin:$PATH" herdr plugin install erichjsonfosse/herdr-hud --yes || logWarning "Could not install herdr-hud plugin (offline or build skipped)"
   else
     logInfo "herdr-hud plugin is already installed"
   fi

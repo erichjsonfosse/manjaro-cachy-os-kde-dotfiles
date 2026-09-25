@@ -23,21 +23,19 @@ fi
 
 # Notify kwin and kglobalaccel to reload configurations if running
 if pgrep -x kwin_wayland > /dev/null || pgrep -x kwin_x11 > /dev/null; then
-  USER_UID=$(id -u "$LOGNAME" 2>/dev/null || echo "1000")
-  DBUS_ADDR="unix:path=/run/user/$USER_UID/bus"
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
-  sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" qdbus6 org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
+  qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
+  qdbus6 org.kde.keyboard /Layouts reloadConfig >/dev/null 2>&1 || true
 
   # Restart kglobalaccel so it loads the updated shortcuts into memory
   if command -v systemctl &>/dev/null; then
-    sudo -H -u "$LOGNAME" XDG_RUNTIME_DIR="/run/user/$USER_UID" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" systemctl --user restart plasma-kglobalaccel.service 2>/dev/null || true
+    systemctl --user restart plasma-kglobalaccel.service 2>/dev/null || true
   fi
 
   # Launch or restart Yakuake so it is active immediately in the live session
   if command -v yakuake &>/dev/null; then
     pkill -x yakuake 2>/dev/null || true
     sleep 0.3
-    sudo -H -u "$LOGNAME" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" yakuake &>/dev/null &
+    yakuake &>/dev/null &
     disown
   fi
 fi

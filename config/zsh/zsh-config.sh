@@ -6,7 +6,7 @@ export ZSH
 
 # Ensure the .zshrc file exists before running grep/sed on it
 if [ ! -f "$ZSHRC_FILE" ]; then
-  sudo -H -u "$LOGNAME" touch "$ZSHRC_FILE"
+  touch "$ZSHRC_FILE"
 fi
 
 # Copy Powerlevel10k configuration file (.p10k.zsh)
@@ -14,7 +14,6 @@ P10K_TEMPLATE="$CONFIGDIR/zsh/.p10k.zsh"
 if [ -f "$P10K_TEMPLATE" ]; then
   logInfo "Copying Powerlevel10k theme configuration (.p10k.zsh)..."
   cp "$P10K_TEMPLATE" "$HOMEDIR/.p10k.zsh"
-  chown "$LOGNAME:$LOGNAME" "$HOMEDIR/.p10k.zsh"
 fi
 
 # Add Powerlevel10k Instant Prompt to top of .zshrc if not present
@@ -27,7 +26,7 @@ if [ ! -d "$ZSH" ]; then
   logInfo "Oh My Zsh not found. Downloading and installing..."
   curl -fsSL -o install-ohmyzsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
   chmod +x install-ohmyzsh.sh
-  sudo -H -u "$LOGNAME" env RUNZSH="no" ./install-ohmyzsh.sh --unattended
+  env RUNZSH="no" ./install-ohmyzsh.sh --unattended
   rm -f ./install-ohmyzsh.sh
 else
   logInfo "Oh My Zsh already installed. Skipping base installation..."
@@ -35,7 +34,7 @@ fi
 
 # Oh My Zsh Theme (Powerlevel10k)
 if [ ! -d "$ZSH/custom/themes/powerlevel10k" ]; then
-  sudo -H -u "$LOGNAME" git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH/custom/themes/powerlevel10k"
 fi
 
 # Activate theme
@@ -51,7 +50,7 @@ if ! grep -q '^plugins=.*manjaro-cachy-os-kde-dotfiles' "$ZSHRC_FILE" && ! awk '
 fi
 
 # Add aliases (using symlinks - ensure directory exists first)
-sudo -H -u "$LOGNAME" mkdir -p "$OHMYZSH_FOLDER/custom/plugins"
+mkdir -p "$OHMYZSH_FOLDER/custom/plugins"
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
 
 # Edit date format for history command output
@@ -109,8 +108,13 @@ fi
 uncommentZshrcPath
 addToZshrcPath '$HOME/.local/bin'
 
-# Setting Zsh as shell for root and user
-chsh -s /bin/zsh
-chsh -s /bin/zsh "$LOGNAME"
+# Setting Zsh as shell for user if needed
+if [ "$SHELL" != "/bin/zsh" ] && [ "$SHELL" != "/usr/bin/zsh" ]; then
+  if command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+    sudo chsh -s /bin/zsh "$LOGNAME"
+  else
+    chsh -s /bin/zsh "$LOGNAME" || logWarning "Could not change shell to /bin/zsh automatically. You can run 'chsh -s /bin/zsh' manually."
+  fi
+fi
 
 logSuccess "Zsh configuration applied successfully!"
