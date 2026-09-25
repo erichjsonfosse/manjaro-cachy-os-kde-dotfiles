@@ -5,15 +5,29 @@ set -eo pipefail
 
 trap "echo -e '\nInstallation aborted by user.'; exit 1" SIGINT
 
-if [ "$EUID" -ne 0 ]
-  then
-    echo "Script must be run as root"
-    exit
+if [ "$EUID" -eq 0 ]; then
+  echo "Error: Dotfiles installer should NOT be run as root."
+  echo "Please run as your regular user: ./init.sh"
+  exit 1
 fi
 
+includeUtilities()
+{
+  source ./utilities/during-install/utilities.sh
+}
+
+setVariables()
+{
+  source ./set-variables.sh
+}
+
+includeUtilities
+setVariables
+
 if ! command -v gum &> /dev/null; then
-    echo "gum could not be found, updating package database and installing it..."
-    pacman -Sy --needed --noconfirm gum
+  echo "gum could not be found, updating package database and installing it..."
+  startSudoKeepalive
+  sudo pacman -Sy --needed --noconfirm gum
 fi
 
 steps=(
@@ -52,32 +66,12 @@ steps=(
 [23]="promptForReboot|Finalizing installation and managing system restart"
 )
 
-includeUtilities()
-{
-  source ./utilities/during-install/utilities.sh
-}
-
-setVariables()
-{
-  source ./set-variables.sh
-}
-
 doRun()
 {
   includeUtilities;
   setVariables;
 
-  # Establish a safe, temporary passwordless sudoers rule for the target user during installation.
-  # This completely eliminates tty-association issues and credential timeouts on strict OSes.
-  cleanup_installer() {
-    rm -f /etc/sudoers.d/99-dotfiles-installer
-  }
-  trap cleanup_installer EXIT
-
-  if [ -n "$LOGNAME" ] && [ "$LOGNAME" != "root" ]; then
-    echo "$LOGNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-dotfiles-installer
-    chmod 440 /etc/sudoers.d/99-dotfiles-installer
-  fi
+  startSudoKeepalive;
 
   if [ ! -f "$RESUME_FILE_NAME" ]; then
     step=0;
@@ -284,10 +278,10 @@ ensureUserOwnershipOfHomeFolder()
   done
 
   logInfo "Installing 'kde-dotfiles-doctor' utility globally to /usr/local/bin..."
-  mkdir -p /usr/local/bin
-  ln -sf "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh" "/usr/local/bin/kde-dotfiles-doctor"
-  chmod +x "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh"
-  chmod +x "/usr/local/bin/kde-dotfiles-doctor"
+  sudo mkdir -p /usr/local/bin
+  sudo ln -sf "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh" "/usr/local/bin/kde-dotfiles-doctor"
+  sudo chmod +x "$BASEDIR/utilities/post-install/kde-dotfiles-doctor.sh"
+  sudo chmod +x "/usr/local/bin/kde-dotfiles-doctor"
 
   logSuccess "User file ownership and global tools successfully verified!"
 }

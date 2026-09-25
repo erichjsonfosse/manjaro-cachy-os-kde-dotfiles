@@ -53,11 +53,11 @@ askForReboot()
         sleep 1
       done
       echo ""
-      reboot
+      sudo reboot
       exit 0
     elif [ "${AUTO_REBOOT:-false}" = "ask" ]; then
       if gum confirm "Reboot (recommended)?"; then
-        reboot
+        sudo reboot
         exit 0
       else
         echo ""
@@ -72,7 +72,7 @@ askForReboot()
   fi
 
   if gum confirm "Reboot (recommended)?"; then
-    reboot
+    sudo reboot
     exit
   fi
 }
@@ -153,10 +153,10 @@ verifyPacmanLock()
     else
       echo "The lock file appears to be stale (no active process with PID $lock_pid was found)."
       if [ "${UNATTENDED:-false}" = "true" ]; then
-        rm -f /var/lib/pacman/db.lck
+        sudo rm -f /var/lib/pacman/db.lck
         logWarning "Stale lock file automatically removed for unattended installation."
       elif gum confirm "Would you like the installer to remove the stale lock file and continue?"; then
-        rm -f /var/lib/pacman/db.lck
+        sudo rm -f /var/lib/pacman/db.lck
         echo "Stale lock file removed. Continuing..."
       else
         echo "Installation aborted. Please resolve the lock file manually."
@@ -187,7 +187,7 @@ waitForPacmanLock()
       logSuccess "Pacman lock released! Continuing..."
     else
       logWarning "Stale pacman lock file found (/var/lib/pacman/db.lck). Automatically removing..."
-      rm -f "$lock_file"
+      sudo rm -f "$lock_file"
     fi
   fi
 }
