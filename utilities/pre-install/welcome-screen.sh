@@ -100,6 +100,24 @@ showWelcomeScreen()
         fi
       fi
 
+      # Check if any selected option requires root privileges
+      local needs_root=false
+      while IFS= read -r opt; do
+        [ -z "$opt" ] && continue
+        local idx
+        idx=$(echo "$opt" | cut -d':' -f1)
+        local entry="${steps[$idx]}"
+        local func="${entry%%|*}"
+        if stepRequiresRoot "$func"; then
+          needs_root=true
+          break
+        fi
+      done <<< "$selected_options"
+
+      if [ "$needs_root" = true ]; then
+        startSudoKeepalive
+      fi
+
       while IFS= read -r opt; do
         [ -z "$opt" ] && continue
         local idx
@@ -134,7 +152,7 @@ showWelcomeScreen()
       ;;
     *"Generate"*)
       echo "Launching SSH Key Generator..."
-      su "$LOGNAME" -c "./utilities/post-install/generate-ssh-key.sh" || true
+      ./utilities/post-install/generate-ssh-key.sh || true
       ;;
     *"Exit"*)
       echo "Goodbye!"
