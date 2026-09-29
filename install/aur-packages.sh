@@ -32,11 +32,10 @@ declare -a packages=(
 "openlens-bin"
 "postman-bin"
 "powershell-bin"
-"slack-desktop-wayland"
+"slack-desktop-wayland-jetm"
 )
 
-waitForPacmanLock
-paru -Syu --needed --noconfirm "${packages[@]}"
+logHeader "Installing AUR packages"
+installPackagesResiliently "paru" "${packages[@]}"
 
-
-logSuccess "AUR packages installed"
+logSuccess "AUR packages step completed"

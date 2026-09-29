@@ -145,8 +145,6 @@ elif [ "$OS_ID" = "cachyos" ]; then
 fi
 
 logHeader "Installing pacman packages"
-waitForPacmanLock
-sudo pacman -S --needed --noconfirm "${packages[@]}"
+installPackagesResiliently "pacman" "${packages[@]}"
 
-
-logSuccess "Pacman packages installed"
+logSuccess "Pacman packages step completed"
