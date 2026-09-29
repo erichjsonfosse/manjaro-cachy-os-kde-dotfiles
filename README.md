@@ -42,7 +42,7 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Eza Modern Directory Listings:** Replaces `ls` with `eza` featuring icons, Git status indicators, and tree hierarchy views.
 * **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation with live `eza` tree previews.
 * **Bat Syntax Highlighting:** Replaces `cat` with `bat` (unpaged) and provides syntax-highlighted manual pages (`man <command>`).
-* **Direnv Integration:** Automatic per-directory environment loading and `.envrc` evaluation.
+* **Direnv & Google Cloud Integration:** Automatic per-directory environment loading via `direnv`. Includes the globally available `setupDirenvForGoogleCloudProject` helper function (aliases: `setup-gcp-direnv`, `direnv-gcp`) to configure `.envrc` and a committable `.envrc.example` template with Google Cloud project IDs and Vertex/Gemini locations, automatic `.gitignore` safeguards, and instant `direnv allow` authorization.
 * **Herdr Workspace & HUD Integration:** Drop-down terminal automatically manages AI agent workspaces and terminal sessions via `herdr-bin`. Includes the [herdr-hud](https://github.com/erichjsonfosse/herdr-hud) plugin with top tab bar shortcut info (`herdr-hud line`) and interactive command palette modal (`prefix Space`), supporting seamless machine-local overrides in `~/.config/herdr/config.local.toml`.
 * **Node Version Manager (NVM):** Automatic NVM hooks and Angular CLI autocompletion support.
 
