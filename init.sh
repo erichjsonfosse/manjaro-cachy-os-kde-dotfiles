@@ -120,7 +120,7 @@ runStep()
       bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "$func"); includeUtilities; setVariables; $func"
       ;;
     *)
-      gum spin --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "$func"); includeUtilities; setVariables; $func"
+      gum spin --show-error --show-output --spinner dot --title "Executing task..." -- bash -c "set -eo pipefail; $(declare -f includeUtilities setVariables "$func"); includeUtilities; setVariables; $func"
       ;;
   esac
 
