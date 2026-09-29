@@ -11,3 +11,4 @@ __pycache__
 RESUME.tmp
 TEMPORARY_CONFIG_FILE.tmp
 tmpConfigFile.tmp
+failed-packages.log
