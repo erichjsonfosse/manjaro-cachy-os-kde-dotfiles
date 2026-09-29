@@ -138,8 +138,8 @@ function getMaxKey()
   local max=-1
   local array=("$@")
   for key in "${!array[@]}"; do
-    if [ $((${key})) -gt $((${max})) ]; then
-      max=${key}
+    if [ "$key" -gt "$max" ]; then
+      max=$key
     fi
   done
 
@@ -380,10 +380,12 @@ installPackagesResiliently()
       local log_file="${FAILED_PACKAGES_LOG:-${BASEDIR:-.}/failed-packages.log}"
       mkdir -p "$(dirname "$log_file")"
       if [ ! -f "$log_file" ]; then
-        echo "# Dotfiles Failed Packages Log" > "$log_file"
-        echo "# Recorded on $(date '+%Y-%m-%d %H:%M:%S')" >> "$log_file"
-        echo "# Format: [<manager>] <package_name>" >> "$log_file"
-        echo "" >> "$log_file"
+        {
+          echo "# Dotfiles Failed Packages Log"
+          echo "# Recorded on $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "# Format: [<manager>] <package_name>"
+          echo ""
+        } > "$log_file"
       fi
       echo "[$tool] $pkg" >> "$log_file"
     else

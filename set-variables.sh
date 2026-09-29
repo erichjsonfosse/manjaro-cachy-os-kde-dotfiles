@@ -35,10 +35,10 @@ TEMPORARY_CONFIG_FILE_NAME="$BASEDIR/TEMPORARY_CONFIG_FILE.tmp"
 export TEMPORARY_CONFIG_FILE_NAME
 
 if [ -f "$TEMPORARY_CONFIG_FILE_NAME" ]; then
-  # shellcheck disable=SC1090
+  # shellcheck disable=SC1090,SC1091
   source "$TEMPORARY_CONFIG_FILE_NAME"
 elif [ -f "TEMPORARY_CONFIG_FILE.tmp" ]; then
-  # shellcheck disable=SC1090
+  # shellcheck disable=SC1090,SC1091
   source "TEMPORARY_CONFIG_FILE.tmp"
 fi
 export DOTFILES_GIT_NAME
