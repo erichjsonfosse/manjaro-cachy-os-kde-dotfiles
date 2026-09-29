@@ -274,7 +274,7 @@ ensureUserOwnershipOfHomeFolder()
 
   for target in "${targets[@]}"; do
     if [ -e "$target" ]; then
-      chown -R "$LOGNAME:$LOGNAME" "$target"
+      sudo chown -R "$LOGNAME:$LOGNAME" "$target"
     fi
   done
 

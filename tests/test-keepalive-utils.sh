@@ -7,6 +7,7 @@ source "./utilities/during-install/utilities.sh"
 echo "Testing stepRequiresRoot..."
 stepRequiresRoot "installPacmanPackages" || { echo "FAIL: installPacmanPackages should require root"; exit 1; }
 stepRequiresRoot "configureDocker" || { echo "FAIL: configureDocker should require root"; exit 1; }
+stepRequiresRoot "ensureUserOwnershipOfHomeFolder" || { echo "FAIL: ensureUserOwnershipOfHomeFolder should require root"; exit 1; }
 stepRequiresRoot "configureGit" && { echo "FAIL: configureGit should not require root"; exit 1; }
 stepRequiresRoot "configureZsh" && { echo "FAIL: configureZsh should not require root"; exit 1; }
 echo "stepRequiresRoot passed!"
