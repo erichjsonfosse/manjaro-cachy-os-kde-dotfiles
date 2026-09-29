@@ -57,3 +57,24 @@ fi
 ln -sfn "$AGENTS_SKILLS_DIR" "$GEMINI_SKILLS_LINK"
 
 logSuccess "AI agent skills directory linked successfully: $GEMINI_SKILLS_LINK -> $AGENTS_SKILLS_DIR"
+
+# Configure AI Agent Plugins
+SOURCE_PLUGINS_DIR="$SCRIPT_DIR/plugins"
+GEMINI_CONFIG_PLUGINS_DIR="$HOMEDIR/.gemini/config/plugins"
+AGENTS_PLUGINS_DIR="$HOMEDIR/.agents/plugins"
+
+if [ -d "$SOURCE_PLUGINS_DIR" ]; then
+  mkdir -p "$GEMINI_CONFIG_PLUGINS_DIR"
+  mkdir -p "$AGENTS_PLUGINS_DIR"
+  shopt -s nullglob
+  for plugin_dir in "$SOURCE_PLUGINS_DIR"/*/; do
+    if [ -d "$plugin_dir" ]; then
+      plugin_name=$(basename "$plugin_dir")
+      logInfo "Linking plugin: $plugin_name (dotfiles -> ~/.agents -> ~/.gemini)..."
+      ln -sfn "$plugin_dir" "$AGENTS_PLUGINS_DIR/$plugin_name"
+      ln -sfn "$AGENTS_PLUGINS_DIR/$plugin_name" "$GEMINI_CONFIG_PLUGINS_DIR/$plugin_name"
+    fi
+  done
+  shopt -u nullglob
+  logSuccess "AI agent plugins linked successfully: dotfiles -> $AGENTS_PLUGINS_DIR -> $GEMINI_CONFIG_PLUGINS_DIR"
+fi
