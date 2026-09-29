@@ -43,8 +43,47 @@ validateUnattendedConfig()
   fi
 }
 
+displayFailedPackagesSummary()
+{
+  local log_file="${FAILED_PACKAGES_LOG:-${BASEDIR:-.}/failed-packages.log}"
+  if [ -f "$log_file" ] && [ -s "$log_file" ]; then
+    echo ""
+    logHeader "Package Installation Notice"
+    if command -v gum &>/dev/null; then
+      gum style --foreground 214 --bold "⚠️  Some packages could not be installed during setup."
+      gum style --foreground 245 "A record of failed packages was saved to: $log_file"
+      echo ""
+      gum style --foreground 196 --bold "Failed Packages:"
+      while IFS= read -r line; do
+        [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+        echo "  • $line"
+      done < "$log_file"
+      echo ""
+      gum style --foreground 245 "Use this list as a guide to update your package lists in:"
+      gum style --foreground 245 "  - install/pacman-packages.sh"
+      gum style --foreground 245 "  - install/aur-packages.sh"
+    else
+      echo "⚠️  Some packages could not be installed during setup."
+      echo "A record of failed packages was saved to: $log_file"
+      echo ""
+      echo "Failed Packages:"
+      while IFS= read -r line; do
+        [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+        echo "  • $line"
+      done < "$log_file"
+      echo ""
+      echo "Use this list as a guide to update your package lists in:"
+      echo "  - install/pacman-packages.sh"
+      echo "  - install/aur-packages.sh"
+    fi
+    echo ""
+  fi
+}
+
 askForReboot()
 {
+  displayFailedPackagesSummary
+
   if [ "${UNATTENDED:-false}" = "true" ]; then
     if [ "${AUTO_REBOOT:-false}" = "true" ]; then
       echo ""

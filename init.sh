@@ -76,6 +76,7 @@ doRun()
   if [ ! -f "$RESUME_FILE_NAME" ]; then
     step=0;
     setStep "$step";
+    rm -f "${FAILED_PACKAGES_LOG:-$BASEDIR/failed-packages.log}";
   else
     step=$(head -n 1 "$RESUME_FILE_NAME");
   fi
