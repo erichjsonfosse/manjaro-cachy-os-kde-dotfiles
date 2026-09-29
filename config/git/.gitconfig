@@ -12,7 +12,7 @@
 [gpg]
 	format = ssh
 [commit]
-	gpgSign = true
+	gpgsign = true
 [init]
 	defaultBranch = main
 [rerere]
