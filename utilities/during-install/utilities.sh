@@ -292,3 +292,73 @@ stepRequiresRoot()
   esac
 }
 
+installPackagesResiliently()
+{
+  local tool="$1"
+  shift
+  local -a pkgs=("$@")
+  local -a failed_pkgs=()
+  local pkg
+
+  if [ ${#pkgs[@]} -eq 0 ]; then
+    return 0
+  fi
+
+  waitForPacmanLock
+
+  # 1. Optimistic batch install attempt
+  local batch_cmd=()
+  if [ "$tool" = "pacman" ]; then
+    batch_cmd=(sudo pacman -S --needed --noconfirm "${pkgs[@]}")
+  elif [ "$tool" = "paru" ]; then
+    batch_cmd=(paru -Syu --needed --noconfirm "${pkgs[@]}")
+  fi
+
+  logInfo "Attempting batch installation of ${#pkgs[@]} $tool package(s)..."
+  if "${batch_cmd[@]}"; then
+    logSuccess "All $tool packages installed successfully in batch"
+    return 0
+  fi
+
+  # 2. Resilient fallback: individual retries
+  logWarning "Batch installation failed. Retrying packages individually to isolate failures..."
+  for pkg in "${pkgs[@]}"; do
+    waitForPacmanLock
+    logInfo "Installing $pkg ($tool)..."
+
+    local single_cmd=()
+    if [ "$tool" = "pacman" ]; then
+      single_cmd=(sudo pacman -S --needed --noconfirm "$pkg")
+    elif [ "$tool" = "paru" ]; then
+      single_cmd=(paru -S --needed --noconfirm "$pkg")
+    fi
+
+    if ! "${single_cmd[@]}"; then
+      logError "Failed to install $tool package: $pkg"
+      failed_pkgs+=("$pkg")
+
+      # Append to failure log
+      local log_file="${FAILED_PACKAGES_LOG:-${BASEDIR:-.}/failed-packages.log}"
+      mkdir -p "$(dirname "$log_file")"
+      if [ ! -f "$log_file" ]; then
+        echo "# Dotfiles Failed Packages Log" > "$log_file"
+        echo "# Recorded on $(date '+%Y-%m-%d %H:%M:%S')" >> "$log_file"
+        echo "# Format: [<manager>] <package_name>" >> "$log_file"
+        echo "" >> "$log_file"
+      fi
+      echo "[$tool] $pkg" >> "$log_file"
+    else
+      logSuccess "Successfully installed $pkg ($tool)"
+    fi
+  done
+
+  if [ ${#failed_pkgs[@]} -gt 0 ]; then
+    logWarning "${#failed_pkgs[@]} $tool package(s) failed to install: ${failed_pkgs[*]}"
+    logWarning "Recorded failed packages in ${FAILED_PACKAGES_LOG:-${BASEDIR:-.}/failed-packages.log}"
+  else
+    logSuccess "All $tool packages installed after individual retry"
+  fi
+
+  return 0
+}
+
