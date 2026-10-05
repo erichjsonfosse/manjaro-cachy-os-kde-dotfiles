@@ -3,7 +3,11 @@ set -eo pipefail
 
 # Capture the true user home before overriding
 ORIG_HOME="${REAL_HOME:-$HOME}"
-PROFILES_BASE="${XDG_DATA_HOME:-$ORIG_HOME/.local/share}/agy/profiles"
+if [[ -n "$REAL_HOME" ]]; then
+    PROFILES_BASE="$REAL_HOME/.local/share/agy/profiles"
+else
+    PROFILES_BASE="${XDG_DATA_HOME:-$ORIG_HOME/.local/share}/agy/profiles"
+fi
 
 # --- 1. Find the real 'agy' binary (avoiding infinite loops) ---
 SELF="$(readlink -f "$0")"
@@ -106,7 +110,7 @@ detect_repo_name() {
         local abs_common
         abs_common="$(readlink -f "$common_dir")"
         if [[ "$(basename "$abs_common")" == ".git" ]]; then
-            echo "$(basename "$(dirname "$abs_common")")"
+            basename "$(dirname "$abs_common")"
             return 0
         fi
     fi
@@ -123,6 +127,55 @@ if [[ "$NO_PROFILE" == "false" && -z "$PROFILE" ]]; then
 fi
 
 # --- 5. Apply hybrid $HOME isolation ---
+merge_json_settings() {
+    local file1="$1"
+    local file2="$2"
+    local dest="$3"
+
+    if [[ ! -f "$file1" && ! -f "$file2" ]]; then
+        return 0
+    fi
+    if [[ ! -f "$file1" ]]; then
+        cp "$file2" "$dest"
+        return 0
+    fi
+    if [[ ! -f "$file2" ]]; then
+        cp "$file1" "$dest"
+        return 0
+    fi
+
+    if command -v jq >/dev/null 2>&1; then
+        local tmp
+        tmp="$(mktemp)"
+        if jq -s '
+            (.[0] // {}) as $a | (.[1] // {}) as $b |
+            ($a * $b)
+            | if ($a.trustedWorkspaces or $b.trustedWorkspaces) then
+                .trustedWorkspaces = ((($a.trustedWorkspaces // []) + ($b.trustedWorkspaces // [])) | unique)
+              else . end
+            | if ($a.permissions or $b.permissions) then
+                .permissions = (($a.permissions // {}) * ($b.permissions // {}))
+                | if ($a.permissions.allow or $b.permissions.allow) then
+                    .permissions.allow = ((($a.permissions.allow // []) + ($b.permissions.allow // [])) | unique)
+                  else . end
+                | if ($a.permissions.deny or $b.permissions.deny) then
+                    .permissions.deny = ((($a.permissions.deny // []) + ($b.permissions.deny // [])) | unique)
+                  else . end
+                | if ($a.permissions.ask or $b.permissions.ask) then
+                    .permissions.ask = ((($a.permissions.ask // []) + ($b.permissions.ask // [])) | unique)
+                  else . end
+              else . end
+        ' "$file1" "$file2" > "$tmp" 2>/dev/null; then
+            mv "$tmp" "$dest"
+            return 0
+        else
+            rm -f "$tmp"
+        fi
+    fi
+
+    cp "$file2" "$dest"
+}
+
 if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
     PROFILE_DIR="$PROFILES_BASE/$PROFILE"
 
@@ -136,6 +189,8 @@ if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
     # Link shared identity & authentication
     [[ -d "$ORIG_HOME/.ssh" ]] && ln -sfn "$ORIG_HOME/.ssh" "$PROFILE_DIR/.ssh"
     [[ -f "$ORIG_HOME/.gitconfig" ]] && ln -sfn "$ORIG_HOME/.gitconfig" "$PROFILE_DIR/.gitconfig"
+    [[ -f "$ORIG_HOME/.gitconfig.local" ]] && ln -sfn "$ORIG_HOME/.gitconfig.local" "$PROFILE_DIR/.gitconfig.local"
+    [[ -f "$ORIG_HOME/.gitignore.global" ]] && ln -sfn "$ORIG_HOME/.gitignore.global" "$PROFILE_DIR/.gitignore.global"
     [[ -f "$ORIG_HOME/.git-credentials" ]] && ln -sfn "$ORIG_HOME/.git-credentials" "$PROFILE_DIR/.git-credentials"
     [[ -d "$ORIG_HOME/.gnupg" ]] && ln -sfn "$ORIG_HOME/.gnupg" "$PROFILE_DIR/.gnupg"
     [[ -d "$ORIG_HOME/.config/gh" ]] && ln -sfn "$ORIG_HOME/.config/gh" "$PROFILE_DIR/.config/gh"
@@ -143,6 +198,32 @@ if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
 
     # Link shared skills/plugins from dotfiles (~/.agents)
     [[ -d "$ORIG_HOME/.agents" ]] && ln -sfn "$ORIG_HOME/.agents" "$PROFILE_DIR/.agents"
+
+    # Link shared gemini settings & global config
+    mkdir -p "$PROFILE_DIR/.gemini/antigravity-cli"
+    GLOBAL_SETTINGS="$ORIG_HOME/.gemini/antigravity-cli/settings.json"
+    PROF_SETTINGS="$PROFILE_DIR/.gemini/antigravity-cli/settings.json"
+
+    # If profile settings is already a regular file, merge back into global first
+    if [[ -f "$PROF_SETTINGS" && ! -L "$PROF_SETTINGS" ]]; then
+        merge_json_settings "$GLOBAL_SETTINGS" "$PROF_SETTINGS" "$GLOBAL_SETTINGS"
+    fi
+
+    # Ensure global settings file exists so symlink is always valid
+    if [[ ! -f "$GLOBAL_SETTINGS" ]]; then
+        mkdir -p "$(dirname "$GLOBAL_SETTINGS")"
+        echo '{}' > "$GLOBAL_SETTINGS"
+    fi
+
+    ln -sfn "$GLOBAL_SETTINGS" "$PROF_SETTINGS"
+
+    # Link global gemini config (MCP servers, plugins, etc.)
+    if [[ -d "$ORIG_HOME/.gemini/config" ]]; then
+        if [[ -d "$PROFILE_DIR/.gemini/config" && ! -L "$PROFILE_DIR/.gemini/config" ]]; then
+            rm -rf "$PROFILE_DIR/.gemini/config"
+        fi
+        ln -sfn "$ORIG_HOME/.gemini/config" "$PROFILE_DIR/.gemini/config"
+    fi
 
     # Link shell startup files so subshells maintain your environment & PATH
     for rc in .bashrc .bash_profile .profile .zshrc .zshenv; do
@@ -158,5 +239,24 @@ if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
     export XDG_CACHE_HOME="$PROFILE_DIR/.cache"
 fi
 
-# --- 6. Execute the real binary ---
-exec "$REAL_AGY" "${NEW_ARGS[@]}"
+# --- 6. Execute with auto-heal for settings ---
+if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
+    # shellcheck disable=SC2329
+    cleanup_settings() {
+        local prof_settings="$PROFILE_DIR/.gemini/antigravity-cli/settings.json"
+        local global_settings="$ORIG_HOME/.gemini/antigravity-cli/settings.json"
+
+        # If agy broke the symlink by atomic rewrite, merge back to global and restore symlink
+        if [[ -f "$prof_settings" && ! -L "$prof_settings" ]]; then
+            merge_json_settings "$global_settings" "$prof_settings" "$global_settings"
+            ln -sfn "$global_settings" "$prof_settings"
+        fi
+    }
+
+    trap cleanup_settings EXIT
+    "$REAL_AGY" "${NEW_ARGS[@]}"
+    EXIT_CODE=$?
+    exit "$EXIT_CODE"
+else
+    exec "$REAL_AGY" "${NEW_ARGS[@]}"
+fi

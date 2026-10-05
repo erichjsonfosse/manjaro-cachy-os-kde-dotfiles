@@ -2,6 +2,7 @@
 
 ######################### OS Information #########################
 if [ -f /etc/os-release ]; then
+  # shellcheck source=/dev/null
   . /etc/os-release
   OS_ID=$ID
 else
@@ -52,7 +53,7 @@ export DOTFILES_GIT_SIGNING_KEY
 ######################### HOMEDIR ##########################
 LOGNAME="${USER:-$(id -un)}"
 export LOGNAME
-HOMEDIR="${HOME:-$(eval echo ~"$LOGNAME")}"
+HOMEDIR="${REAL_HOME:-${HOME:-$(eval echo ~"$LOGNAME")}}}"
 export HOMEDIR
 ######################### HOMEDIR ##########################
 

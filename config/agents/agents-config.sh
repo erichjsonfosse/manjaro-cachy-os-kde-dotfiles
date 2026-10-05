@@ -4,7 +4,7 @@
 
 # Fallback definitions for standalone execution
 if [ -z "$HOMEDIR" ]; then
-  HOMEDIR="$HOME"
+  HOMEDIR="${REAL_HOME:-$HOME}"
 fi
 
 if [ -z "$LOGNAME" ]; then
@@ -90,4 +90,56 @@ if [ -f "$AGY_WRAPPER_SOURCE" ]; then
   ln -sfn "$AGY_WRAPPER_SOURCE" "$AGY_WRAPPER_TARGET"
   logSuccess "AI agent profile wrapper linked successfully: $AGY_WRAPPER_TARGET -> $AGY_WRAPPER_SOURCE"
 fi
+
+# Configure AI Agent Global Settings & Baseline Permissions
+GEMINI_SETTINGS_FILE="$GEMINI_CLI_DIR/settings.json"
+
+if [ ! -f "$GEMINI_SETTINGS_FILE" ]; then
+  logInfo "Initializing AI agent global settings with baseline permissions..."
+  cat > "$GEMINI_SETTINGS_FILE" <<'EOF'
+{
+  "colorScheme": "tokyo night",
+  "notifications": true,
+  "permissions": {
+    "allow": [
+      "command(git)",
+      "command(ls)",
+      "command(cat)",
+      "command(grep)",
+      "command(rg)",
+      "command(find)",
+      "command(echo)",
+      "command(head)",
+      "command(pwd)"
+    ]
+  }
+}
+EOF
+  chmod 600 "$GEMINI_SETTINGS_FILE"
+  logSuccess "AI agent global settings initialized: $GEMINI_SETTINGS_FILE"
+elif command -v jq >/dev/null 2>&1; then
+  # Merge baseline permissions into existing settings without overwriting user customizations
+  tmp_settings=$(mktemp)
+  if jq '
+    .permissions = (.permissions // {})
+    | .permissions.allow = ((.permissions.allow // []) + [
+        "command(git)",
+        "command(ls)",
+        "command(cat)",
+        "command(grep)",
+        "command(rg)",
+        "command(find)",
+        "command(echo)",
+        "command(head)",
+        "command(pwd)"
+      ] | unique)
+  ' "$GEMINI_SETTINGS_FILE" > "$tmp_settings" 2>/dev/null; then
+    mv "$tmp_settings" "$GEMINI_SETTINGS_FILE"
+    chmod 600 "$GEMINI_SETTINGS_FILE"
+    logSuccess "Merged baseline command permissions into $GEMINI_SETTINGS_FILE"
+  else
+    rm -f "$tmp_settings"
+  fi
+fi
+
 
