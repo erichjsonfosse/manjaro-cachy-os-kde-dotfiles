@@ -20,6 +20,9 @@ export CONFIGDIR
 ZSHPLUGINDIR="$CONFIGDIR/zsh/plugins"
 export ZSHPLUGINDIR
 
+BINDIR="$BASEDIR/bin"
+export BINDIR
+
 INSTALLDIR="$BASEDIR/install"
 export INSTALLDIR
 ######################### Directories ##########################

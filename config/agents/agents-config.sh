@@ -78,3 +78,16 @@ if [ -d "$SOURCE_PLUGINS_DIR" ]; then
   shopt -u nullglob
   logSuccess "AI agent plugins linked successfully: dotfiles -> $AGENTS_PLUGINS_DIR -> $GEMINI_CONFIG_PLUGINS_DIR"
 fi
+
+# Configure AI Agent Profile Wrapper (agy)
+AGY_WRAPPER_SOURCE="$SCRIPT_DIR/../../bin/agy"
+AGY_WRAPPER_TARGET="$HOMEDIR/.local/bin/agy"
+
+if [ -f "$AGY_WRAPPER_SOURCE" ]; then
+  mkdir -p "$HOMEDIR/.local/bin"
+  logInfo "Linking agy wrapper: $AGY_WRAPPER_TARGET -> $AGY_WRAPPER_SOURCE..."
+  chmod +x "$AGY_WRAPPER_SOURCE"
+  ln -sfn "$AGY_WRAPPER_SOURCE" "$AGY_WRAPPER_TARGET"
+  logSuccess "AI agent profile wrapper linked successfully: $AGY_WRAPPER_TARGET -> $AGY_WRAPPER_SOURCE"
+fi
+

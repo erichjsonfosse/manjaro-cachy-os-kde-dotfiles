@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# Capture the true user home before overriding
+ORIG_HOME="${REAL_HOME:-$HOME}"
+PROFILES_BASE="${XDG_DATA_HOME:-$ORIG_HOME/.local/share}/agy/profiles"
+
+# --- 1. Find the real 'agy' binary (avoiding infinite loops) ---
+SELF="$(readlink -f "$0")"
+REAL_AGY=""
+
+while IFS= read -r bin; do
+    [[ -x "$bin" ]] || continue
+    if [[ "$(readlink -f "$bin")" != "$SELF" ]]; then
+        REAL_AGY="$bin"
+        break
+    fi
+done < <(type -ap agy 2>/dev/null)
+
+if [[ -z "$REAL_AGY" ]]; then
+    echo "Error: Real 'agy' binary not found in PATH." >&2
+    exit 1
+fi
+
+# --- 2. Parse profile flags from arguments ---
+PROFILE=""
+NO_PROFILE=false
+NEW_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --no-profile)
+            NO_PROFILE=true
+            shift
+            ;;
+        --profile=*)
+            PROFILE="${1#*=}"
+            shift
+            ;;
+        --profile)
+            if [[ $# -lt 2 || -z "$2" ]]; then
+                echo "Error: --profile requires a non-empty argument." >&2
+                exit 1
+            fi
+            PROFILE="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            NEW_ARGS+=("$@")
+            break
+            ;;
+        *)
+            NEW_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# --- 3. Robust Git Repository Detection ---
+detect_repo_name() {
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local repo_root
+    repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
+
+    # Priority 1: In-repo explicit override file (.agy-profile)
+    if [[ -f "$repo_root/.agy-profile" ]]; then
+        local override
+        override="$(head -n 1 "$repo_root/.agy-profile" | tr -d '[:space:]')"
+        if [[ -n "$override" ]]; then
+            echo "$override"
+            return 0
+        fi
+    fi
+
+    # Priority 2: Remote URL (origin or first available remote)
+    local remote_url
+    remote_url="$(git config --get remote.origin.url 2>/dev/null)"
+    if [[ -z "$remote_url" ]]; then
+        local first_remote
+        first_remote="$(git remote 2>/dev/null | head -n 1)"
+        if [[ -n "$first_remote" ]]; then
+            remote_url="$(git config --get "remote.${first_remote}.url" 2>/dev/null)"
+        fi
+    fi
+
+    if [[ -n "$remote_url" ]]; then
+        # Strip trailing slash & .git suffix
+        local clean="${remote_url%/}"
+        clean="${clean%.git}"
+        # Extract name after last '/' or ':' (covers HTTPS, SSH, SCP-like URLs)
+        local repo_name="${clean##*[/:]}"
+        if [[ -n "$repo_name" ]]; then
+            echo "$repo_name"
+            return 0
+        fi
+    fi
+
+    # Priority 3: Worktrees without remotes -> resolve common .git dir parent
+    local common_dir
+    common_dir="$(git rev-parse --git-common-dir 2>/dev/null)"
+    if [[ -n "$common_dir" ]]; then
+        local abs_common
+        abs_common="$(readlink -f "$common_dir")"
+        if [[ "$(basename "$abs_common")" == ".git" ]]; then
+            echo "$(basename "$(dirname "$abs_common")")"
+            return 0
+        fi
+    fi
+
+    # Priority 4: Fall back to worktree/folder basename
+    basename "$repo_root"
+}
+
+# --- 4. Determine active profile ---
+if [[ "$NO_PROFILE" == "false" && -z "$PROFILE" ]]; then
+    if repo_name="$(detect_repo_name)"; then
+        PROFILE="$repo_name"
+    fi
+fi
+
+# --- 5. Apply hybrid $HOME isolation ---
+if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
+    PROFILE_DIR="$PROFILES_BASE/$PROFILE"
+
+    # Create profile directory structure
+    mkdir -p "$PROFILE_DIR" \
+             "$PROFILE_DIR/.config" \
+             "$PROFILE_DIR/.local/share" \
+             "$PROFILE_DIR/.local/state" \
+             "$PROFILE_DIR/.cache"
+
+    # Link shared identity & authentication
+    [[ -d "$ORIG_HOME/.ssh" ]] && ln -sfn "$ORIG_HOME/.ssh" "$PROFILE_DIR/.ssh"
+    [[ -f "$ORIG_HOME/.gitconfig" ]] && ln -sfn "$ORIG_HOME/.gitconfig" "$PROFILE_DIR/.gitconfig"
+    [[ -f "$ORIG_HOME/.git-credentials" ]] && ln -sfn "$ORIG_HOME/.git-credentials" "$PROFILE_DIR/.git-credentials"
+    [[ -d "$ORIG_HOME/.gnupg" ]] && ln -sfn "$ORIG_HOME/.gnupg" "$PROFILE_DIR/.gnupg"
+    [[ -d "$ORIG_HOME/.config/gh" ]] && ln -sfn "$ORIG_HOME/.config/gh" "$PROFILE_DIR/.config/gh"
+    [[ -d "$ORIG_HOME/.config/git" ]] && ln -sfn "$ORIG_HOME/.config/git" "$PROFILE_DIR/.config/git"
+
+    # Link shared skills/plugins from dotfiles (~/.agents)
+    [[ -d "$ORIG_HOME/.agents" ]] && ln -sfn "$ORIG_HOME/.agents" "$PROFILE_DIR/.agents"
+
+    # Link shell startup files so subshells maintain your environment & PATH
+    for rc in .bashrc .bash_profile .profile .zshrc .zshenv; do
+        [[ -f "$ORIG_HOME/$rc" ]] && ln -sfn "$ORIG_HOME/$rc" "$PROFILE_DIR/$rc"
+    done
+
+    # Switch environment to the profile
+    export REAL_HOME="$ORIG_HOME"
+    export HOME="$PROFILE_DIR"
+    export XDG_CONFIG_HOME="$PROFILE_DIR/.config"
+    export XDG_DATA_HOME="$PROFILE_DIR/.local/share"
+    export XDG_STATE_HOME="$PROFILE_DIR/.local/state"
+    export XDG_CACHE_HOME="$PROFILE_DIR/.cache"
+fi
+
+# --- 6. Execute the real binary ---
+exec "$REAL_AGY" "${NEW_ARGS[@]}"
