@@ -102,15 +102,15 @@ if [ ! -f "$GEMINI_SETTINGS_FILE" ]; then
   "notifications": true,
   "permissions": {
     "allow": [
-      "command(git)",
-      "command(ls)",
       "command(cat)",
-      "command(grep)",
-      "command(rg)",
-      "command(find)",
       "command(echo)",
+      "command(find)",
+      "command(git)",
+      "command(grep)",
       "command(head)",
-      "command(pwd)"
+      "command(ls)",
+      "command(pwd)",
+      "command(rg)"
     ]
   }
 }
@@ -123,15 +123,15 @@ elif command -v jq >/dev/null 2>&1; then
   if jq '
     .permissions = (.permissions // {})
     | .permissions.allow = ((.permissions.allow // []) + [
-        "command(git)",
-        "command(ls)",
         "command(cat)",
-        "command(grep)",
-        "command(rg)",
-        "command(find)",
         "command(echo)",
+        "command(find)",
+        "command(git)",
+        "command(grep)",
         "command(head)",
-        "command(pwd)"
+        "command(ls)",
+        "command(pwd)",
+        "command(rg)"
       ] | unique)
   ' "$GEMINI_SETTINGS_FILE" > "$tmp_settings" 2>/dev/null; then
     mv "$tmp_settings" "$GEMINI_SETTINGS_FILE"
