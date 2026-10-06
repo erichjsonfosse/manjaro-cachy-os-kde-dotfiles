@@ -32,37 +32,37 @@ This specification formalizes the architecture to achieve:
 
 ```mermaid
 flowchart TD
-    subgraph GlobalHome [Global User State (~/.gemini & ~/.config)]
+    subgraph GlobalHome ["Global User State (~/.gemini and ~/.config)"]
         G_SET["Global settings.json<br/>- permissions.allow (master list)<br/>- user preferences (editor, colorScheme)"]
         G_ADC["Global gcloud ADC<br/>application_default_credentials.json"]
     end
 
-    subgraph ProfileInit [Profile Startup in bin/agy]
-        P_INIT["Determine Profile Dir: $PROFILES_BASE/$PROFILE"]
+    subgraph ProfileInit ["Profile Startup in bin/agy"]
+        P_INIT["Determine Profile Dir:<br/>PROFILES_BASE/PROFILE"]
         P_BREAK{"Is profile settings.json<br/>a symlink?"}
         P_CONV["Break symlink: convert to<br/>independent real file"]
-        P_MERGE["Sync permissions.allow<br/>Global -> Profile"]
+        P_MERGE["Sync permissions.allow<br/>Global to Profile"]
         P_ENV["Export Scoped GCP Env:<br/>CLOUDSDK_CORE_PROJECT<br/>GOOGLE_CLOUD_PROJECT<br/>GOOGLE_CLOUD_LOCATION"]
         P_ADC{"Global ADC exists and<br/>profile ADC absent?"}
-        P_LNK_ADC["Symlink global ADC file into<br/>$PROFILE_DIR/.config/gcloud/"]
+        P_LNK_ADC["Symlink global ADC into<br/>PROFILE_DIR/.config/gcloud/"]
     end
 
-    subgraph ProfileExec [Execution & Exit Trap]
+    subgraph ProfileExec ["Execution and Exit Trap"]
         RUN["Execute REAL_AGY in Profile Env"]
-        EXIT_TRAP["Exit Trap in bin/agy:<br/>Merge newly allowed permissions<br/>Profile -> Global"]
+        EXIT_TRAP["Exit Trap in bin/agy:<br/>Merge newly allowed permissions<br/>Profile to Global"]
     end
 
     G_SET -->|Read master permissions| P_MERGE
     P_INIT --> P_BREAK
-    P_BREAK -- Yes --> P_CONV
-    P_BREAK -- No --> P_MERGE
+    P_BREAK -->|Yes| P_CONV
+    P_BREAK -->|No| P_MERGE
     P_CONV --> P_MERGE
     P_MERGE --> P_ENV
-    G_ADC --> P_ADC
-    P_ADC -- Yes --> P_LNK_ADC
-    P_ADC -- No --> P_ENV
-    P_LNK_ADC --> P_ENV
-    P_ENV --> RUN
+    P_ENV --> P_ADC
+    G_ADC -.->|Source file| P_ADC
+    P_ADC -->|Yes| P_LNK_ADC
+    P_ADC -->|No| RUN
+    P_LNK_ADC --> RUN
     RUN --> EXIT_TRAP
     EXIT_TRAP -->|Write back new grants| G_SET
 ```
