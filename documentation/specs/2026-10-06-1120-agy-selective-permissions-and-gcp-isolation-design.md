@@ -4,8 +4,8 @@
 **Topic:** Selective Permission Sync and Concurrent Google Cloud Project Isolation across Antigravity Profiles  
 **Status:** Approved by User  
 **Files Affected:**
-- [`bin/agy`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/bin/agy)
-- [`tests/test-agy-selective-permissions.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/tests/test-agy-selective-permissions.sh)
+- [`bin/agy`](../../bin/agy)
+- [`tests/test-agy-selective-permissions.sh`](../../tests/test-agy-selective-permissions.sh)
 
 ---
 
@@ -104,7 +104,7 @@ flowchart TD
 
 ## 4. Verification & Testing Strategy
 
-1. **Unit / Integration Tests ([`tests/test-agy-selective-permissions.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/tests/test-agy-selective-permissions.sh))**:
+1. **Unit / Integration Tests ([`tests/test-agy-selective-permissions.sh`](../../tests/test-agy-selective-permissions.sh))**:
    - Test symlink breaking and real file conversion.
    - Test permission unioning from global to profile without clobbering `gcp.project`.
    - Test permission unioning from profile back to global on exit without overwriting global `gcp.project`.

@@ -4,9 +4,9 @@
 - **Date:** 2026-09-29
 - **Status:** APPROVED
 - **Target Files:**
-  - [`config/agents/plugins/skills-that-thrill/rules/git-conventions.md`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/rules/git-conventions.md)
-  - [`config/agents/plugins/skills-that-thrill/rules/AGENTS.md`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/rules/AGENTS.md)
-  - [`config/agents/plugins/skills-that-thrill/rules/GEMINI.md`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/rules/GEMINI.md)
+  - [`config/agents/plugins/skills-that-thrill/rules/git-conventions.md`](../../config/agents/plugins/skills-that-thrill/rules/git-conventions.md)
+  - [`config/agents/plugins/skills-that-thrill/rules/AGENTS.md`](../../config/agents/plugins/skills-that-thrill/rules/AGENTS.md)
+  - [`config/agents/plugins/skills-that-thrill/rules/GEMINI.md`](../../config/agents/plugins/skills-that-thrill/rules/GEMINI.md)
 
 ---
 

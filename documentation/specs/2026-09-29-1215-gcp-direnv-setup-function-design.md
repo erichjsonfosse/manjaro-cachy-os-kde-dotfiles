@@ -4,8 +4,8 @@
 **Topic:** Globally Available Zsh Function for Direnv Google Cloud Project Setup  
 **Status:** Approved by User  
 **Files Affected:**
-- [`config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh)
-- [`tests/unit/test-direnv-gcp.bats`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/tests/unit/test-direnv-gcp.bats)
+- [`config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh`](../../config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh)
+- [`tests/unit/test-direnv-gcp.bats`](../../tests/unit/test-direnv-gcp.bats)
 
 ---
 
@@ -49,7 +49,7 @@ flowchart TD
 ### 2.1 Function Name & Aliases
 * **Primary Function Name:** `setupDirenvForGoogleCloudProject`
 * **Convenience Aliases:** `setup-gcp-direnv`, `direnv-gcp`
-* **Shell Integration:** Added to [`config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh), which is automatically loaded in all interactive Zsh shells via Oh My Zsh custom plugin loading.
+* **Shell Integration:** Added to [`config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh`](../../config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/direnv.zsh), which is automatically loaded in all interactive Zsh shells via Oh My Zsh custom plugin loading.
 
 ---
 
@@ -147,7 +147,7 @@ When updating `.envrc` or `.envrc.example`:
 - [ ] Aliases `setup-gcp-direnv` and `direnv-gcp` invoke `setupDirenvForGoogleCloudProject`.
 
 ### 6.2 Automated Test Suite
-- Create unit tests in [`tests/unit/test-direnv-gcp.bats`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/tests/unit/test-direnv-gcp.bats) using Bats to execute:
+- Create unit tests in [`tests/unit/test-direnv-gcp.bats`](../../tests/unit/test-direnv-gcp.bats) using Bats to execute:
   1. Creation of new `.envrc` and `.envrc.example`.
   2. In-place replacement of existing managed block.
   3. Gitignore appending logic.

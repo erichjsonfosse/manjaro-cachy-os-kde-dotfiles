@@ -4,12 +4,12 @@
 - **Date:** 2026-09-29
 - **Status:** DRAFT (Awaiting Approval)
 - **Target Files:**
-  - [`utilities/during-install/utilities.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/utilities/during-install/utilities.sh)
-  - [`install/pacman-packages.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/install/pacman-packages.sh)
-  - [`install/aur-packages.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/install/aur-packages.sh)
-  - [`set-variables.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/set-variables.sh)
-  - [`init.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/init.sh)
-  - [`.gitignore`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/.gitignore)
+  - [`utilities/during-install/utilities.sh`](../../utilities/during-install/utilities.sh)
+  - [`install/pacman-packages.sh`](../../install/pacman-packages.sh)
+  - [`install/aur-packages.sh`](../../install/aur-packages.sh)
+  - [`set-variables.sh`](../../set-variables.sh)
+  - [`init.sh`](../../init.sh)
+  - [`.gitignore`](../../.gitignore)
 
 ---
 
@@ -80,14 +80,14 @@ flowchart TD
 
 ## 4. Detailed Component Design
 
-### 4.1 Environment Variables ([`set-variables.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/set-variables.sh))
+### 4.1 Environment Variables ([`set-variables.sh`](../../set-variables.sh))
 Add the canonical path to the log file:
 ```bash
 FAILED_PACKAGES_LOG="$BASEDIR/failed-packages.log"
 export FAILED_PACKAGES_LOG
 ```
 
-### 4.2 Helper Function ([`utilities/during-install/utilities.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/utilities/during-install/utilities.sh))
+### 4.2 Helper Function ([`utilities/during-install/utilities.sh`](../../utilities/during-install/utilities.sh))
 Implement `installPackagesResiliently`:
 ```bash
 installPackagesResiliently()
@@ -160,20 +160,20 @@ installPackagesResiliently()
 ```
 
 ### 4.3 Installer Integration
-- **[`install/pacman-packages.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/install/pacman-packages.sh):**
+- **[`install/pacman-packages.sh`](../../install/pacman-packages.sh):**
   Replace raw `sudo pacman -S --needed --noconfirm "${packages[@]}"` with:
   ```bash
   logHeader "Installing pacman packages"
   installPackagesResiliently "pacman" "${packages[@]}"
   ```
-- **[`install/aur-packages.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/install/aur-packages.sh):**
+- **[`install/aur-packages.sh`](../../install/aur-packages.sh):**
   Replace raw `paru -Syu --needed --noconfirm "${packages[@]}"` with:
   ```bash
   logHeader "Installing AUR packages"
   installPackagesResiliently "paru" "${packages[@]}"
   ```
 
-### 4.4 End-of-Run Summary ([`init.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/init.sh))
+### 4.4 End-of-Run Summary ([`init.sh`](../../init.sh))
 In `init.sh` right before `promptForReboot`:
 ```bash
 displayFailedPackagesSummary()

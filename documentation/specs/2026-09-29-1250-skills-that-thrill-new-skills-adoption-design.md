@@ -1,9 +1,9 @@
 # Design Specification: Skills That Thrill New Skills Adoption & Standardization
 
-**Spec Reference:** [Design Spec](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1250-skills-that-thrill-new-skills-adoption-design.md)  
+**Spec Reference:** [Design Spec](2026-09-29-1250-skills-that-thrill-new-skills-adoption-design.md)  
 **Creation Date & Time:** 2026-09-29-1250  
 **Source Repository:** [`/home/erichjsonfosse/projects/tests/training-purposes-hauws/main/skills`](file:///home/erichjsonfosse/projects/tests/training-purposes-hauws/main/skills)  
-**Target Plugin Directory:** [`config/agents/plugins/skills-that-thrill/skills/`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/skills/)  
+**Target Plugin Directory:** [`config/agents/plugins/skills-that-thrill/skills/`](../../config/agents/plugins/skills-that-thrill/skills/)  
 
 ---
 

@@ -1,10 +1,10 @@
 # Implementation Plan: Skills That Thrill New Skills Adoption
 
-**Spec Reference:** [Design Spec](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1250-skills-that-thrill-new-skills-adoption-design.md)  
+**Spec Reference:** [Design Spec](../specs/2026-09-29-1250-skills-that-thrill-new-skills-adoption-design.md)  
 **Plan Date & Time:** 2026-09-29-1254  
-**Target Repository:** [`/home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main)  
+**Target Repository:** [`/home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main`](../..)  
 **Source Skills Directory:** [`/home/erichjsonfosse/projects/tests/training-purposes-hauws/main/skills`](file:///home/erichjsonfosse/projects/tests/training-purposes-hauws/main/skills)  
-**Destination Plugin Directory:** [`config/agents/plugins/skills-that-thrill/skills/`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/skills/)  
+**Destination Plugin Directory:** [`config/agents/plugins/skills-that-thrill/skills/`](../../config/agents/plugins/skills-that-thrill/skills/)  
 
 ---
 

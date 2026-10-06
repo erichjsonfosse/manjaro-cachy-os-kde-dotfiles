@@ -8,7 +8,7 @@
 
 **Tech Stack:** Bash, `jq`, POSIX Shell, Git, Google Cloud CLI / ADC conventions.
 
-**Spec Reference:** [Design Spec](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-10-06-1120-agy-selective-permissions-and-gcp-isolation-design.md)
+**Spec Reference:** [Design Spec](../specs/2026-10-06-1120-agy-selective-permissions-and-gcp-isolation-design.md)
 
 ## Global Constraints
 
@@ -25,7 +25,7 @@
 ### Task 1: Test Suite for Selective Permissions & GCP Isolation
 
 **Files:**
-- Create: [`tests/test-agy-selective-permissions.sh`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/tests/test-agy-selective-permissions.sh)
+- Create: [`tests/test-agy-selective-permissions.sh`](../../tests/test-agy-selective-permissions.sh)
 
 **Interfaces:**
 - Consumes: Test environment sandbox with mock `ORIG_HOME` and mock `PROFILE_DIR`.
@@ -57,7 +57,7 @@ git commit -m "test(agents): add test suite for agy selective permissions and gc
 ### Task 2: Implement Selective Permission Synchronization & Standalone File Enforcement
 
 **Files:**
-- Modify: [`bin/agy:130-220`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/bin/agy#L130-L220)
+- Modify: [`bin/agy:130-220`](../../bin/agy#L130-L220)
 
 **Interfaces:**
 - Consumes: `$ORIG_HOME/.gemini/antigravity-cli/settings.json`, `$PROFILE_DIR/.gemini/antigravity-cli/settings.json`.
@@ -84,7 +84,7 @@ Expected: Permission sync and file decoupling tests PASS.
 ### Task 3: Implement Scoped GCP Environment Exports & ADC Credential Symlinking
 
 **Files:**
-- Modify: [`bin/agy:215-255`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/bin/agy#L215-L255)
+- Modify: [`bin/agy:215-255`](../../bin/agy#L215-L255)
 
 **Interfaces:**
 - Consumes: `.gcp.project` and `.gcp.location` in `$PROF_SETTINGS`, `$ORIG_HOME/.config/gcloud/application_default_credentials.json`.

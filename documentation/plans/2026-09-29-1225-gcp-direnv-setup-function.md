@@ -8,7 +8,7 @@
 
 **Tech Stack:** Zsh / POSIX shell, direnv, gcloud CLI, gum / fzf (interactive picker).
 
-**Spec Reference:** [Design Specification](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1215-gcp-direnv-setup-function-design.md)
+**Spec Reference:** [Design Specification](../specs/2026-09-29-1215-gcp-direnv-setup-function-design.md)
 
 ## Global Constraints
 

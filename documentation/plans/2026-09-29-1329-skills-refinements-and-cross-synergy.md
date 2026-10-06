@@ -2,7 +2,7 @@
 
 - **Topic:** Final Skills Refinement, Visual Diagrams, and Cross-Skill Synergy
 - **Date:** 2026-09-29 13:29
-- **Design Spec:** [2026-09-29-1327-skills-refinements-and-cross-synergy-design.md](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1327-skills-refinements-and-cross-synergy-design.md)
+- **Design Spec:** [2026-09-29-1327-skills-refinements-and-cross-synergy-design.md](../specs/2026-09-29-1327-skills-refinements-and-cross-synergy-design.md)
 - **Status:** Pending Approval
 
 ---

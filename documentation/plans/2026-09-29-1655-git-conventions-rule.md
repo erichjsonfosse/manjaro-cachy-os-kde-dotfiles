@@ -8,7 +8,7 @@
 
 **Tech Stack:** Markdown, Git, Bash.
 
-**Spec Reference:** [Design Spec](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1654-git-conventions-rule-design.md)
+**Spec Reference:** [Design Spec](../specs/2026-09-29-1654-git-conventions-rule-design.md)
 
 ## Global Constraints
 - Rule file location: `config/agents/plugins/skills-that-thrill/rules/git-conventions.md`.

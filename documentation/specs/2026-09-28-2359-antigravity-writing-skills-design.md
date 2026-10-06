@@ -34,7 +34,7 @@ This adaptation updates `writing-skills` to be **Antigravity-First**, standardiz
 ### 2.2 Standardize on Native Mermaid Visuals (Replace Graphviz)
 * Convert Graphviz `.dot` diagrams to native **Mermaid** blocks (`flowchart TD`, `sequenceDiagram`, `stateDiagram-v2`).
 * Zero daemon overhead: Mermaid renders directly in IDEs (VSCode, JetBrains) and on GitHub without external SVG generation scripts.
-* Add [`mermaid-conventions.md`](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/config/agents/plugins/skills-that-thrill/skills/writing-skills/mermaid-conventions.md) providing clear style rules (flowchart syntax, quoting node labels with special characters, layout direction).
+* Add [`mermaid-conventions.md`](../../config/agents/plugins/skills-that-thrill/skills/writing-skills/mermaid-conventions.md) providing clear style rules (flowchart syntax, quoting node labels with special characters, layout direction).
 
 ### 2.3 TDD for Skills with Antigravity Subagents
 * Use `invoke_subagent` for skill testing:

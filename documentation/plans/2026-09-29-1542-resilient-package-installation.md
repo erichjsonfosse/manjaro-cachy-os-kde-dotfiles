@@ -8,7 +8,7 @@
 
 **Tech Stack:** Bash, Pacman, Paru, Gum (styling).
 
-**Spec Reference:** [Design Spec](file:///home/erichjsonfosse/projects/manjaro-cachy-os-kde-dotfiles/main/documentation/specs/2026-09-29-1535-resilient-package-installation-design.md)
+**Spec Reference:** [Design Spec](../specs/2026-09-29-1535-resilient-package-installation-design.md)
 
 ## Global Constraints
 - Target log file: `$BASEDIR/failed-packages.log` (git-ignored).
