@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_AGY="$SCRIPT_DIR/../bin/agy"
 
 # Source bin/agy for function testing
-# shellcheck source=../bin/agy
+# shellcheck source=../bin/agy disable=SC1091
 source "$BIN_AGY"
 
 MOCK_ORIG_HOME="$TEST_TMPDIR/orig_home"
