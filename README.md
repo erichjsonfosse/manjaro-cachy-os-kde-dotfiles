@@ -57,7 +57,10 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Modular Git Config:** Maintains separation between tracked global `.gitconfig` and machine-local `.gitconfig.local`.
 * **KDE SSH Askpass (`ksshaskpass`):** Symlinks `/usr/lib/ssh/ssh-askpass` to `/usr/bin/ksshaskpass` and exports `SSH_ASKPASS` across Plasma 6 environment, providing native graphical passphrase dialogs for GUI tools (Obsidian, IDEs).
 
-### 🩺 System Diagnostics
+### 🩺 System Diagnostics & Backups
+* **Categorized Backup Engine:** Pre-installation safely archives existing configurations into domain categories (`git/`, `zsh/`, `kde/`, `ssh/`, `herdr/`, `nano/`, `paru/`, `agents/`) under `~/.manjaro-cachy-os-kde-dotfiles-backup/<timestamp>/`.
+* **Symlink Dereferencing:** Preserves actual file content as immutable snapshots rather than copying fragile symlink pointers.
+* **Dual Manifests:** Generates both a Markdown summary (`manifest.md`) and a machine-readable JSON manifest (`manifest.json`) detailing original locations, targets, and status for auditing or future automated restoration.
 * **KDE Dotfiles Doctor:** Includes `utilities/post-install/kde-dotfiles-doctor.sh` to verify system health, package dependencies, and configuration integrity after installation.
 
 ---
