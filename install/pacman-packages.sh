@@ -103,6 +103,7 @@ declare -a packages=(
 "eza"
 "filezilla"
 "fzf"
+"gnome-keyring"
 "gum"
 "helm"
 "inkscape"

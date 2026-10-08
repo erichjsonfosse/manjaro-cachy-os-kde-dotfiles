@@ -237,6 +237,79 @@ link_adc_credentials() {
     fi
 }
 
+run_profile_with_keyring() {
+    local profile_dir="$1"
+    shift
+
+    export AGY_PROFILE_DIR="$profile_dir"
+
+    dbus-run-session -- bash -s -- "$@" <<'PROFILE_RUNNER'
+set -e
+
+PROFILE_DIR="$AGY_PROFILE_DIR"
+
+KEYRING_DIR="$PROFILE_DIR/.local/share/keyrings"
+KEYRING_STATE_DIR="$PROFILE_DIR/.local/state/gnome-keyring"
+
+mkdir -p "$KEYRING_DIR" "$KEYRING_STATE_DIR"
+chmod 700 "$KEYRING_DIR" "$KEYRING_STATE_DIR"
+
+export GNOME_KEYRING_CONTROL="$KEYRING_STATE_DIR"
+
+# Run a completely profile-local Secret Service.
+#
+# --foreground is important: it gives us a child process whose PID
+# we own and can reliably terminate when agy exits.
+gnome-keyring-daemon \
+    --foreground \
+    --components=secrets \
+    --control-directory="$KEYRING_STATE_DIR" \
+    >/dev/null 2>&1 &
+
+KEYRING_PID=$!
+
+cleanup_keyring() {
+    local exit_code=$?
+
+    trap - EXIT INT TERM
+
+    if kill -0 "$KEYRING_PID" 2>/dev/null; then
+        kill "$KEYRING_PID" 2>/dev/null || true
+        wait "$KEYRING_PID" 2>/dev/null || true
+    fi
+
+    # The keyring database itself lives in .local/share/keyrings.
+    # Only remove transient runtime/control state.
+    rm -rf "$KEYRING_STATE_DIR"
+
+    exit "$exit_code"
+}
+
+trap cleanup_keyring EXIT INT TERM
+
+# Wait briefly for the private Secret Service to acquire its D-Bus name.
+for _ in {1..50}; do
+    if busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then
+        break
+    fi
+
+    if ! kill -0 "$KEYRING_PID" 2>/dev/null; then
+        echo "Error: gnome-keyring-daemon exited unexpectedly" >&2
+        exit 1
+    fi
+
+    sleep 0.02
+done
+
+if ! busctl --user status org.freedesktop.secrets >/dev/null 2>&1; then
+    echo "Error: profile Secret Service did not start" >&2
+    exit 1
+fi
+
+"$@"
+PROFILE_RUNNER
+}
+
 main() {
     # --- 1. Find the real 'agy' binary (avoiding infinite loops) ---
     SELF="$(readlink -f "$0")"
@@ -363,7 +436,7 @@ main() {
         }
 
         trap cleanup_settings EXIT
-        "$REAL_AGY" "${NEW_ARGS[@]}"
+        run_profile_with_keyring "$PROFILE_DIR" "$REAL_AGY" "${NEW_ARGS[@]}"
         EXIT_CODE=$?
         exit "$EXIT_CODE"
     else
