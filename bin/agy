@@ -67,56 +67,6 @@ detect_repo_name() {
     basename "$repo_root"
 }
 
-# --- 5. Apply hybrid $HOME isolation ---
-merge_json_settings() {
-    local file1="$1"
-    local file2="$2"
-    local dest="$3"
-
-    if [[ ! -f "$file1" && ! -f "$file2" ]]; then
-        return 0
-    fi
-    if [[ ! -f "$file1" ]]; then
-        cp "$file2" "$dest"
-        return 0
-    fi
-    if [[ ! -f "$file2" ]]; then
-        cp "$file1" "$dest"
-        return 0
-    fi
-
-    if command -v jq >/dev/null 2>&1; then
-        local tmp
-        tmp="$(mktemp)"
-        if jq -s '
-            (.[0] // {}) as $a | (.[1] // {}) as $b |
-            ($a * $b)
-            | if ($a.trustedWorkspaces or $b.trustedWorkspaces) then
-                .trustedWorkspaces = ((($a.trustedWorkspaces // []) + ($b.trustedWorkspaces // [])) | unique)
-              else . end
-            | if ($a.permissions or $b.permissions) then
-                .permissions = (($a.permissions // {}) * ($b.permissions // {}))
-                | if ($a.permissions.allow or $b.permissions.allow) then
-                    .permissions.allow = ((($a.permissions.allow // []) + ($b.permissions.allow // [])) | unique)
-                  else . end
-                | if ($a.permissions.deny or $b.permissions.deny) then
-                    .permissions.deny = ((($a.permissions.deny // []) + ($b.permissions.deny // [])) | unique)
-                  else . end
-                | if ($a.permissions.ask or $b.permissions.ask) then
-                    .permissions.ask = ((($a.permissions.ask // []) + ($b.permissions.ask // [])) | unique)
-                  else . end
-              else . end
-        ' "$file1" "$file2" > "$tmp" 2>/dev/null; then
-            mv "$tmp" "$dest"
-            return 0
-        else
-            rm -f "$tmp"
-        fi
-    fi
-
-    cp "$file2" "$dest"
-}
-
 ensure_profile_settings() {
     local global_file="$1"
     local prof_file="$2"
@@ -249,7 +199,7 @@ set -e
 PROFILE_DIR="$AGY_PROFILE_DIR"
 
 KEYRING_DIR="$PROFILE_DIR/.local/share/keyrings"
-KEYRING_STATE_DIR="$PROFILE_DIR/.local/state/gnome-keyring"
+KEYRING_STATE_DIR="$PROFILE_DIR/.local/state/gnome-keyring/$BASHPID"
 
 mkdir -p "$KEYRING_DIR" "$KEYRING_STATE_DIR"
 chmod 700 "$KEYRING_DIR" "$KEYRING_STATE_DIR"
