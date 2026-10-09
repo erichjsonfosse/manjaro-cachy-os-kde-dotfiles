@@ -2,11 +2,11 @@
 set -eo pipefail
 
 # Capture the true user home before overriding
-ORIG_HOME="${REAL_HOME:-$HOME}"
+ORIGINAL_HOME="${REAL_HOME:-$HOME}"
 if [[ -n "$REAL_HOME" ]]; then
     PROFILES_BASE="$REAL_HOME/.local/share/agy/profiles"
 else
-    PROFILES_BASE="${XDG_DATA_HOME:-$ORIG_HOME/.local/share}/agy/profiles"
+    PROFILES_BASE="${XDG_DATA_HOME:-$ORIGINAL_HOME/.local/share}/agy/profiles"
 fi
 
 # --- Git Repository Detection ---
@@ -15,13 +15,13 @@ detect_repo_name() {
         return 1
     fi
 
-    local repo_root
-    repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"
+    local repository_root
+    repository_root="$(git rev-parse --show-toplevel 2>/dev/null)"
 
     # Priority 1: In-repo explicit override file (.agy-profile)
-    if [[ -f "$repo_root/.agy-profile" ]]; then
+    if [[ -f "$repository_root/.agy-profile" ]]; then
         local override
-        override="$(head -n 1 "$repo_root/.agy-profile" | tr -d '[:space:]')"
+        override="$(head -n 1 "$repository_root/.agy-profile" | tr -d '[:space:]')"
         if [[ -n "$override" ]]; then
             echo "$override"
             return 0
@@ -44,19 +44,19 @@ detect_repo_name() {
         local clean="${remote_url%/}"
         clean="${clean%.git}"
         # Extract name after last '/' or ':' (covers HTTPS, SSH, SCP-like URLs)
-        local repo_name="${clean##*[/:]}"
-        if [[ -n "$repo_name" ]]; then
-            echo "$repo_name"
+        local repository_name="${clean##*[/:]}"
+        if [[ -n "$repository_name" ]]; then
+            echo "$repository_name"
             return 0
         fi
     fi
 
     # Priority 3: Worktrees without remotes -> resolve common .git dir parent
-    local common_dir
-    common_dir="$(git rev-parse --git-common-dir 2>/dev/null)"
-    if [[ -n "$common_dir" ]]; then
+    local common_directory
+    common_directory="$(git rev-parse --git-common-dir 2>/dev/null)"
+    if [[ -n "$common_directory" ]]; then
         local abs_common
-        abs_common="$(readlink -f "$common_dir")"
+        abs_common="$(readlink -f "$common_directory")"
         if [[ "$(basename "$abs_common")" == ".git" ]]; then
             basename "$(dirname "$abs_common")"
             return 0
@@ -64,40 +64,40 @@ detect_repo_name() {
     fi
 
     # Priority 4: Fall back to worktree/folder basename
-    basename "$repo_root"
+    basename "$repository_root"
 }
 
 ensure_profile_settings() {
-    local global_file="$1"
-    local prof_file="$2"
+    local global_settings_file="$1"
+    local profile_settings_file="$2"
 
-    mkdir -p "$(dirname "$prof_file")"
+    mkdir -p "$(dirname "$profile_settings_file")"
 
-    # If prof_file is a symlink, break it and convert to a standalone real file
-    if [[ -L "$prof_file" ]]; then
+    # If profile_settings_file is a symlink, break it and convert to a standalone real file
+    if [[ -L "$profile_settings_file" ]]; then
         local target
-        target="$(readlink -f "$prof_file" 2>/dev/null || true)"
-        rm -f "$prof_file"
+        target="$(readlink -f "$profile_settings_file" 2>/dev/null || true)"
+        rm -f "$profile_settings_file"
         if [[ -n "$target" && -f "$target" ]]; then
-            cp "$target" "$prof_file"
+            cp "$target" "$profile_settings_file"
         fi
     fi
 
-    # If prof_file does not exist, initialize from global without gcp/trustedWorkspaces or empty
-    if [[ ! -f "$prof_file" ]]; then
-        if [[ -f "$global_file" ]] && command -v jq >/dev/null 2>&1; then
-            jq 'del(.gcp) | del(.trustedWorkspaces)' "$global_file" > "$prof_file" 2>/dev/null || echo '{}' > "$prof_file"
+    # If profile_settings_file does not exist, initialize from global without gcp/trustedWorkspaces or empty
+    if [[ ! -f "$profile_settings_file" ]]; then
+        if [[ -f "$global_settings_file" ]] && command -v jq >/dev/null 2>&1; then
+            jq 'del(.gcp) | del(.trustedWorkspaces)' "$global_settings_file" > "$profile_settings_file" 2>/dev/null || echo '{}' > "$profile_settings_file"
         else
-            echo '{}' > "$prof_file"
+            echo '{}' > "$profile_settings_file"
         fi
     fi
 }
 
 sync_permissions_to_profile() {
-    local global_file="$1"
-    local prof_file="$2"
+    local global_settings_file="$1"
+    local profile_settings_file="$2"
 
-    [[ -f "$global_file" && -f "$prof_file" ]] || return 0
+    [[ -f "$global_settings_file" && -f "$profile_settings_file" ]] || return 0
     command -v jq >/dev/null 2>&1 || return 0
 
     local tmp
@@ -113,23 +113,23 @@ sync_permissions_to_profile() {
         }
         | if .permissions.deny == [] then del(.permissions.deny) else . end
         | if .permissions.ask == [] then del(.permissions.ask) else . end
-    ' "$global_file" "$prof_file" > "$tmp" 2>/dev/null; then
-        mv "$tmp" "$prof_file"
+    ' "$global_settings_file" "$profile_settings_file" > "$tmp" 2>/dev/null; then
+        mv "$tmp" "$profile_settings_file"
     else
         rm -f "$tmp"
     fi
 }
 
 sync_permissions_to_global() {
-    local global_file="$1"
-    local prof_file="$2"
+    local global_settings_file="$1"
+    local profile_settings_file="$2"
 
-    [[ -f "$prof_file" ]] || return 0
+    [[ -f "$profile_settings_file" ]] || return 0
     command -v jq >/dev/null 2>&1 || return 0
 
-    if [[ ! -f "$global_file" ]]; then
-        mkdir -p "$(dirname "$global_file")"
-        echo '{}' > "$global_file"
+    if [[ ! -f "$global_settings_file" ]]; then
+        mkdir -p "$(dirname "$global_settings_file")"
+        echo '{}' > "$global_settings_file"
     fi
 
     local tmp
@@ -145,22 +145,22 @@ sync_permissions_to_global() {
         }
         | if .permissions.deny == [] then del(.permissions.deny) else . end
         | if .permissions.ask == [] then del(.permissions.ask) else . end
-    ' "$global_file" "$prof_file" > "$tmp" 2>/dev/null; then
-        mv "$tmp" "$global_file"
+    ' "$global_settings_file" "$profile_settings_file" > "$tmp" 2>/dev/null; then
+        mv "$tmp" "$global_settings_file"
     else
         rm -f "$tmp"
     fi
 }
 
 export_profile_gcp_env() {
-    local prof_file="$1"
+    local profile_settings_file="$1"
 
-    [[ -f "$prof_file" ]] || return 0
+    [[ -f "$profile_settings_file" ]] || return 0
     command -v jq >/dev/null 2>&1 || return 0
 
     local gcp_proj gcp_loc
-    gcp_proj="$(jq -r '.gcp.project // empty' "$prof_file" 2>/dev/null || true)"
-    gcp_loc="$(jq -r '.gcp.location // empty' "$prof_file" 2>/dev/null || true)"
+    gcp_proj="$(jq -r '.gcp.project // empty' "$profile_settings_file" 2>/dev/null || true)"
+    gcp_loc="$(jq -r '.gcp.location // empty' "$profile_settings_file" 2>/dev/null || true)"
 
     if [[ -n "$gcp_proj" ]]; then
         export CLOUDSDK_CORE_PROJECT="$gcp_proj"
@@ -175,31 +175,31 @@ export_profile_gcp_env() {
 }
 
 link_adc_credentials() {
-    local orig_home="$1"
-    local profile_dir="$2"
+    local original_home="$1"
+    local profile_directory="$2"
 
-    local global_adc="$orig_home/.config/gcloud/application_default_credentials.json"
-    local prof_adc="$profile_dir/.config/gcloud/application_default_credentials.json"
+    local global_application_default_credentials="$original_home/.config/gcloud/application_default_credentials.json"
+    local profile_application_default_credentials="$profile_directory/.config/gcloud/application_default_credentials.json"
 
-    if [[ -f "$global_adc" && ! -e "$prof_adc" ]]; then
-        mkdir -p "$(dirname "$prof_adc")"
-        ln -sfn "$global_adc" "$prof_adc"
+    if [[ -f "$global_application_default_credentials" && ! -e "$profile_application_default_credentials" ]]; then
+        mkdir -p "$(dirname "$profile_application_default_credentials")"
+        ln -sfn "$global_application_default_credentials" "$profile_application_default_credentials"
     fi
 }
 
 run_profile_with_keyring() {
-    local profile_dir="$1"
+    local profile_directory="$1"
     shift
 
-    export AGY_PROFILE_DIR="$profile_dir"
+    export AGY_PROFILE_DIRECTORY="$profile_directory"
 
     dbus-run-session -- bash -s -- "$@" <<'PROFILE_RUNNER'
 set -e
 
-PROFILE_DIR="$AGY_PROFILE_DIR"
+PROFILE_DIRECTORY="$AGY_PROFILE_DIRECTORY"
 
-KEYRING_DIR="$PROFILE_DIR/.local/share/keyrings"
-KEYRING_STATE_DIR="$PROFILE_DIR/.local/state/gnome-keyring/$BASHPID"
+KEYRING_DIR="$PROFILE_DIRECTORY/.local/share/keyrings"
+KEYRING_STATE_DIR="$PROFILE_DIRECTORY/.local/state/gnome-keyring/$BASHPID"
 
 mkdir -p "$KEYRING_DIR" "$KEYRING_STATE_DIR"
 chmod 700 "$KEYRING_DIR" "$KEYRING_STATE_DIR"
@@ -315,78 +315,78 @@ main() {
 
     # --- 3. Determine active profile ---
     if [[ "$NO_PROFILE" == "false" && -z "$PROFILE" ]]; then
-        if repo_name="$(detect_repo_name)"; then
-            PROFILE="$repo_name"
+        if repository_name="$(detect_repo_name)"; then
+            PROFILE="$repository_name"
         fi
     fi
 
     # --- 4. Apply hybrid $HOME isolation ---
     if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
-        PROFILE_DIR="$PROFILES_BASE/$PROFILE"
+        PROFILE_DIRECTORY="$PROFILES_BASE/$PROFILE"
 
         # Create profile directory structure
-        mkdir -p "$PROFILE_DIR" \
-                 "$PROFILE_DIR/.config" \
-                 "$PROFILE_DIR/.local/share" \
-                 "$PROFILE_DIR/.local/state" \
-                 "$PROFILE_DIR/.cache"
+        mkdir -p "$PROFILE_DIRECTORY" \
+                 "$PROFILE_DIRECTORY/.config" \
+                 "$PROFILE_DIRECTORY/.local/share" \
+                 "$PROFILE_DIRECTORY/.local/state" \
+                 "$PROFILE_DIRECTORY/.cache"
 
         # Link shared identity & authentication
-        [[ -d "$ORIG_HOME/.ssh" ]] && ln -sfn "$ORIG_HOME/.ssh" "$PROFILE_DIR/.ssh"
-        [[ -f "$ORIG_HOME/.gitconfig" ]] && ln -sfn "$ORIG_HOME/.gitconfig" "$PROFILE_DIR/.gitconfig"
-        [[ -f "$ORIG_HOME/.gitconfig.local" ]] && ln -sfn "$ORIG_HOME/.gitconfig.local" "$PROFILE_DIR/.gitconfig.local"
-        [[ -f "$ORIG_HOME/.gitignore.global" ]] && ln -sfn "$ORIG_HOME/.gitignore.global" "$PROFILE_DIR/.gitignore.global"
-        [[ -f "$ORIG_HOME/.git-credentials" ]] && ln -sfn "$ORIG_HOME/.git-credentials" "$PROFILE_DIR/.git-credentials"
-        [[ -d "$ORIG_HOME/.gnupg" ]] && ln -sfn "$ORIG_HOME/.gnupg" "$PROFILE_DIR/.gnupg"
-        [[ -d "$ORIG_HOME/.config/gh" ]] && ln -sfn "$ORIG_HOME/.config/gh" "$PROFILE_DIR/.config/gh"
-        [[ -d "$ORIG_HOME/.config/git" ]] && ln -sfn "$ORIG_HOME/.config/git" "$PROFILE_DIR/.config/git"
+        [[ -d "$ORIGINAL_HOME/.ssh" ]] && ln -sfn "$ORIGINAL_HOME/.ssh" "$PROFILE_DIRECTORY/.ssh"
+        [[ -f "$ORIGINAL_HOME/.gitconfig" ]] && ln -sfn "$ORIGINAL_HOME/.gitconfig" "$PROFILE_DIRECTORY/.gitconfig"
+        [[ -f "$ORIGINAL_HOME/.gitconfig.local" ]] && ln -sfn "$ORIGINAL_HOME/.gitconfig.local" "$PROFILE_DIRECTORY/.gitconfig.local"
+        [[ -f "$ORIGINAL_HOME/.gitignore.global" ]] && ln -sfn "$ORIGINAL_HOME/.gitignore.global" "$PROFILE_DIRECTORY/.gitignore.global"
+        [[ -f "$ORIGINAL_HOME/.git-credentials" ]] && ln -sfn "$ORIGINAL_HOME/.git-credentials" "$PROFILE_DIRECTORY/.git-credentials"
+        [[ -d "$ORIGINAL_HOME/.gnupg" ]] && ln -sfn "$ORIGINAL_HOME/.gnupg" "$PROFILE_DIRECTORY/.gnupg"
+        [[ -d "$ORIGINAL_HOME/.config/gh" ]] && ln -sfn "$ORIGINAL_HOME/.config/gh" "$PROFILE_DIRECTORY/.config/gh"
+        [[ -d "$ORIGINAL_HOME/.config/git" ]] && ln -sfn "$ORIGINAL_HOME/.config/git" "$PROFILE_DIRECTORY/.config/git"
 
         # Link shared skills/plugins from dotfiles (~/.agents)
-        [[ -d "$ORIG_HOME/.agents" ]] && ln -sfn "$ORIG_HOME/.agents" "$PROFILE_DIR/.agents"
+        [[ -d "$ORIGINAL_HOME/.agents" ]] && ln -sfn "$ORIGINAL_HOME/.agents" "$PROFILE_DIRECTORY/.agents"
 
         # Setup standalone profile settings, sync permissions, export GCP env & link ADC
-        GLOBAL_SETTINGS="$ORIG_HOME/.gemini/antigravity-cli/settings.json"
-        PROF_SETTINGS="$PROFILE_DIR/.gemini/antigravity-cli/settings.json"
+        GLOBAL_SETTINGS="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
+        PROFILE_SETTINGS="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
 
-        ensure_profile_settings "$GLOBAL_SETTINGS" "$PROF_SETTINGS"
-        sync_permissions_to_profile "$GLOBAL_SETTINGS" "$PROF_SETTINGS"
-        export_profile_gcp_env "$PROF_SETTINGS"
-        link_adc_credentials "$ORIG_HOME" "$PROFILE_DIR"
+        ensure_profile_settings "$GLOBAL_SETTINGS" "$PROFILE_SETTINGS"
+        sync_permissions_to_profile "$GLOBAL_SETTINGS" "$PROFILE_SETTINGS"
+        export_profile_gcp_env "$PROFILE_SETTINGS"
+        link_adc_credentials "$ORIGINAL_HOME" "$PROFILE_DIRECTORY"
 
         # Link global gemini config (MCP servers, plugins, etc.)
-        if [[ -d "$ORIG_HOME/.gemini/config" ]]; then
-            if [[ -d "$PROFILE_DIR/.gemini/config" && ! -L "$PROFILE_DIR/.gemini/config" ]]; then
-                rm -rf "$PROFILE_DIR/.gemini/config"
+        if [[ -d "$ORIGINAL_HOME/.gemini/config" ]]; then
+            if [[ -d "$PROFILE_DIRECTORY/.gemini/config" && ! -L "$PROFILE_DIRECTORY/.gemini/config" ]]; then
+                rm -rf "$PROFILE_DIRECTORY/.gemini/config"
             fi
-            ln -sfn "$ORIG_HOME/.gemini/config" "$PROFILE_DIR/.gemini/config"
+            ln -sfn "$ORIGINAL_HOME/.gemini/config" "$PROFILE_DIRECTORY/.gemini/config"
         fi
 
         # Link shell startup files so subshells maintain your environment & PATH
         for rc in .bashrc .bash_profile .profile .zshrc .zshenv; do
-            [[ -f "$ORIG_HOME/$rc" ]] && ln -sfn "$ORIG_HOME/$rc" "$PROFILE_DIR/$rc"
+            [[ -f "$ORIGINAL_HOME/$rc" ]] && ln -sfn "$ORIGINAL_HOME/$rc" "$PROFILE_DIRECTORY/$rc"
         done
 
         # Switch environment to the profile
-        export REAL_HOME="$ORIG_HOME"
-        export HOME="$PROFILE_DIR"
-        export XDG_CONFIG_HOME="$PROFILE_DIR/.config"
-        export XDG_DATA_HOME="$PROFILE_DIR/.local/share"
-        export XDG_STATE_HOME="$PROFILE_DIR/.local/state"
-        export XDG_CACHE_HOME="$PROFILE_DIR/.cache"
+        export REAL_HOME="$ORIGINAL_HOME"
+        export HOME="$PROFILE_DIRECTORY"
+        export XDG_CONFIG_HOME="$PROFILE_DIRECTORY/.config"
+        export XDG_DATA_HOME="$PROFILE_DIRECTORY/.local/share"
+        export XDG_STATE_HOME="$PROFILE_DIRECTORY/.local/state"
+        export XDG_CACHE_HOME="$PROFILE_DIRECTORY/.cache"
     fi
 
     # --- 5. Execute with selective permissions exit sync ---
     if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
         # shellcheck disable=SC2329
         cleanup_settings() {
-            local prof_settings="$PROFILE_DIR/.gemini/antigravity-cli/settings.json"
-            local global_settings="$ORIG_HOME/.gemini/antigravity-cli/settings.json"
+            local profile_settings="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
+            local global_settings="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
 
-            sync_permissions_to_global "$global_settings" "$prof_settings"
+            sync_permissions_to_global "$global_settings" "$profile_settings"
         }
 
         trap cleanup_settings EXIT
-        run_profile_with_keyring "$PROFILE_DIR" "$REAL_AGY" "${NEW_ARGS[@]}"
+        run_profile_with_keyring "$PROFILE_DIRECTORY" "$REAL_AGY" "${NEW_ARGS[@]}"
         EXIT_CODE=$?
         exit "$EXIT_CODE"
     else
