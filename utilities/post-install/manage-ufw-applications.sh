@@ -96,6 +96,105 @@ resolve_profile_name() {
   return 1
 }
 
+run_privileged_command() {
+  local privileged_wrapper="${UFW_PRIVILEGED_WRAPPER-sudo}"
+  if [[ -n "$privileged_wrapper" ]]; then
+    "$privileged_wrapper" "$@"
+  else
+    "$@"
+  fi
+}
+
+get_application_status() {
+  local input_query="$1"
+  local output_status_variable_name="$2"
+
+  local resolved_profile_name=""
+  local resolved_filename=""
+  if ! resolve_profile_name "$input_query" resolved_profile_name resolved_filename; then
+    return 1
+  fi
+
+  local system_directory="${UFW_SYSTEM_DIRECTORY:-${SYSTEM_CONFIG_DIRECTORY:-/etc/ufw/applications.d}}"
+  local installed_profile_path="$system_directory/$resolved_filename"
+  local ufw_binary="${UFW_COMMAND:-ufw}"
+
+  local current_status="unconfigured"
+  if [[ -f "$installed_profile_path" ]]; then
+    local status_output=""
+    status_output="$("$ufw_binary" status 2>/dev/null || true)"
+    if echo "$status_output" | grep -q "Status: active" && echo "$status_output" | grep -q -E "^${resolved_profile_name}([[:space:]]|$)"; then
+      current_status="active"
+    else
+      current_status="inactive_installed"
+    fi
+  fi
+
+  if [[ -n "$output_status_variable_name" ]]; then
+    printf -v "$output_status_variable_name" '%s' "$current_status"
+  else
+    echo "$current_status"
+  fi
+  return 0
+}
+
+enable_application() {
+  local input_query="$1"
+
+  local resolved_profile_name=""
+  local resolved_filename=""
+  if ! resolve_profile_name "$input_query" resolved_profile_name resolved_filename; then
+    echo "Error: Application profile '$input_query' not found." >&2
+    return 1
+  fi
+
+  local source_profile_path="$SOURCE_CONFIG_DIRECTORY/$resolved_filename"
+  if [[ ! -f "$source_profile_path" ]]; then
+    echo "Error: Source configuration file not found at $source_profile_path" >&2
+    return 1
+  fi
+
+  local system_directory="${UFW_SYSTEM_DIRECTORY:-${SYSTEM_CONFIG_DIRECTORY:-/etc/ufw/applications.d}}"
+  local installed_profile_path="$system_directory/$resolved_filename"
+  local ufw_binary="${UFW_COMMAND:-ufw}"
+
+  run_privileged_command mkdir -p "$system_directory"
+  run_privileged_command cp -f "$source_profile_path" "$installed_profile_path"
+  run_privileged_command chmod 0644 "$installed_profile_path"
+
+  if [[ -n "${UFW_PRIVILEGED_WRAPPER-sudo}" ]]; then
+    run_privileged_command chown root:root "$installed_profile_path" 2>/dev/null || true
+  fi
+
+  run_privileged_command "$ufw_binary" app update "$resolved_profile_name"
+  run_privileged_command "$ufw_binary" allow "$resolved_profile_name"
+  echo "Enabled and allowed firewall profile: $resolved_profile_name"
+}
+
+disable_application() {
+  local input_query="$1"
+
+  local resolved_profile_name=""
+  local resolved_filename=""
+  if ! resolve_profile_name "$input_query" resolved_profile_name resolved_filename; then
+    echo "Error: Application profile '$input_query' not found." >&2
+    return 1
+  fi
+
+  local system_directory="${UFW_SYSTEM_DIRECTORY:-${SYSTEM_CONFIG_DIRECTORY:-/etc/ufw/applications.d}}"
+  local installed_profile_path="$system_directory/$resolved_filename"
+  local ufw_binary="${UFW_COMMAND:-ufw}"
+
+  run_privileged_command "$ufw_binary" delete allow "$resolved_profile_name" 2>/dev/null || true
+
+  if [[ -f "$installed_profile_path" ]]; then
+    run_privileged_command rm -f "$installed_profile_path"
+  fi
+
+  run_privileged_command "$ufw_binary" app update "$resolved_profile_name" 2>/dev/null || true
+  echo "Disabled and removed firewall profile: $resolved_profile_name"
+}
+
 main() {
   echo "manage-ufw-applications initialized."
 }
