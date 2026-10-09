@@ -220,3 +220,61 @@ fi
 echo "PASS: Disable idempotency verified."
 
 echo "All Task 2 tests passed!"
+
+# Task 3: CLI Argument Dispatcher
+echo "--- Test 9: CLI --help option ---"
+help_output="$(bash "$UTILITY_SCRIPT" --help)"
+if [[ "$help_output" != *"Usage:"* || "$help_output" != *"--enable"* || "$help_output" != *"--disable"* ]]; then
+  echo "FAIL: Expected usage instructions in --help output" >&2
+  exit 1
+fi
+echo "PASS: CLI --help verified."
+
+echo "--- Test 10: CLI --list option ---"
+list_output="$(bash "$UTILITY_SCRIPT" --list)"
+if [[ "$list_output" != *"KDEConnect"* || "$list_output" != *"noson"* ]]; then
+  echo "FAIL: Expected KDEConnect and noson in --list output, got: $list_output" >&2
+  exit 1
+fi
+echo "PASS: CLI --list verified."
+
+echo "--- Test 11: CLI --status option ---"
+status_output="$(env UFW_COMMAND="$MOCK_UFW_COMMAND" UFW_PRIVILEGED_WRAPPER="" UFW_SYSTEM_DIRECTORY="$TEST_TEMP_DIRECTORY/etc/ufw/applications.d" bash "$UTILITY_SCRIPT" --status)"
+if [[ "$status_output" != *"KDEConnect"* || "$status_output" != *"unconfigured"* ]]; then
+  echo "FAIL: Expected KDEConnect and unconfigured in --status output, got: $status_output" >&2
+  exit 1
+fi
+echo "PASS: CLI --status verified."
+
+echo "--- Test 12: CLI --enable all and individual profile ---"
+env UFW_COMMAND="$MOCK_UFW_COMMAND" UFW_PRIVILEGED_WRAPPER="" UFW_SYSTEM_DIRECTORY="$TEST_TEMP_DIRECTORY/etc/ufw/applications.d" bash "$UTILITY_SCRIPT" --enable all
+if [[ ! -f "$TEST_TEMP_DIRECTORY/etc/ufw/applications.d/kdeconnect" || ! -f "$TEST_TEMP_DIRECTORY/etc/ufw/applications.d/noson" ]]; then
+  echo "FAIL: Expected both profiles installed after --enable all" >&2
+  exit 1
+fi
+if ! grep -q "KDEConnect" "$MOCK_UFW_RULES_FILE" || ! grep -q "noson" "$MOCK_UFW_RULES_FILE"; then
+  echo "FAIL: Expected rules for both profiles in mock UFW rules after --enable all" >&2
+  exit 1
+fi
+echo "PASS: CLI --enable all verified."
+
+echo "--- Test 13: CLI --disable all ---"
+env UFW_COMMAND="$MOCK_UFW_COMMAND" UFW_PRIVILEGED_WRAPPER="" UFW_SYSTEM_DIRECTORY="$TEST_TEMP_DIRECTORY/etc/ufw/applications.d" bash "$UTILITY_SCRIPT" --disable all
+if [[ -f "$TEST_TEMP_DIRECTORY/etc/ufw/applications.d/kdeconnect" || -f "$TEST_TEMP_DIRECTORY/etc/ufw/applications.d/noson" ]]; then
+  echo "FAIL: Expected profiles to be removed after --disable all" >&2
+  exit 1
+fi
+if grep -q "KDEConnect" "$MOCK_UFW_RULES_FILE" || grep -q "noson" "$MOCK_UFW_RULES_FILE"; then
+  echo "FAIL: Expected rules to be removed after --disable all" >&2
+  exit 1
+fi
+echo "PASS: CLI --disable all verified."
+
+echo "--- Test 14: Invalid CLI flag rejection ---"
+if bash "$UTILITY_SCRIPT" --invalid-flag 2>/dev/null; then
+  echo "FAIL: Expected non-zero exit code on invalid flag" >&2
+  exit 1
+fi
+echo "PASS: Invalid CLI flag rejection verified."
+
+echo "All Task 3 tests passed!"

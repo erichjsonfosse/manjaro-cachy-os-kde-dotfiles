@@ -119,21 +119,21 @@ get_application_status() {
   local installed_profile_path="$system_directory/$resolved_filename"
   local ufw_binary="${UFW_COMMAND:-ufw}"
 
-  local current_status="unconfigured"
+  local inspected_status="unconfigured"
   if [[ -f "$installed_profile_path" ]]; then
     local status_output=""
     status_output="$("$ufw_binary" status 2>/dev/null || true)"
     if echo "$status_output" | grep -q "Status: active" && echo "$status_output" | grep -q -E "^${resolved_profile_name}([[:space:]]|$)"; then
-      current_status="active"
+      inspected_status="active"
     else
-      current_status="inactive_installed"
+      inspected_status="inactive_installed"
     fi
   fi
 
   if [[ -n "$output_status_variable_name" ]]; then
-    printf -v "$output_status_variable_name" '%s' "$current_status"
+    printf -v "$output_status_variable_name" '%s' "$inspected_status"
   else
-    echo "$current_status"
+    echo "$inspected_status"
   fi
   return 0
 }
@@ -195,8 +195,222 @@ disable_application() {
   echo "Disabled and removed firewall profile: $resolved_profile_name"
 }
 
+display_usage() {
+  cat << 'EOF'
+Usage: manage-ufw-applications.sh [OPTIONS]
+
+Manage UFW firewall application profiles for dotfiles applications.
+When executed without arguments in an interactive terminal, launches an interactive TUI.
+
+Options:
+  --enable <app|all>    Install profile definition and allow firewall traffic for <app> or all profiles
+  --disable <app|all>   Delete allow rule and remove profile definition for <app> or all profiles
+  --status              Display current installation and firewall status of all profiles
+  --list                List all available application profile names
+  -h, --help            Display this help message and exit
+EOF
+}
+
+display_status_table() {
+  if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+    discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+  fi
+
+  printf "%-18s %-20s %s\n" "Application" "Status" "Ports"
+  printf "%-18s %-20s %s\n" "-----------" "------" "-----"
+
+  for index in "${!discovered_filenames[@]}"; do
+    local profile_name="${discovered_profile_names[index]}"
+    local ports="${discovered_ports[index]}"
+    local application_status=""
+    get_application_status "$profile_name" application_status
+    printf "%-18s %-20s %s\n" "$profile_name" "$application_status" "$ports"
+  done
+}
+
+list_applications() {
+  if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+    discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+  fi
+
+  for index in "${!discovered_filenames[@]}"; do
+    local profile_name="${discovered_profile_names[index]}"
+    echo "$profile_name"
+  done
+}
+
+enable_all_applications() {
+  if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+    discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+  fi
+
+  for index in "${!discovered_filenames[@]}"; do
+    local profile_name="${discovered_profile_names[index]}"
+    enable_application "$profile_name"
+  done
+}
+
+disable_all_applications() {
+  if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+    discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+  fi
+
+  for index in "${!discovered_filenames[@]}"; do
+    local profile_name="${discovered_profile_names[index]}"
+    disable_application "$profile_name"
+  done
+}
+
+launch_interactive_tui() {
+  if ! command -v gum &>/dev/null; then
+    echo "Notice: 'gum' is not installed. Falling back to standard status view."
+    display_status_table
+    echo ""
+    display_usage
+    return 0
+  fi
+
+  while true; do
+    clear
+    gum style \
+      --border normal \
+      --border-foreground 99 \
+      --foreground 99 \
+      --padding "0 1" \
+      --margin "1 0" \
+      --bold \
+      "🛡️  UFW Dotfiles Application Manager"
+
+    echo ""
+    gum style --foreground 245 "Current firewall profile statuses:"
+    display_status_table
+    echo ""
+
+    local selected_action=""
+    selected_action="$(gum choose \
+      "1. Enable application(s)" \
+      "2. Disable & remove application(s)" \
+      "3. View detailed firewall status" \
+      "4. Exit" || true)"
+
+    case "$selected_action" in
+      "1. Enable application(s)")
+        if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+          discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+        fi
+        local choices=("all" "${discovered_profile_names[@]}")
+        local chosen_profiles=""
+        chosen_profiles="$(gum choose --no-limit "${choices[@]}" || true)"
+        if [[ -n "$chosen_profiles" ]]; then
+          while IFS= read -r profile_item; do
+            [[ -n "$profile_item" ]] || continue
+            if [[ "$profile_item" == "all" ]]; then
+              enable_all_applications
+              break
+            else
+              enable_application "$profile_item"
+            fi
+          done <<< "$chosen_profiles"
+        fi
+        gum input --placeholder "Press Enter to continue..." || true
+        ;;
+      "2. Disable & remove application(s)")
+        if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
+          discover_profiles "$SOURCE_CONFIG_DIRECTORY"
+        fi
+        local choices=("all" "${discovered_profile_names[@]}")
+        local chosen_profiles=""
+        chosen_profiles="$(gum choose --no-limit "${choices[@]}" || true)"
+        if [[ -n "$chosen_profiles" ]]; then
+          while IFS= read -r profile_item; do
+            [[ -n "$profile_item" ]] || continue
+            if [[ "$profile_item" == "all" ]]; then
+              disable_all_applications
+              break
+            else
+              disable_application "$profile_item"
+            fi
+          done <<< "$chosen_profiles"
+        fi
+        gum input --placeholder "Press Enter to continue..." || true
+        ;;
+      "3. View detailed firewall status")
+        local ufw_binary="${UFW_COMMAND:-ufw}"
+        echo ""
+        "$ufw_binary" status verbose 2>/dev/null || "$ufw_binary" status || true
+        echo ""
+        gum input --placeholder "Press Enter to continue..." || true
+        ;;
+      "4. Exit"|"")
+        break
+        ;;
+    esac
+  done
+}
+
+parse_command_line_arguments() {
+  if [[ $# -eq 0 ]]; then
+    if [[ -t 0 ]]; then
+      launch_interactive_tui
+      return 0
+    else
+      display_usage
+      return 0
+    fi
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --enable)
+        if [[ -z "${2-}" || "$2" == --* ]]; then
+          echo "Error: --enable requires an application name or 'all'." >&2
+          return 1
+        fi
+        local target_application="$2"
+        shift 2
+        if [[ "$target_application" == "all" ]]; then
+          enable_all_applications
+        else
+          enable_application "$target_application"
+        fi
+        ;;
+      --disable)
+        if [[ -z "${2-}" || "$2" == --* ]]; then
+          echo "Error: --disable requires an application name or 'all'." >&2
+          return 1
+        fi
+        local target_application="$2"
+        shift 2
+        if [[ "$target_application" == "all" ]]; then
+          disable_all_applications
+        else
+          disable_application "$target_application"
+        fi
+        ;;
+      --status)
+        shift
+        display_status_table
+        ;;
+      --list)
+        shift
+        list_applications
+        ;;
+      -h|--help)
+        shift
+        display_usage
+        return 0
+        ;;
+      *)
+        echo "Error: Unknown option '$1'" >&2
+        display_usage >&2
+        return 1
+        ;;
+    esac
+  done
+}
+
 main() {
-  echo "manage-ufw-applications initialized."
+  parse_command_line_arguments "$@"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
