@@ -467,4 +467,107 @@ EOF
   echo "PASS: sync_permissions_to_global successfully preserved dotfile symlink."
 )
 
+echo "=== Test 13: Multi-profile concurrent lifecycle cross-propagation & zombie prevention ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t13_global/settings.json"
+  P1_F="$TEST_TMPDIR/t13_p1/settings.json"
+  P1_BASE="$TEST_TMPDIR/t13_p1/.permissions-baseline.json"
+  P2_F="$TEST_TMPDIR/t13_p2/settings.json"
+  P2_BASE="$TEST_TMPDIR/t13_p2/.permissions-baseline.json"
+  mkdir -p "$TEST_TMPDIR/t13_global" "$TEST_TMPDIR/t13_p1" "$TEST_TMPDIR/t13_p2"
+
+  # Initial global state
+  cat << 'EOF' > "$GLOBAL_F"
+{
+  "permissions": {
+    "allow": ["command(cat)"]
+  }
+}
+EOF
+
+  # 1. Both P1 and P2 start up concurrently
+  echo '{"permissions": {"allow": ["command(cat)"]}}' > "$P1_F"
+  echo '{"permissions": {"allow": ["command(cat)"]}}' > "$P2_F"
+  sync_permissions_to_profile "$GLOBAL_F" "$P1_F"
+  sync_permissions_to_profile "$GLOBAL_F" "$P2_F"
+
+  # 2. Concurrently active:
+  # P1 revokes cat and adds npm
+  cat << 'EOF' > "$P1_F"
+{
+  "permissions": {
+    "allow": ["command(npm)"]
+  }
+}
+EOF
+  # P2 adds python (still having cat)
+  cat << 'EOF' > "$P2_F"
+{
+  "permissions": {
+    "allow": ["command(cat)", "command(python)"]
+  }
+}
+EOF
+
+  # 3. P1 exits first
+  sync_permissions_to_global "$GLOBAL_F" "$P1_F"
+
+  # 4. P2 exits second (reconciliation must bring P2 in sync with global and prevent cat resurrection)
+  sync_permissions_to_global "$GLOBAL_F" "$P2_F"
+
+  # Verify Global state: has npm & python, NO cat
+  jq -e '.permissions.allow | index("command(npm)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: npm missing from global"; exit 1; }
+  jq -e '.permissions.allow | index("command(python)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: python missing from global"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(cat)")) == null' "$GLOBAL_F" >/dev/null || { echo "FAIL: cat resurrected in global"; exit 1; }
+
+  # Verify P2 local settings and baseline reconciled at exit
+  jq -e '.permissions.allow | index("command(npm)") != null' "$P2_F" >/dev/null || { echo "FAIL: npm not synced into P2 settings at exit"; exit 1; }
+  jq -e '.permissions.allow | index("command(python)") != null' "$P2_F" >/dev/null || { echo "FAIL: python missing from P2 settings"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(cat)")) == null' "$P2_F" >/dev/null || { echo "FAIL: cat remains as zombie in P2 settings"; exit 1; }
+  jq -e '.permissions.allow | index("command(npm)") != null' "$P2_BASE" >/dev/null || { echo "FAIL: npm missing from P2 baseline"; exit 1; }
+  jq -e '.permissions.allow | index("command(python)") != null' "$P2_BASE" >/dev/null || { echo "FAIL: python missing from P2 baseline"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(cat)")) == null' "$P2_BASE" >/dev/null || { echo "FAIL: cat remains in P2 baseline"; exit 1; }
+
+  # 5. P1 starts up next session
+  sync_permissions_to_profile "$GLOBAL_F" "$P1_F"
+  jq -e '.permissions.allow | index("command(python)") != null' "$P1_F" >/dev/null || { echo "FAIL: python not propagated to P1 on restart"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(cat)")) == null' "$P1_F" >/dev/null || { echo "FAIL: cat resurrected in P1"; exit 1; }
+  jq -e '.permissions.allow | index("command(python)") != null' "$P1_BASE" >/dev/null || { echo "FAIL: python not updated in P1 baseline on restart"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(cat)")) == null' "$P1_BASE" >/dev/null || { echo "FAIL: cat remains in P1 baseline on restart"; exit 1; }
+
+  echo "PASS: Multi-profile concurrency correctly synchronizes across sessions without zombie permissions."
+)
+
+echo "=== Test 14: Corrupted JSON does not wipe baseline snapshot ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t14_global/settings.json"
+  PROF_F="$TEST_TMPDIR/t14_prof/settings.json"
+  BASE_F="$TEST_TMPDIR/t14_prof/.permissions-baseline.json"
+  mkdir -p "$TEST_TMPDIR/t14_global" "$TEST_TMPDIR/t14_prof"
+
+  # Valid initial state
+  echo '{"permissions": {"allow": ["command(valid)"]}}' > "$GLOBAL_F"
+  echo '{"permissions": {"allow": ["command(valid)"]}}' > "$PROF_F"
+  sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
+
+  jq -e '.permissions.allow | index("command(valid)") != null' "$BASE_F" >/dev/null || { echo "FAIL: Baseline setup failed"; exit 1; }
+
+  # Corrupt global file with invalid JSON
+  echo '{invalid-syntax: broken' > "$GLOBAL_F"
+
+  # Startup sync with corrupt global must not wipe baseline
+  sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
+  [[ -f "$BASE_F" ]] || { echo "FAIL: Baseline was deleted on corrupt global"; exit 1; }
+  jq -e '.permissions.allow | index("command(valid)") != null' "$BASE_F" >/dev/null || { echo "FAIL: Baseline was wiped by corrupt global"; exit 1; }
+
+  # Exit sync with corrupt profile must not wipe baseline or global
+  echo '{"permissions": {"allow": ["command(valid)"]}}' > "$GLOBAL_F"
+  echo '{bad-json-in-profile' > "$PROF_F"
+  sync_permissions_to_global "$GLOBAL_F" "$PROF_F"
+  jq -e '.permissions.allow | index("command(valid)") != null' "$BASE_F" >/dev/null || { echo "FAIL: Baseline was wiped by corrupt profile exit"; exit 1; }
+  jq -e '.permissions.allow | index("command(valid)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: Global was wiped by corrupt profile exit"; exit 1; }
+
+  echo "PASS: Corrupted JSON handled safely without wiping baseline snapshots."
+)
+
 echo "All tests passed successfully!"
