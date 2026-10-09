@@ -56,6 +56,13 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Modular Git Config:** Maintains separation between tracked global `.gitconfig` and machine-local `.gitconfig.local`.
 * **KDE SSH Askpass (`ksshaskpass`):** Symlinks `/usr/lib/ssh/ssh-askpass` to `/usr/bin/ksshaskpass` and exports `SSH_ASKPASS` across Plasma 6 environment, providing native graphical passphrase dialogs for GUI tools (Obsidian, IDEs).
 
+### 🛡️ Firewall & Network Security (UFW)
+* **Application Profiles (`config/ufw/applications.d/`):** Custom firewall application definitions for desktop applications including KDE Connect (UDP/TCP `1714:1764`) and Noson Sonos controller.
+* **On-Demand Profile Manager (`utilities/post-install/manage-ufw-applications.sh`):** Standalone post-installation utility with dual-mode UX:
+  * **Interactive TUI:** Powered by `gum` with multi-select checkboxes to easily inspect, enable, or disable firewall profiles.
+  * **Scriptable CLI:** Supports `--status`, `--enable <app|all>`, `--disable <app|all>`, and `--list` flags.
+  * **Privilege Separation:** Runs unprivileged as regular user, using targeted `sudo` escalation only when copying profile definitions to `/etc/ufw/applications.d/` and updating firewall rules.
+
 ### 🩺 System Diagnostics & Backups
 * **Categorized Backup Engine:** Pre-installation safely archives existing configurations into domain categories (`git/`, `zsh/`, `kde/`, `ssh/`, `herdr/`, `nano/`, `paru/`, `agents/`) under `~/.manjaro-cachy-os-kde-dotfiles-backup/<timestamp>/`.
 * **Symlink Dereferencing:** Preserves actual file content as immutable snapshots rather than copying fragile symlink pointers.
