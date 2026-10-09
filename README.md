@@ -57,7 +57,7 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **KDE SSH Askpass (`ksshaskpass`):** Symlinks `/usr/lib/ssh/ssh-askpass` to `/usr/bin/ksshaskpass` and exports `SSH_ASKPASS` across Plasma 6 environment, providing native graphical passphrase dialogs for GUI tools (Obsidian, IDEs).
 
 ### 🛡️ Firewall & Network Security (UFW)
-* **Application Profiles (`config/ufw/applications.d/`):** Custom firewall application definitions for desktop applications including KDE Connect (UDP/TCP `1714:1764`) and Noson Sonos controller.
+* **Application Profiles (`config/ufw/applications.d/`):** Custom firewall application definitions for desktop applications.
 * **On-Demand Profile Manager (`utilities/post-install/manage-ufw-applications.sh`):** Standalone post-installation utility with dual-mode UX:
   * **Interactive TUI:** Powered by `gum` with multi-select checkboxes to easily inspect, enable, or disable firewall profiles.
   * **Scriptable CLI:** Supports `--status`, `--enable <app|all>`, `--disable <app|all>`, and `--list` flags.
