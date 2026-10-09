@@ -104,8 +104,9 @@ atomic_write_json() {
 
     local tmp
     tmp="$(mktemp "${real_dest}.tmp.XXXXXX")"
-    chmod 600 "$tmp"
-    if echo "$json_content" > "$tmp"; then
+    [[ -n "$tmp" && -f "$tmp" ]] || return 1
+    chmod 600 "$tmp" 2>/dev/null || true
+    if printf '%s\n' "$json_content" > "$tmp"; then
         mv -f "$tmp" "$real_dest"
     else
         rm -f "$tmp"
@@ -178,7 +179,7 @@ merge_permissions_3way() {
         as $final_perms |
 
         $t | if $final_perms == {} then del(.permissions) else .permissions = $final_perms end
-    ')" || return 1
+    ' 2>/dev/null)" || return 1
 
     atomic_write_json "$target_file" "$merged_json"
 }
@@ -195,15 +196,16 @@ sync_permissions_to_profile() {
 
     if [[ ! -f "$base_file" ]]; then
         # Initial baseline creation: safe union
-        merge_permissions_3way "$profile_settings_file" "$global_settings_file" "/dev/null"
+        merge_permissions_3way "$profile_settings_file" "$global_settings_file" "/dev/null" || return 0
     else
         # 3-way sync: apply Global changes to Profile against Base
-        merge_permissions_3way "$profile_settings_file" "$global_settings_file" "$base_file"
+        merge_permissions_3way "$profile_settings_file" "$global_settings_file" "$base_file" || return 0
     fi
 
     # Save current profile permissions as the new baseline for this profile
     local perms
-    perms="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$profile_settings_file" 2>/dev/null || echo '{}')"
+    perms="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$profile_settings_file" 2>/dev/null)" || return 0
+    [[ -n "$perms" ]] || return 0
     atomic_write_json "$base_file" "$perms"
 }
 
@@ -230,15 +232,19 @@ sync_permissions_to_global() {
             flock -w 5 200 || return 0
         fi
 
-        if [[ ! -f "$base_file" ]]; then
-            merge_permissions_3way "$global_settings_file" "$profile_settings_file" "/dev/null"
-        else
-            merge_permissions_3way "$global_settings_file" "$profile_settings_file" "$base_file"
-        fi
+        local merge_base="$base_file"
+        [[ -f "$base_file" ]] || merge_base="/dev/null"
 
-        # Update baseline to match final synchronized state
+        # 1. Merge profile changes into global
+        merge_permissions_3way "$global_settings_file" "$profile_settings_file" "$merge_base" || return 0
+
+        # 2. Reconcile profile settings with final global state before saving baseline
+        merge_permissions_3way "$profile_settings_file" "$global_settings_file" "$merge_base" || return 0
+
+        # 3. Update baseline to match final synchronized state
         local perms
-        perms="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$global_settings_file" 2>/dev/null || echo '{}')"
+        perms="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$global_settings_file" 2>/dev/null)" || return 0
+        [[ -n "$perms" ]] || return 0
         atomic_write_json "$base_file" "$perms"
     )
 }
