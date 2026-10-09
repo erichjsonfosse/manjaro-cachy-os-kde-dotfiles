@@ -295,4 +295,72 @@ EOF
   echo "PASS: sync_permissions_to_profile successfully propagates global revocations and moves."
 )
 
+echo "=== Test 9: sync_permissions_to_global propagates profile deletions/moves and preserves global ask ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t9_orig/settings.json"
+  PROF_F="$TEST_TMPDIR/t9_profile/settings.json"
+  BASE_F="$TEST_TMPDIR/t9_profile/.permissions-baseline.json"
+  mkdir -p "$TEST_TMPDIR/t9_orig" "$TEST_TMPDIR/t9_profile"
+
+  # Initial baseline and global state:
+  # global has ask: [command(sudo)] and allow: [command(cat), command(git), command(rm)]
+  cat << 'EOF' > "$GLOBAL_F"
+{
+  "gcp": {"project": "global-p0"},
+  "permissions": {
+    "allow": ["command(cat)", "command(git)", "command(rm)"],
+    "ask": ["command(sudo)"]
+  }
+}
+EOF
+
+  cat << 'EOF' > "$BASE_F"
+{
+  "permissions": {
+    "allow": ["command(cat)", "command(git)", "command(rm)"],
+    "ask": ["command(sudo)"]
+  }
+}
+EOF
+
+  # In profile during session:
+  # - user deleted command(rm)
+  # - user moved command(git) to ask
+  # - user added command(docker) to allow
+  # (Note: command(sudo) remains in ask or profile didn't touch it)
+  cat << 'EOF' > "$PROF_F"
+{
+  "gcp": {"project": "prof-p2"},
+  "permissions": {
+    "allow": ["command(cat)", "command(docker)"],
+    "ask": ["command(git)", "command(sudo)"]
+  }
+}
+EOF
+
+  sync_permissions_to_global "$GLOBAL_F" "$PROF_F"
+
+  # 1. Verify global GCP project is preserved
+  grep -q '"project": "global-p0"' "$GLOBAL_F" || { echo "FAIL: Global GCP project clobbered"; exit 1; }
+
+  # 2. Verify command(docker) added to global allow
+  jq -e '.permissions.allow | index("command(docker)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: docker not added to global allow"; exit 1; }
+
+  # 3. Verify command(rm) was deleted from global allow
+  jq -e '((.permissions.allow // []) | index("command(rm)")) == null' "$GLOBAL_F" >/dev/null || { echo "FAIL: rm was not deleted from global"; exit 1; }
+
+  # 4. Verify command(git) was moved to ask in global and removed from allow
+  jq -e '.permissions.ask | index("command(git)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: git not in global ask"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(git)")) == null' "$GLOBAL_F" >/dev/null || { echo "FAIL: git still in global allow"; exit 1; }
+
+  # 5. Verify command(sudo) is preserved in global ask (regression test for line 143 bug)
+  jq -e '.permissions.ask | index("command(sudo)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: sudo missing from global ask (line 143 bug)"; exit 1; }
+
+  # 6. Verify baseline is updated
+  jq -e '.permissions.allow | index("command(docker)") != null' "$BASE_F" >/dev/null || { echo "FAIL: baseline missing docker"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(rm)")) == null' "$BASE_F" >/dev/null || { echo "FAIL: rm still in baseline"; exit 1; }
+
+  echo "PASS: sync_permissions_to_global propagates deletions and moves and preserves global ask rules."
+)
+
 echo "All tests passed successfully!"
