@@ -363,4 +363,108 @@ EOF
   echo "PASS: sync_permissions_to_global propagates deletions and moves and preserves global ask rules."
 )
 
+echo "=== Test 10: 0-byte global file resilience does not wipe profile GCP settings ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t10_global.json"
+  PROF_F="$TEST_TMPDIR/t10_profile/settings.json"
+  mkdir -p "$TEST_TMPDIR/t10_profile"
+
+  # Create 0-byte global file
+  touch "$GLOBAL_F"
+
+  cat << 'EOF' > "$PROF_F"
+{
+  "colorScheme": "gruvbox",
+  "gcp": {
+    "project": "my-important-project",
+    "location": "us-east1"
+  },
+  "permissions": {
+    "allow": ["command(node)"]
+  }
+}
+EOF
+
+  sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
+
+  # Check GCP project NOT wiped
+  grep -q '"project": "my-important-project"' "$PROF_F" || { echo "FAIL: Profile GCP project was wiped by 0-byte global file"; exit 1; }
+  grep -q '"location": "us-east1"' "$PROF_F" || { echo "FAIL: Profile GCP location was wiped by 0-byte global file"; exit 1; }
+  grep -q '"colorScheme": "gruvbox"' "$PROF_F" || { echo "FAIL: Profile colorScheme was wiped by 0-byte global file"; exit 1; }
+  echo "PASS: 0-byte global file handled safely without wiping profile configuration."
+)
+
+echo "=== Test 11: Move allow -> deny in profile propagates to global with strict precedence ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t11_global.json"
+  PROF_F="$TEST_TMPDIR/t11_profile/settings.json"
+  BASE_F="$TEST_TMPDIR/t11_profile/.permissions-baseline.json"
+  mkdir -p "$TEST_TMPDIR/t11_profile"
+
+  cat << 'EOF' > "$GLOBAL_F"
+{
+  "permissions": {
+    "allow": ["command(danger)", "command(safe)"]
+  }
+}
+EOF
+
+  cat << 'EOF' > "$BASE_F"
+{
+  "permissions": {
+    "allow": ["command(danger)", "command(safe)"]
+  }
+}
+EOF
+
+  # Move danger from allow to deny in profile
+  cat << 'EOF' > "$PROF_F"
+{
+  "permissions": {
+    "allow": ["command(safe)"],
+    "deny": ["command(danger)"]
+  }
+}
+EOF
+
+  sync_permissions_to_global "$GLOBAL_F" "$PROF_F"
+
+  jq -e '.permissions.deny | index("command(danger)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: danger not added to global deny"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(danger)")) == null' "$GLOBAL_F" >/dev/null || { echo "FAIL: danger still in global allow"; exit 1; }
+  jq -e '.permissions.allow | index("command(safe)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: safe missing from global allow"; exit 1; }
+  echo "PASS: allow -> deny propagation enforces strict least-privilege precedence."
+)
+
+echo "=== Test 12: sync_permissions_to_global preserves dotfile symlink ==="
+(
+  DOTFILES_REAL="$TEST_TMPDIR/dotfiles/settings.json"
+  GLOBAL_SYMLINK="$TEST_TMPDIR/global_symlink/settings.json"
+  PROF_F="$TEST_TMPDIR/t12_profile/settings.json"
+  mkdir -p "$TEST_TMPDIR/dotfiles" "$TEST_TMPDIR/global_symlink" "$TEST_TMPDIR/t12_profile"
+
+  cat << 'EOF' > "$DOTFILES_REAL"
+{
+  "permissions": {
+    "allow": ["command(ls)"]
+  }
+}
+EOF
+  ln -sf "$DOTFILES_REAL" "$GLOBAL_SYMLINK"
+  [[ -L "$GLOBAL_SYMLINK" ]] || { echo "FAIL: Setup symlink failed"; exit 1; }
+
+  cat << 'EOF' > "$PROF_F"
+{
+  "permissions": {
+    "allow": ["command(ls)", "command(pwd)"]
+  }
+}
+EOF
+
+  sync_permissions_to_global "$GLOBAL_SYMLINK" "$PROF_F"
+
+  [[ -L "$GLOBAL_SYMLINK" ]] || { echo "FAIL: Global settings symlink was broken by sync_permissions_to_global"; exit 1; }
+  grep -q '"command(pwd)"' "$DOTFILES_REAL" || { echo "FAIL: Real dotfile was not updated"; exit 1; }
+  echo "PASS: sync_permissions_to_global successfully preserved dotfile symlink."
+)
+
 echo "All tests passed successfully!"
