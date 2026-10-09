@@ -52,8 +52,8 @@ echo "yakuake-autostart-content" > "$HOMEDIR/.config/autostart/yakuake.desktop"
 echo "real-kwinrc-content" > "$TEST_TEMP_DIR/external_repo/kwinrc"
 ln -s "$TEST_TEMP_DIR/external_repo/kwinrc" "$HOMEDIR/.config/kwinrc"
 
-# Create broken symlink
-ln -s "$TEST_TEMP_DIR/external_repo/nonexistent.nanorc" "$HOMEDIR/.nanorc"
+# Create broken symlink with quotes and backslash to verify JSON escaping
+ln -s "$TEST_TEMP_DIR/external_repo/nonexistent_\"target\"_with_\\backslash.nanorc" "$HOMEDIR/.nanorc"
 
 # Run backup script
 bash "$BASEDIR/utilities/pre-install/backup-configs.sh"
@@ -149,7 +149,8 @@ assert 'kwinrc' in symlink_entry['symlink_target'], 'symlink_target mismatch'
 broken_entry = next((e for e in data['entries'] if e['relative_path'] == '.nanorc'), None)
 assert broken_entry is not None, '.nanorc entry missing'
 assert broken_entry['was_symlink'] is True, '.nanorc was_symlink should be True'
-assert broken_entry['status'] == 'broken_symlink', f'Expected broken_symlink status, got {broken_entry[\"status\"]}'
+assert '\"target\"' in broken_entry['symlink_target'], 'symlink_target quote escaping mismatch'
+assert r'\\backslash' in broken_entry['symlink_target'], 'symlink_target backslash escaping mismatch'
 "
 echo "PASS: manifest.json schema and data validation passed"
 

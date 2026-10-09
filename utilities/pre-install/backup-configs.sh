@@ -68,7 +68,7 @@ manifest_statuses=()
 manifest_sizes=()
 
 for target in "${config_targets[@]}"; do
-  IFS='|' read -r category rel_path backup_subpath desc <<< "$target"
+  IFS='|' read -r category rel_path backup_subpath _ <<< "$target"
   src="$HOMEDIR/$rel_path"
   dest="$backup_dir/$backup_subpath"
 
@@ -124,49 +124,111 @@ for target in "${config_targets[@]}"; do
 done
 
 if [ "$total_found" -gt 0 ]; then
-  # 1. Generate manifest.json
-  {
-    echo "{"
-    echo "  \"version\": \"1.0.0\","
-    echo "  \"timestamp\": \"$iso_timestamp\","
-    echo "  \"user\": \"$LOGNAME\","
-    echo "  \"home\": \"$HOMEDIR\","
-    echo "  \"backup_dir\": \"$backup_dir\","
-    echo "  \"stats\": {"
-    echo "    \"total_found\": $total_found,"
-    echo "    \"regular_files\": $regular_files,"
-    echo "    \"symlinks_dereferenced\": $symlinks_dereferenced,"
-    echo "    \"broken_symlinks\": $broken_symlinks"
-    echo "  },"
-    echo "  \"entries\": ["
-    for ((i=0; i<total_found; i++)); do
-      cat_val="${manifest_categories[i]}"
-      rel_val="${manifest_rel_paths[i]}"
-      bak_val="${manifest_backup_paths[i]}"
-      sym_val="${manifest_was_symlinks[i]}"
-      tgt_val="${manifest_targets[i]}"
-      sta_val="${manifest_statuses[i]}"
-      siz_val="${manifest_sizes[i]}"
+  # 1. Generate manifest.json safely
+  if command -v jq >/dev/null 2>&1; then
+    entries_json=$(
+      for ((i=0; i<total_found; i++)); do
+        jq -n -c \
+          --arg cat "${manifest_categories[i]}" \
+          --arg orig "$HOMEDIR/${manifest_rel_paths[i]}" \
+          --arg rel "${manifest_rel_paths[i]}" \
+          --arg bak "${manifest_backup_paths[i]}" \
+          --argjson was_sym "${manifest_was_symlinks[i]}" \
+          --arg tgt "${manifest_targets[i]}" \
+          --arg sta "${manifest_statuses[i]}" \
+          --argjson siz "${manifest_sizes[i]}" \
+          '{
+            category: $cat,
+            original_path: $orig,
+            relative_path: $rel,
+            backup_subpath: $bak,
+            was_symlink: $was_sym,
+            symlink_target: $tgt,
+            status: $sta,
+            size_bytes: $siz
+          }'
+      done | jq -s .
+    )
 
-      comma=","
-      if [ "$i" -eq "$((total_found - 1))" ]; then
-        comma=""
-      fi
+    jq -n \
+      --arg ver "1.0.0" \
+      --arg ts "$iso_timestamp" \
+      --arg user "$LOGNAME" \
+      --arg home "$HOMEDIR" \
+      --arg bdir "$backup_dir" \
+      --argjson total "$total_found" \
+      --argjson reg "$regular_files" \
+      --argjson sym "$symlinks_dereferenced" \
+      --argjson brk "$broken_symlinks" \
+      --argjson entries "$entries_json" \
+      '{
+        version: $ver,
+        timestamp: $ts,
+        user: $user,
+        home: $home,
+        backup_dir: $bdir,
+        stats: {
+          total_found: $total,
+          regular_files: $reg,
+          symlinks_dereferenced: $sym,
+          broken_symlinks: $brk
+        },
+        entries: $entries
+      }' > "$backup_dir/manifest.json"
+  else
+    json_escape() {
+      local s="$1"
+      s="${s//\\/\\\\}"
+      s="${s//\"/\\\"}"
+      s="${s//$'\n'/\\n}"
+      s="${s//$'\r'/\\r}"
+      s="${s//$'\t'/\\t}"
+      printf '%s' "$s"
+    }
 
-      echo "    {"
-      echo "      \"category\": \"$cat_val\","
-      echo "      \"original_path\": \"$HOMEDIR/$rel_val\","
-      echo "      \"relative_path\": \"$rel_val\","
-      echo "      \"backup_subpath\": \"$bak_val\","
-      echo "      \"was_symlink\": $sym_val,"
-      echo "      \"symlink_target\": \"$tgt_val\","
-      echo "      \"status\": \"$sta_val\","
-      echo "      \"size_bytes\": $siz_val"
-      echo "    }$comma"
-    done
-    echo "  ]"
-    echo "}"
-  } > "$backup_dir/manifest.json"
+    {
+      echo "{"
+      echo "  \"version\": \"1.0.0\","
+      echo "  \"timestamp\": \"$iso_timestamp\","
+      echo "  \"user\": \"$(json_escape "$LOGNAME")\","
+      echo "  \"home\": \"$(json_escape "$HOMEDIR")\","
+      echo "  \"backup_dir\": \"$(json_escape "$backup_dir")\","
+      echo "  \"stats\": {"
+      echo "    \"total_found\": $total_found,"
+      echo "    \"regular_files\": $regular_files,"
+      echo "    \"symlinks_dereferenced\": $symlinks_dereferenced,"
+      echo "    \"broken_symlinks\": $broken_symlinks"
+      echo "  },"
+      echo "  \"entries\": ["
+      for ((i=0; i<total_found; i++)); do
+        cat_val="${manifest_categories[i]}"
+        rel_val="${manifest_rel_paths[i]}"
+        bak_val="${manifest_backup_paths[i]}"
+        sym_val="${manifest_was_symlinks[i]}"
+        tgt_val="${manifest_targets[i]}"
+        sta_val="${manifest_statuses[i]}"
+        siz_val="${manifest_sizes[i]}"
+
+        comma=","
+        if [ "$i" -eq "$((total_found - 1))" ]; then
+          comma=""
+        fi
+
+        echo "    {"
+        echo "      \"category\": \"$(json_escape "$cat_val")\","
+        echo "      \"original_path\": \"$(json_escape "$HOMEDIR/$rel_val")\","
+        echo "      \"relative_path\": \"$(json_escape "$rel_val")\","
+        echo "      \"backup_subpath\": \"$(json_escape "$bak_val")\","
+        echo "      \"was_symlink\": $sym_val,"
+        echo "      \"symlink_target\": \"$(json_escape "$tgt_val")\","
+        echo "      \"status\": \"$(json_escape "$sta_val")\","
+        echo "      \"size_bytes\": $siz_val"
+        echo "    }$comma"
+      done
+      echo "  ]"
+      echo "}"
+    } > "$backup_dir/manifest.json"
+  fi
 
   # 2. Generate manifest.md
   {
@@ -215,7 +277,7 @@ if [ "$total_found" -gt 0 ]; then
     chown -R "$LOGNAME:$LOGNAME" "$HOMEDIR/.manjaro-cachy-os-kde-dotfiles-backup" 2>/dev/null || true
   fi
 
-  logSuccess "Backups successfully saved to: ${backup_dir#$HOMEDIR/}"
+  logSuccess "Backups successfully saved to: ${backup_dir#"$HOMEDIR"/}"
 else
   logInfo "No existing configurations found to backup."
 fi
