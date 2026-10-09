@@ -131,4 +131,18 @@ echo "=== Test 5: Shared ADC credentials symlink ==="
   echo "PASS: ADC credentials symlinked successfully."
 )
 
+echo "=== Test 6: Atomic write preserves symlink target ==="
+(
+  REAL_FILE="$MOCK_ORIG_HOME/real_settings.json"
+  SYMLINK_FILE="$MOCK_ORIG_HOME/symlink_settings.json"
+  echo '{"colorScheme": "tokyo"}' > "$REAL_FILE"
+  ln -sf "$REAL_FILE" "$SYMLINK_FILE"
+
+  atomic_write_json "$SYMLINK_FILE" '{"colorScheme": "dracula"}'
+
+  [[ -L "$SYMLINK_FILE" ]] || { echo "FAIL: Symlink was broken"; exit 1; }
+  grep -q '"colorScheme": "dracula"' "$REAL_FILE" || { echo "FAIL: Target was not updated"; exit 1; }
+  echo "PASS: atomic_write_json preserves symlink target."
+)
+
 echo "All tests passed successfully!"

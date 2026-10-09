@@ -93,6 +93,26 @@ ensure_profile_settings() {
     fi
 }
 
+atomic_write_json() {
+    local dest_file="$1"
+    local json_content="$2"
+
+    local real_dest
+    real_dest="$(readlink -f "$dest_file" 2>/dev/null || true)"
+    [[ -z "$real_dest" ]] && real_dest="$dest_file"
+    mkdir -p "$(dirname "$real_dest")"
+
+    local tmp
+    tmp="$(mktemp "${real_dest}.tmp.XXXXXX")"
+    chmod 600 "$tmp"
+    if echo "$json_content" > "$tmp"; then
+        mv -f "$tmp" "$real_dest"
+    else
+        rm -f "$tmp"
+        return 1
+    fi
+}
+
 sync_permissions_to_profile() {
     local global_settings_file="$1"
     local profile_settings_file="$2"
