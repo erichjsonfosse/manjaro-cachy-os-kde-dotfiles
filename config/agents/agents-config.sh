@@ -119,9 +119,9 @@ EOF
   logSuccess "AI agent global settings initialized: $GEMINI_SETTINGS_FILE"
 elif command -v jq >/dev/null 2>&1; then
   # Merge baseline permissions into existing settings without overwriting user customizations
-  real_dest="$(readlink -f "$GEMINI_SETTINGS_FILE" 2>/dev/null || true)"
-  [ -z "$real_dest" ] && real_dest="$GEMINI_SETTINGS_FILE"
-  tmp_settings=$(mktemp "${real_dest}.tmp.XXXXXX" 2>/dev/null || mktemp)
+  real_destination="$(readlink -f "$GEMINI_SETTINGS_FILE" 2>/dev/null || true)"
+  [ -z "$real_destination" ] && real_destination="$GEMINI_SETTINGS_FILE"
+  tmp_settings=$(mktemp "${real_destination}.tmp.XXXXXX" 2>/dev/null || mktemp)
   if jq '
     .permissions = (.permissions // {})
     | .permissions.allow = ((.permissions.allow // []) + [
@@ -135,9 +135,9 @@ elif command -v jq >/dev/null 2>&1; then
         "command(pwd)",
         "command(rg)"
       ] | unique)
-  ' "$real_dest" > "$tmp_settings" 2>/dev/null; then
+  ' "$real_destination" > "$tmp_settings" 2>/dev/null; then
     chmod 600 "$tmp_settings"
-    mv -f "$tmp_settings" "$real_dest"
+    mv -f "$tmp_settings" "$real_destination"
     logSuccess "Merged baseline command permissions into $GEMINI_SETTINGS_FILE"
   else
     rm -f "$tmp_settings"
