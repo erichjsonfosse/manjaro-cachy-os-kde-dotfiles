@@ -234,4 +234,65 @@ EOF
   echo "PASS: merge_permissions_3way correctly computes deltas and enforces deny > ask > allow precedence."
 )
 
+echo "=== Test 8: sync_permissions_to_profile propagates global revocations and moves ==="
+(
+  GLOBAL_F="$TEST_TMPDIR/t8_global.json"
+  PROF_F="$TEST_TMPDIR/t8_profile/settings.json"
+  BASE_F="$TEST_TMPDIR/t8_profile/.permissions-baseline.json"
+  mkdir -p "$TEST_TMPDIR/t8_profile"
+
+  # Initial global settings
+  cat << 'EOF' > "$GLOBAL_F"
+{
+  "permissions": {
+    "allow": ["command(cat)", "command(ls)", "command(rm)"]
+  }
+}
+EOF
+
+  # Initial profile settings
+  cat << 'EOF' > "$PROF_F"
+{
+  "gcp": {"project": "prof-p1"},
+  "permissions": {
+    "allow": ["command(cat)", "command(ls)", "command(rm)"]
+  }
+}
+EOF
+
+  # 1. First run: baseline does not exist yet. Running startup sync should initialize baseline.
+  sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
+  [[ -f "$BASE_F" ]] || { echo "FAIL: Baseline file not created on initial run"; exit 1; }
+  jq -e '.permissions.allow | index("command(rm)") != null' "$BASE_F" >/dev/null || { echo "FAIL: Baseline missing rm"; exit 1; }
+
+  # 2. User revokes command(rm) globally and moves command(ls) from allow to ask
+  cat << 'EOF' > "$GLOBAL_F"
+{
+  "permissions": {
+    "allow": ["command(cat)"],
+    "ask": ["command(ls)"]
+  }
+}
+EOF
+
+  # Run startup sync again
+  sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
+
+  # Verify rm is removed from profile
+  jq -e '((.permissions.allow // []) | index("command(rm)")) == null' "$PROF_F" >/dev/null || { echo "FAIL: rm was not revoked from profile"; exit 1; }
+
+  # Verify ls moved to ask in profile
+  jq -e '.permissions.ask | index("command(ls)") != null' "$PROF_F" >/dev/null || { echo "FAIL: ls not moved to ask in profile"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(ls)")) == null' "$PROF_F" >/dev/null || { echo "FAIL: ls still in allow in profile"; exit 1; }
+
+  # Verify GCP project is preserved
+  grep -q '"project": "prof-p1"' "$PROF_F" || { echo "FAIL: Profile GCP project was clobbered"; exit 1; }
+
+  # Verify baseline was updated
+  jq -e '((.permissions.allow // []) | index("command(rm)")) == null' "$BASE_F" >/dev/null || { echo "FAIL: rm still in baseline"; exit 1; }
+  jq -e '.permissions.ask | index("command(ls)") != null' "$BASE_F" >/dev/null || { echo "FAIL: ls not in ask in baseline"; exit 1; }
+
+  echo "PASS: sync_permissions_to_profile successfully propagates global revocations and moves."
+)
+
 echo "All tests passed successfully!"
