@@ -94,20 +94,20 @@ ensure_profile_settings() {
 }
 
 atomic_write_json() {
-    local dest_file="$1"
+    local destination_file="$1"
     local json_content="$2"
 
-    local real_dest
-    real_dest="$(readlink -f "$dest_file" 2>/dev/null || true)"
-    [[ -z "$real_dest" ]] && real_dest="$dest_file"
-    mkdir -p "$(dirname "$real_dest")"
+    local real_destination
+    real_destination="$(readlink -f "$destination_file" 2>/dev/null || true)"
+    [[ -z "$real_destination" ]] && real_destination="$destination_file"
+    mkdir -p "$(dirname "$real_destination")"
 
     local tmp
-    tmp="$(mktemp "${real_dest}.tmp.XXXXXX")"
+    tmp="$(mktemp "${real_destination}.tmp.XXXXXX")"
     [[ -n "$tmp" && -f "$tmp" ]] || return 1
     chmod 600 "$tmp" 2>/dev/null || true
     if printf '%s\n' "$json_content" > "$tmp"; then
-        mv -f "$tmp" "$real_dest"
+        mv -f "$tmp" "$real_destination"
     else
         rm -f "$tmp"
         return 1
@@ -121,46 +121,46 @@ merge_permissions_3way() {
 
     command -v jq >/dev/null 2>&1 || return 0
 
-    local tgt_in="/dev/null"
-    local cur_in="/dev/null"
-    local base_in="/dev/null"
+    local target_input="/dev/null"
+    local current_input="/dev/null"
+    local base_input="/dev/null"
 
-    [[ -f "$target_file" ]] && tgt_in="$target_file"
-    [[ -f "$current_file" ]] && cur_in="$current_file"
-    [[ -f "$base_file" ]] && base_in="$base_file"
+    [[ -f "$target_file" ]] && target_input="$target_file"
+    [[ -f "$current_file" ]] && current_input="$current_file"
+    [[ -f "$base_file" ]] && base_input="$base_file"
 
     local merged_json
     merged_json="$(jq -n \
-        --slurpfile tgt "$tgt_in" \
-        --slurpfile cur "$cur_in" \
-        --slurpfile base "$base_in" '
-        ($tgt[0] // {}) as $t |
-        ($cur[0] // {}) as $c |
-        ($base[0] // {}) as $b |
+        --slurpfile target "$target_input" \
+        --slurpfile current "$current_input" \
+        --slurpfile base "$base_input" '
+        ($target[0] // {}) as $target_doc |
+        ($current[0] // {}) as $current_doc |
+        ($base[0] // {}) as $base_doc |
 
-        def perm_list($obj; $k): (($obj.permissions // {})[$k] // []);
+        def extract_permissions($obj; $category): (($obj.permissions // {})[$category] // []);
 
-        perm_list($b; "allow") as $b_allow |
-        perm_list($b; "deny")  as $b_deny  |
-        perm_list($b; "ask")   as $b_ask   |
+        extract_permissions($base_doc; "allow") as $base_allow |
+        extract_permissions($base_doc; "deny")  as $base_deny  |
+        extract_permissions($base_doc; "ask")   as $base_ask   |
 
-        perm_list($c; "allow") as $c_allow |
-        perm_list($c; "deny")  as $c_deny  |
-        perm_list($c; "ask")   as $c_ask   |
+        extract_permissions($current_doc; "allow") as $current_allow |
+        extract_permissions($current_doc; "deny")  as $current_deny  |
+        extract_permissions($current_doc; "ask")   as $current_ask   |
 
-        perm_list($t; "allow") as $t_allow |
-        perm_list($t; "deny")  as $t_deny  |
-        perm_list($t; "ask")   as $t_ask   |
+        extract_permissions($target_doc; "allow") as $target_allow |
+        extract_permissions($target_doc; "deny")  as $target_deny  |
+        extract_permissions($target_doc; "ask")   as $target_ask   |
 
         # Deltas in current vs base
-        ($c_allow - $b_allow) as $add_allow | ($b_allow - $c_allow) as $rem_allow |
-        ($c_deny  - $b_deny)  as $add_deny  | ($b_deny  - $c_deny)  as $rem_deny  |
-        ($c_ask   - $b_ask)   as $add_ask   | ($b_ask   - $c_ask)   as $rem_ask   |
+        ($current_allow - $base_allow) as $added_allow | ($base_allow - $current_allow) as $removed_allow |
+        ($current_deny  - $base_deny)  as $added_deny  | ($base_deny  - $current_deny)  as $removed_deny  |
+        ($current_ask   - $base_ask)   as $added_ask   | ($base_ask   - $current_ask)   as $removed_ask   |
 
         # Apply deltas to target
-        ((($t_deny  + $add_deny)  - $rem_deny)  | unique) as $raw_deny  |
-        ((($t_ask   + $add_ask)   - $rem_ask)   | unique) as $raw_ask   |
-        ((($t_allow + $add_allow) - $rem_allow) | unique) as $raw_allow |
+        ((($target_deny  + $added_deny)  - $removed_deny)  | unique) as $raw_deny  |
+        ((($target_ask   + $added_ask)   - $removed_ask)   | unique) as $raw_ask   |
+        ((($target_allow + $added_allow) - $removed_allow) | unique) as $raw_allow |
 
         # Enforce mutual exclusivity with precedence: deny > ask > allow
         $raw_deny as $final_deny |
@@ -168,7 +168,7 @@ merge_permissions_3way() {
         (($raw_allow - $final_deny) - $final_ask) as $final_allow |
 
         # Merge cleanly into target permissions without clobbering other properties
-        (($t.permissions // {}) + {
+        (($target_doc.permissions // {}) + {
             allow: $final_allow,
             deny: $final_deny,
             ask: $final_ask
@@ -176,9 +176,9 @@ merge_permissions_3way() {
         | if .deny == [] then del(.deny) else . end
         | if .ask == [] then del(.ask) else . end
         | if .allow == [] then del(.allow) else . end
-        as $final_perms |
+        as $final_permissions |
 
-        $t | if $final_perms == {} then del(.permissions) else .permissions = $final_perms end
+        $target_doc | if $final_permissions == {} then del(.permissions) else .permissions = $final_permissions end
     ' 2>/dev/null)" || return 1
 
     atomic_write_json "$target_file" "$merged_json"
@@ -242,10 +242,10 @@ sync_permissions_to_global() {
         merge_permissions_3way "$profile_settings_file" "$global_settings_file" "$merge_base" || return 0
 
         # 3. Update baseline to match final synchronized state
-        local perms
-        perms="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$global_settings_file" 2>/dev/null)" || return 0
-        [[ -n "$perms" ]] || return 0
-        atomic_write_json "$base_file" "$perms"
+        local permissions_payload
+        permissions_payload="$(jq '{permissions: (.permissions // {})} | if .permissions == {} then del(.permissions) else . end' "$global_settings_file" 2>/dev/null)" || return 0
+        [[ -n "$permissions_payload" ]] || return 0
+        atomic_write_json "$base_file" "$permissions_payload"
     )
 }
 
@@ -476,14 +476,14 @@ main() {
     if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
         # shellcheck disable=SC2329
         cleanup_settings() {
-            local sig="${1:-EXIT}"
+            local termination_signal="${1:-EXIT}"
             trap - EXIT INT TERM HUP
             local profile_settings="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
             local global_settings="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
 
             sync_permissions_to_global "$global_settings" "$profile_settings"
 
-            case "$sig" in
+            case "$termination_signal" in
                 INT)  exit 130 ;;
                 TERM) exit 143 ;;
                 HUP)  exit 129 ;;

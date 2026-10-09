@@ -581,19 +581,19 @@ echo "=== Test 15: Signal trap syncs permissions on SIGINT / SIGTERM ==="
   sync_permissions_to_profile "$GLOBAL_F" "$PROF_F"
 
   # Simulate SIGINT during session
-  sigint_code=0
+  sigint_exit_code=0
   bash -c '
     source bin/agy
     PROFILE_DIRECTORY="'"$TEST_TMPDIR"'/t15_prof"
     ORIGINAL_HOME="'"$TEST_TMPDIR"'/t15_global"
 
     cleanup_settings() {
-      local sig="${1:-EXIT}"
+      local termination_signal="${1:-EXIT}"
       trap - EXIT INT TERM HUP
       local profile_settings="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
       local global_settings="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
       sync_permissions_to_global "$global_settings" "$profile_settings"
-      case "$sig" in
+      case "$termination_signal" in
         INT)  exit 130 ;;
         TERM) exit 143 ;;
         HUP)  exit 129 ;;
@@ -608,25 +608,25 @@ echo "=== Test 15: Signal trap syncs permissions on SIGINT / SIGTERM ==="
 
     echo "{\"permissions\": {\"allow\": [\"command(init)\", \"command(added_on_sigint)\"]}}" > "'"$PROF_F"'"
     kill -s INT $$
-  ' || sigint_code=$?
+  ' || sigint_exit_code=$?
 
-  [[ "$sigint_code" -eq 130 ]] || { echo "FAIL: Expected exit code 130 for SIGINT, got $sigint_code"; exit 1; }
+  [[ "$sigint_exit_code" -eq 130 ]] || { echo "FAIL: Expected exit code 130 for SIGINT, got $sigint_exit_code"; exit 1; }
   jq -e '.permissions.allow | index("command(added_on_sigint)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: Permissions not synced to global on SIGINT"; exit 1; }
 
   # Simulate SIGTERM during session
-  sigterm_code=0
+  sigterm_exit_code=0
   bash -c '
     source bin/agy
     PROFILE_DIRECTORY="'"$TEST_TMPDIR"'/t15_prof"
     ORIGINAL_HOME="'"$TEST_TMPDIR"'/t15_global"
 
     cleanup_settings() {
-      local sig="${1:-EXIT}"
+      local termination_signal="${1:-EXIT}"
       trap - EXIT INT TERM HUP
       local profile_settings="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
       local global_settings="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
       sync_permissions_to_global "$global_settings" "$profile_settings"
-      case "$sig" in
+      case "$termination_signal" in
         INT)  exit 130 ;;
         TERM) exit 143 ;;
         HUP)  exit 129 ;;
@@ -641,9 +641,9 @@ echo "=== Test 15: Signal trap syncs permissions on SIGINT / SIGTERM ==="
 
     echo "{\"permissions\": {\"allow\": [\"command(init)\", \"command(added_on_sigint)\", \"command(added_on_sigterm)\"]}}" > "'"$PROF_F"'"
     kill -s TERM $$
-  ' || sigterm_code=$?
+  ' || sigterm_exit_code=$?
 
-  [[ "$sigterm_code" -eq 143 ]] || { echo "FAIL: Expected exit code 143 for SIGTERM, got $sigterm_code"; exit 1; }
+  [[ "$sigterm_exit_code" -eq 143 ]] || { echo "FAIL: Expected exit code 143 for SIGTERM, got $sigterm_exit_code"; exit 1; }
   jq -e '.permissions.allow | index("command(added_on_sigterm)") != null' "$GLOBAL_F" >/dev/null || { echo "FAIL: Permissions not synced to global on SIGTERM"; exit 1; }
 
   echo "PASS: Signal traps safely sync permissions on SIGINT and SIGTERM."
