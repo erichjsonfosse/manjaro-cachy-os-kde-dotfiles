@@ -60,64 +60,64 @@ broken_symlinks=0
 
 # Arrays to collect manifest entries
 manifest_categories=()
-manifest_rel_paths=()
+manifest_relative_paths=()
 manifest_backup_paths=()
 manifest_was_symlinks=()
-manifest_targets=()
+manifest_symlink_targets=()
 manifest_statuses=()
-manifest_sizes=()
+manifest_size_bytes=()
 
 for target in "${config_targets[@]}"; do
-  IFS='|' read -r category rel_path backup_subpath _ <<< "$target"
-  src="$HOMEDIR/$rel_path"
-  dest="$backup_dir/$backup_subpath"
+  IFS='|' read -r category relative_path backup_subpath _ <<< "$target"
+  source_path="$HOMEDIR/$relative_path"
+  destination_path="$backup_dir/$backup_subpath"
 
-  if [ -f "$src" ] || [ -L "$src" ]; then
+  if [ -f "$source_path" ] || [ -L "$source_path" ]; then
     if [ "$total_found" -eq 0 ]; then
       mkdir -p "$backup_dir"
     fi
 
-    mkdir -p "$(dirname "$dest")"
+    mkdir -p "$(dirname "$destination_path")"
 
-    if [ -L "$src" ]; then
-      symlink_target=$(readlink "$src" || echo "")
-      if [ -e "$src" ]; then
+    if [ -L "$source_path" ]; then
+      symlink_target=$(readlink "$source_path" || echo "")
+      if [ -e "$source_path" ]; then
         # Valid symlink - dereference content
-        cp -L "$src" "$dest"
+        cp -L "$source_path" "$destination_path"
         was_symlink="true"
         status="dereferenced"
         symlinks_dereferenced=$((symlinks_dereferenced + 1))
-        file_size=$(wc -c < "$dest" 2>/dev/null || echo 0)
+        file_size=$(wc -c < "$destination_path" 2>/dev/null || echo 0)
         file_size=${file_size// /}
-        logInfo "Backed up (dereferenced symlink): $rel_path -> $backup_subpath"
+        logInfo "Backed up (dereferenced symlink): $relative_path -> $backup_subpath"
       else
         # Broken symlink - preserve pointer or record broken status
-        cp -P "$src" "$dest" 2>/dev/null || true
+        cp -P "$source_path" "$destination_path" 2>/dev/null || true
         was_symlink="true"
         status="broken_symlink"
         broken_symlinks=$((broken_symlinks + 1))
         file_size=0
-        logWarning "Backed up (broken symlink): $rel_path -> $symlink_target (target missing)"
+        logWarning "Backed up (broken symlink): $relative_path -> $symlink_target (target missing)"
       fi
     else
       # Regular file
-      cp "$src" "$dest"
+      cp "$source_path" "$destination_path"
       was_symlink="false"
       symlink_target=""
       status="copied"
       regular_files=$((regular_files + 1))
-      file_size=$(wc -c < "$dest" 2>/dev/null || echo 0)
+      file_size=$(wc -c < "$destination_path" 2>/dev/null || echo 0)
       file_size=${file_size// /}
-      logInfo "Backed up: $rel_path -> $backup_subpath"
+      logInfo "Backed up: $relative_path -> $backup_subpath"
     fi
 
     manifest_categories+=("$category")
-    manifest_rel_paths+=("$rel_path")
+    manifest_relative_paths+=("$relative_path")
     manifest_backup_paths+=("$backup_subpath")
     manifest_was_symlinks+=("$was_symlink")
-    manifest_targets+=("$symlink_target")
+    manifest_symlink_targets+=("$symlink_target")
     manifest_statuses+=("$status")
-    manifest_sizes+=("$file_size")
+    manifest_size_bytes+=("$file_size")
 
     total_found=$((total_found + 1))
   fi
@@ -129,61 +129,61 @@ if [ "$total_found" -gt 0 ]; then
     entries_json=$(
       for ((i=0; i<total_found; i++)); do
         jq -n -c \
-          --arg cat "${manifest_categories[i]}" \
-          --arg orig "$HOMEDIR/${manifest_rel_paths[i]}" \
-          --arg rel "${manifest_rel_paths[i]}" \
-          --arg bak "${manifest_backup_paths[i]}" \
-          --argjson was_sym "${manifest_was_symlinks[i]}" \
-          --arg tgt "${manifest_targets[i]}" \
-          --arg sta "${manifest_statuses[i]}" \
-          --argjson siz "${manifest_sizes[i]}" \
+          --arg category "${manifest_categories[i]}" \
+          --arg original_path "$HOMEDIR/${manifest_relative_paths[i]}" \
+          --arg relative_path "${manifest_relative_paths[i]}" \
+          --arg backup_subpath "${manifest_backup_paths[i]}" \
+          --argjson was_symlink "${manifest_was_symlinks[i]}" \
+          --arg symlink_target "${manifest_symlink_targets[i]}" \
+          --arg status "${manifest_statuses[i]}" \
+          --argjson size_bytes "${manifest_size_bytes[i]}" \
           '{
-            category: $cat,
-            original_path: $orig,
-            relative_path: $rel,
-            backup_subpath: $bak,
-            was_symlink: $was_sym,
-            symlink_target: $tgt,
-            status: $sta,
-            size_bytes: $siz
+            category: $category,
+            original_path: $original_path,
+            relative_path: $relative_path,
+            backup_subpath: $backup_subpath,
+            was_symlink: $was_symlink,
+            symlink_target: $symlink_target,
+            status: $status,
+            size_bytes: $size_bytes
           }'
       done | jq -s .
     )
 
     jq -n \
-      --arg ver "1.0.0" \
-      --arg ts "$iso_timestamp" \
+      --arg version "1.0.0" \
+      --arg timestamp "$iso_timestamp" \
       --arg user "$LOGNAME" \
       --arg home "$HOMEDIR" \
-      --arg bdir "$backup_dir" \
-      --argjson total "$total_found" \
-      --argjson reg "$regular_files" \
-      --argjson sym "$symlinks_dereferenced" \
-      --argjson brk "$broken_symlinks" \
+      --arg backup_dir "$backup_dir" \
+      --argjson total_found "$total_found" \
+      --argjson regular_files "$regular_files" \
+      --argjson symlinks_dereferenced "$symlinks_dereferenced" \
+      --argjson broken_symlinks "$broken_symlinks" \
       --argjson entries "$entries_json" \
       '{
-        version: $ver,
-        timestamp: $ts,
+        version: $version,
+        timestamp: $timestamp,
         user: $user,
         home: $home,
-        backup_dir: $bdir,
+        backup_dir: $backup_dir,
         stats: {
-          total_found: $total,
-          regular_files: $reg,
-          symlinks_dereferenced: $sym,
-          broken_symlinks: $brk
+          total_found: $total_found,
+          regular_files: $regular_files,
+          symlinks_dereferenced: $symlinks_dereferenced,
+          broken_symlinks: $broken_symlinks
         },
         entries: $entries
       }' > "$backup_dir/manifest.json"
   else
     json_escape() {
-      local s="$1"
-      s="${s//\\/\\\\}"
-      s="${s//\"/\\\"}"
-      s="${s//$'\n'/\\n}"
-      s="${s//$'\r'/\\r}"
-      s="${s//$'\t'/\\t}"
-      printf '%s' "$s"
+      local string_input="$1"
+      string_input="${string_input//\\/\\\\}"
+      string_input="${string_input//\"/\\\"}"
+      string_input="${string_input//$'\n'/\\n}"
+      string_input="${string_input//$'\r'/\\r}"
+      string_input="${string_input//$'\t'/\\t}"
+      printf '%s' "$string_input"
     }
 
     {
@@ -201,13 +201,13 @@ if [ "$total_found" -gt 0 ]; then
       echo "  },"
       echo "  \"entries\": ["
       for ((i=0; i<total_found; i++)); do
-        cat_val="${manifest_categories[i]}"
-        rel_val="${manifest_rel_paths[i]}"
-        bak_val="${manifest_backup_paths[i]}"
-        sym_val="${manifest_was_symlinks[i]}"
-        tgt_val="${manifest_targets[i]}"
-        sta_val="${manifest_statuses[i]}"
-        siz_val="${manifest_sizes[i]}"
+        category_value="${manifest_categories[i]}"
+        relative_path_value="${manifest_relative_paths[i]}"
+        backup_subpath_value="${manifest_backup_paths[i]}"
+        was_symlink_value="${manifest_was_symlinks[i]}"
+        target_value="${manifest_symlink_targets[i]}"
+        status_value="${manifest_statuses[i]}"
+        size_bytes_value="${manifest_size_bytes[i]}"
 
         comma=","
         if [ "$i" -eq "$((total_found - 1))" ]; then
@@ -215,14 +215,14 @@ if [ "$total_found" -gt 0 ]; then
         fi
 
         echo "    {"
-        echo "      \"category\": \"$(json_escape "$cat_val")\","
-        echo "      \"original_path\": \"$(json_escape "$HOMEDIR/$rel_val")\","
-        echo "      \"relative_path\": \"$(json_escape "$rel_val")\","
-        echo "      \"backup_subpath\": \"$(json_escape "$bak_val")\","
-        echo "      \"was_symlink\": $sym_val,"
-        echo "      \"symlink_target\": \"$(json_escape "$tgt_val")\","
-        echo "      \"status\": \"$(json_escape "$sta_val")\","
-        echo "      \"size_bytes\": $siz_val"
+        echo "      \"category\": \"$(json_escape "$category_value")\","
+        echo "      \"original_path\": \"$(json_escape "$HOMEDIR/$relative_path_value")\","
+        echo "      \"relative_path\": \"$(json_escape "$relative_path_value")\","
+        echo "      \"backup_subpath\": \"$(json_escape "$backup_subpath_value")\","
+        echo "      \"was_symlink\": $was_symlink_value,"
+        echo "      \"symlink_target\": \"$(json_escape "$target_value")\","
+        echo "      \"status\": \"$(json_escape "$status_value")\","
+        echo "      \"size_bytes\": $size_bytes_value"
         echo "    }$comma"
       done
       echo "  ]"
@@ -247,28 +247,28 @@ if [ "$total_found" -gt 0 ]; then
     echo "| Category | Original Path | Backup Path | Type | Symlink Target | Status |"
     echo "| :--- | :--- | :--- | :--- | :--- | :--- |"
     for ((i=0; i<total_found; i++)); do
-      cat_val="${manifest_categories[i]}"
-      rel_val="${manifest_rel_paths[i]}"
-      bak_val="${manifest_backup_paths[i]}"
-      sym_val="${manifest_was_symlinks[i]}"
-      tgt_val="${manifest_targets[i]}"
-      sta_val="${manifest_statuses[i]}"
+      category_value="${manifest_categories[i]}"
+      relative_path_value="${manifest_relative_paths[i]}"
+      backup_path_value="${manifest_backup_paths[i]}"
+      was_symlink_value="${manifest_was_symlinks[i]}"
+      symlink_target_value="${manifest_symlink_targets[i]}"
+      status_value="${manifest_statuses[i]}"
 
-      type_str="Regular File"
-      target_str="-"
-      if [ "$sym_val" = "true" ]; then
-        type_str="Symlink"
-        target_str="\`$tgt_val\`"
+      type_string="Regular File"
+      target_string="-"
+      if [ "$was_symlink_value" = "true" ]; then
+        type_string="Symlink"
+        target_string="\`$symlink_target_value\`"
       fi
 
       status_display="Copied"
-      if [ "$sta_val" = "dereferenced" ]; then
+      if [ "$status_value" = "dereferenced" ]; then
         status_display="Dereferenced"
-      elif [ "$sta_val" = "broken_symlink" ]; then
+      elif [ "$status_value" = "broken_symlink" ]; then
         status_display="Broken Symlink"
       fi
 
-      echo "| \`$cat_val\` | \`~/$rel_val\` | \`$bak_val\` | $type_str | $target_str | $status_display |"
+      echo "| \`$category_value\` | \`~/$relative_path_value\` | \`$backup_path_value\` | $type_string | $target_string | $status_display |"
     done
   } > "$backup_dir/manifest.md"
 
