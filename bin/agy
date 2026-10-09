@@ -476,13 +476,25 @@ main() {
     if [[ "$NO_PROFILE" == "false" && -n "$PROFILE" ]]; then
         # shellcheck disable=SC2329
         cleanup_settings() {
+            local sig="${1:-EXIT}"
+            trap - EXIT INT TERM HUP
             local profile_settings="$PROFILE_DIRECTORY/.gemini/antigravity-cli/settings.json"
             local global_settings="$ORIGINAL_HOME/.gemini/antigravity-cli/settings.json"
 
             sync_permissions_to_global "$global_settings" "$profile_settings"
+
+            case "$sig" in
+                INT)  exit 130 ;;
+                TERM) exit 143 ;;
+                HUP)  exit 129 ;;
+                *)    ;;
+            esac
         }
 
-        trap cleanup_settings EXIT
+        trap 'cleanup_settings EXIT' EXIT
+        trap 'cleanup_settings INT' INT
+        trap 'cleanup_settings TERM' TERM
+        trap 'cleanup_settings HUP' HUP
         run_profile_with_keyring "$PROFILE_DIRECTORY" "$REAL_AGY" "${NEW_ARGS[@]}"
         EXIT_CODE=$?
         exit "$EXIT_CODE"
