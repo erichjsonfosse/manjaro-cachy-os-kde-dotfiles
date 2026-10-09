@@ -145,4 +145,93 @@ echo "=== Test 6: Atomic write preserves symlink target ==="
   echo "PASS: atomic_write_json preserves symlink target."
 )
 
+echo "=== Test 7: Three-way merge deltas and deny > ask > allow precedence ==="
+(
+  TARGET_F="$TEST_TMPDIR/t7_target.json"
+  CURRENT_F="$TEST_TMPDIR/t7_current.json"
+  BASE_F="$TEST_TMPDIR/t7_base.json"
+
+  # Base state:
+  # allow: [cat, rm, curl, wget]
+  # deny: []
+  # ask: []
+  cat << 'EOF' > "$BASE_F"
+{
+  "permissions": {
+    "allow": ["command(cat)", "command(rm)", "command(curl)", "command(wget)"]
+  }
+}
+EOF
+
+  # Current state (provides deltas vs Base):
+  # - added to allow: command(ls)
+  # - removed from allow: command(rm)
+  # - moved command(wget) from allow to ask
+  # - added command(curl) to deny
+  cat << 'EOF' > "$CURRENT_F"
+{
+  "permissions": {
+    "allow": ["command(cat)", "command(ls)"],
+    "ask": ["command(wget)"],
+    "deny": ["command(curl)"]
+  }
+}
+EOF
+
+  # Target state:
+  # has gcp, and allow: [cat, rm, git, curl, wget]
+  cat << 'EOF' > "$TARGET_F"
+{
+  "gcp": {"project": "keep-me"},
+  "permissions": {
+    "allow": ["command(cat)", "command(rm)", "command(git)", "command(curl)", "command(wget)"]
+  }
+}
+EOF
+
+  merge_permissions_3way "$TARGET_F" "$CURRENT_F" "$BASE_F"
+
+  # Verify target preserves gcp
+  grep -q '"project": "keep-me"' "$TARGET_F" || { echo "FAIL: GCP project clobbered"; exit 1; }
+
+  # Verify allow contains: cat, git, ls
+  grep -q '"command(cat)"' "$TARGET_F" || { echo "FAIL: cat missing from allow"; exit 1; }
+  grep -q '"command(git)"' "$TARGET_F" || { echo "FAIL: git missing from allow"; exit 1; }
+  grep -q '"command(ls)"' "$TARGET_F" || { echo "FAIL: ls missing from allow"; exit 1; }
+
+  # Verify rm is removed
+  grep -q '"command(rm)"' "$TARGET_F" && { echo "FAIL: rm was not removed"; exit 1; }
+
+  # Verify wget moved to ask and NOT in allow
+  jq -e '.permissions.ask | index("command(wget)") != null' "$TARGET_F" >/dev/null || { echo "FAIL: wget not in ask"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(wget)")) == null' "$TARGET_F" >/dev/null || { echo "FAIL: wget still in allow"; exit 1; }
+
+  # Verify curl is in deny and purged from allow (deny > allow precedence)
+  jq -e '.permissions.deny | index("command(curl)") != null' "$TARGET_F" >/dev/null || { echo "FAIL: curl not in deny"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(curl)")) == null' "$TARGET_F" >/dev/null || { echo "FAIL: curl still in allow"; exit 1; }
+
+  # Test tie-breaker: deny > ask
+  cat << 'EOF' > "$CURRENT_F"
+{
+  "permissions": {
+    "ask": ["command(conflict)"],
+    "deny": ["command(conflict)"]
+  }
+}
+EOF
+  cat << 'EOF' > "$TARGET_F"
+{
+  "permissions": {
+    "allow": ["command(conflict)"]
+  }
+}
+EOF
+  merge_permissions_3way "$TARGET_F" "$CURRENT_F" "/dev/null"
+  jq -e '.permissions.deny | index("command(conflict)") != null' "$TARGET_F" >/dev/null || { echo "FAIL: conflict not in deny"; exit 1; }
+  jq -e '((.permissions.ask // []) | index("command(conflict)")) == null' "$TARGET_F" >/dev/null || { echo "FAIL: conflict should not be in ask when deny present"; exit 1; }
+  jq -e '((.permissions.allow // []) | index("command(conflict)")) == null' "$TARGET_F" >/dev/null || { echo "FAIL: conflict should not be in allow when deny present"; exit 1; }
+
+  echo "PASS: merge_permissions_3way correctly computes deltas and enforces deny > ask > allow precedence."
+)
+
 echo "All tests passed successfully!"

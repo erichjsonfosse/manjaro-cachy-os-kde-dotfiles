@@ -113,6 +113,76 @@ atomic_write_json() {
     fi
 }
 
+merge_permissions_3way() {
+    local target_file="$1"
+    local current_file="$2"
+    local base_file="$3"
+
+    command -v jq >/dev/null 2>&1 || return 0
+
+    local tgt_in="/dev/null"
+    local cur_in="/dev/null"
+    local base_in="/dev/null"
+
+    [[ -f "$target_file" ]] && tgt_in="$target_file"
+    [[ -f "$current_file" ]] && cur_in="$current_file"
+    [[ -f "$base_file" ]] && base_in="$base_file"
+
+    local merged_json
+    merged_json="$(jq -n \
+        --slurpfile tgt "$tgt_in" \
+        --slurpfile cur "$cur_in" \
+        --slurpfile base "$base_in" '
+        ($tgt[0] // {}) as $t |
+        ($cur[0] // {}) as $c |
+        ($base[0] // {}) as $b |
+
+        def perm_list($obj; $k): (($obj.permissions // {})[$k] // []);
+
+        perm_list($b; "allow") as $b_allow |
+        perm_list($b; "deny")  as $b_deny  |
+        perm_list($b; "ask")   as $b_ask   |
+
+        perm_list($c; "allow") as $c_allow |
+        perm_list($c; "deny")  as $c_deny  |
+        perm_list($c; "ask")   as $c_ask   |
+
+        perm_list($t; "allow") as $t_allow |
+        perm_list($t; "deny")  as $t_deny  |
+        perm_list($t; "ask")   as $t_ask   |
+
+        # Deltas in current vs base
+        ($c_allow - $b_allow) as $add_allow | ($b_allow - $c_allow) as $rem_allow |
+        ($c_deny  - $b_deny)  as $add_deny  | ($b_deny  - $c_deny)  as $rem_deny  |
+        ($c_ask   - $b_ask)   as $add_ask   | ($b_ask   - $c_ask)   as $rem_ask   |
+
+        # Apply deltas to target
+        ((($t_deny  + $add_deny)  - $rem_deny)  | unique) as $raw_deny  |
+        ((($t_ask   + $add_ask)   - $rem_ask)   | unique) as $raw_ask   |
+        ((($t_allow + $add_allow) - $rem_allow) | unique) as $raw_allow |
+
+        # Enforce mutual exclusivity with precedence: deny > ask > allow
+        $raw_deny as $final_deny |
+        ($raw_ask - $final_deny) as $final_ask |
+        (($raw_allow - $final_deny) - $final_ask) as $final_allow |
+
+        # Merge cleanly into target permissions without clobbering other properties
+        (($t.permissions // {}) + {
+            allow: $final_allow,
+            deny: $final_deny,
+            ask: $final_ask
+        })
+        | if .deny == [] then del(.deny) else . end
+        | if .ask == [] then del(.ask) else . end
+        | if .allow == [] then del(.allow) else . end
+        as $final_perms |
+
+        $t | if $final_perms == {} then del(.permissions) else .permissions = $final_perms end
+    ')" || return 1
+
+    atomic_write_json "$target_file" "$merged_json"
+}
+
 sync_permissions_to_profile() {
     local global_settings_file="$1"
     local profile_settings_file="$2"
