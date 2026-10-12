@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 logHeader "Configuring Zsh Shell"
+HOMEDIR="${HOMEDIR:-$HOME}"
 ZSH="$HOMEDIR/.oh-my-zsh"
 export ZSH
 
