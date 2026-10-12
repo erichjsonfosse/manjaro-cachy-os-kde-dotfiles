@@ -2,12 +2,6 @@
 # Manage UFW firewall application profiles for dotfiles applications.
 set -eo pipefail
 
-if [ "$EUID" -eq 0 ]; then
-  echo "Error: Dotfiles firewall manager should NOT be run directly as root." >&2
-  echo "Please run as your regular user: $0" >&2
-  exit 1
-fi
-
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPOSITORY_ROOT="$(cd "$SCRIPT_DIRECTORY/../.." && pwd)"
 SOURCE_CONFIG_DIRECTORY="${UFW_SOURCE_DIRECTORY:-$REPOSITORY_ROOT/config/ufw/applications.d}"
@@ -96,18 +90,36 @@ resolve_profile_name() {
   return 1
 }
 
-run_privileged_command() {
+ensure_privileged_access() {
+  if [[ "$EUID" -eq 0 ]]; then
+    return 0
+  fi
+
   local privileged_wrapper="${UFW_PRIVILEGED_WRAPPER-sudo}"
-  if [[ -n "$privileged_wrapper" ]]; then
-    "$privileged_wrapper" "$@"
-  else
+  if [[ "$privileged_wrapper" == "sudo" ]]; then
+    if ! sudo -n true 2>/dev/null; then
+      echo "Administrative privileges are required to manage UFW firewall profiles."
+      sudo -v || {
+        echo "Error: Failed to obtain sudo privileges." >&2
+        return 1
+      }
+    fi
+  fi
+  return 0
+}
+
+run_privileged_command() {
+  if [[ "$EUID" -eq 0 || -z "${UFW_PRIVILEGED_WRAPPER-sudo}" ]]; then
     "$@"
+  else
+    "${UFW_PRIVILEGED_WRAPPER-sudo}" "$@"
   fi
 }
 
 get_application_status() {
   local input_query="$1"
   local output_status_variable_name="$2"
+  local cached_status_output="${3-}"
 
   local resolved_profile_name=""
   local resolved_filename=""
@@ -121,8 +133,10 @@ get_application_status() {
 
   local inspected_status="unconfigured"
   if [[ -f "$installed_profile_path" ]]; then
-    local status_output=""
-    status_output="$("$ufw_binary" status 2>/dev/null || true)"
+    local status_output="$cached_status_output"
+    if [[ -z "$status_output" ]]; then
+      status_output="$(run_privileged_command "$ufw_binary" status 2>/dev/null || true)"
+    fi
     if echo "$status_output" | grep -q "Status: active" && echo "$status_output" | grep -q -E "^${resolved_profile_name}([[:space:]]|$)"; then
       inspected_status="active"
     else
@@ -203,8 +217,8 @@ Manage UFW firewall application profiles for dotfiles applications.
 When executed without arguments in an interactive terminal, launches an interactive TUI.
 
 Options:
-  --enable <app|all>    Install profile definition and allow firewall traffic for <app> or all profiles
-  --disable <app|all>   Delete allow rule and remove profile definition for <app> or all profiles
+  --enable <application|all>    Install profile definition and allow firewall traffic for <application> or all profiles
+  --disable <application|all>   Delete allow rule and remove profile definition for <application> or all profiles
   --status              Display current installation and firewall status of all profiles
   --list                List all available application profile names
   -h, --help            Display this help message and exit
@@ -216,6 +230,10 @@ display_status_table() {
     discover_profiles "$SOURCE_CONFIG_DIRECTORY"
   fi
 
+  local ufw_binary="${UFW_COMMAND:-ufw}"
+  local current_ufw_status=""
+  current_ufw_status="$(run_privileged_command "$ufw_binary" status 2>/dev/null || true)"
+
   printf "%-18s %-20s %s\n" "Application" "Status" "Ports"
   printf "%-18s %-20s %s\n" "-----------" "------" "-----"
 
@@ -223,7 +241,7 @@ display_status_table() {
     local profile_name="${discovered_profile_names[index]}"
     local ports="${discovered_ports[index]}"
     local application_status=""
-    get_application_status "$profile_name" application_status
+    get_application_status "$profile_name" application_status "$current_ufw_status"
     printf "%-18s %-20s %s\n" "$profile_name" "$application_status" "$ports"
   done
 }
@@ -270,6 +288,8 @@ launch_interactive_tui() {
     return 0
   fi
 
+  ensure_privileged_access || return 1
+
   while true; do
     clear
     gum style \
@@ -298,46 +318,46 @@ launch_interactive_tui() {
         if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
           discover_profiles "$SOURCE_CONFIG_DIRECTORY"
         fi
-        local choices=("all" "${discovered_profile_names[@]}")
-        local chosen_profiles=""
-        chosen_profiles="$(gum choose --no-limit "${choices[@]}" || true)"
-        if [[ -n "$chosen_profiles" ]]; then
-          while IFS= read -r profile_item; do
-            [[ -n "$profile_item" ]] || continue
-            if [[ "$profile_item" == "all" ]]; then
-              enable_all_applications
-              break
-            else
-              enable_application "$profile_item"
-            fi
-          done <<< "$chosen_profiles"
-        fi
-        gum input --placeholder "Press Enter to continue..." || true
+        local choices=("All applications" "${discovered_profile_names[@]}" "← Back")
+        local chosen_profile=""
+        chosen_profile="$(gum choose --header="Select an application to enable:" "${choices[@]}" || true)"
+        case "$chosen_profile" in
+          "All applications")
+            enable_all_applications
+            gum input --placeholder "Press Enter to continue..." || true
+            ;;
+          "← Back"|"")
+            ;;
+          *)
+            enable_application "$chosen_profile"
+            gum input --placeholder "Press Enter to continue..." || true
+            ;;
+        esac
         ;;
       "2. Disable & remove application(s)")
         if [[ "${#discovered_filenames[@]}" -eq 0 ]]; then
           discover_profiles "$SOURCE_CONFIG_DIRECTORY"
         fi
-        local choices=("all" "${discovered_profile_names[@]}")
-        local chosen_profiles=""
-        chosen_profiles="$(gum choose --no-limit "${choices[@]}" || true)"
-        if [[ -n "$chosen_profiles" ]]; then
-          while IFS= read -r profile_item; do
-            [[ -n "$profile_item" ]] || continue
-            if [[ "$profile_item" == "all" ]]; then
-              disable_all_applications
-              break
-            else
-              disable_application "$profile_item"
-            fi
-          done <<< "$chosen_profiles"
-        fi
-        gum input --placeholder "Press Enter to continue..." || true
+        local choices=("All applications" "${discovered_profile_names[@]}" "← Back")
+        local chosen_profile=""
+        chosen_profile="$(gum choose --header="Select an application to disable & remove:" "${choices[@]}" || true)"
+        case "$chosen_profile" in
+          "All applications")
+            disable_all_applications
+            gum input --placeholder "Press Enter to continue..." || true
+            ;;
+          "← Back"|"")
+            ;;
+          *)
+            disable_application "$chosen_profile"
+            gum input --placeholder "Press Enter to continue..." || true
+            ;;
+        esac
         ;;
       "3. View detailed firewall status")
         local ufw_binary="${UFW_COMMAND:-ufw}"
         echo ""
-        "$ufw_binary" status verbose 2>/dev/null || "$ufw_binary" status || true
+        run_privileged_command "$ufw_binary" status verbose || true
         echo ""
         gum input --placeholder "Press Enter to continue..." || true
         ;;
@@ -366,6 +386,7 @@ parse_command_line_arguments() {
           echo "Error: --enable requires an application name or 'all'." >&2
           return 1
         fi
+        ensure_privileged_access || return 1
         local target_application="$2"
         shift 2
         if [[ "$target_application" == "all" ]]; then
@@ -379,6 +400,7 @@ parse_command_line_arguments() {
           echo "Error: --disable requires an application name or 'all'." >&2
           return 1
         fi
+        ensure_privileged_access || return 1
         local target_application="$2"
         shift 2
         if [[ "$target_application" == "all" ]]; then
@@ -389,6 +411,7 @@ parse_command_line_arguments() {
         ;;
       --status)
         shift
+        ensure_privileged_access || return 1
         display_status_table
         ;;
       --list)

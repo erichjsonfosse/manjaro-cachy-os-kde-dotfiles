@@ -124,19 +124,19 @@ case "$1" in
     fi
     ;;
   allow)
-    app="$2"
-    if [[ -f "$rules_file" ]] && grep -q -F "$app" "$rules_file"; then
+    application_name="$2"
+    if [[ -f "$rules_file" ]] && grep -q -F "$application_name" "$rules_file"; then
       echo "Skipping adding existing rule"
     else
-      echo "$app                      ALLOW IN    Anywhere" >> "$rules_file"
+      echo "$application_name                      ALLOW IN    Anywhere" >> "$rules_file"
       echo "Rule added"
     fi
     ;;
   delete)
     if [[ "$2" == "allow" ]]; then
-      app="$3"
+      application_name="$3"
       if [[ -f "$rules_file" ]]; then
-        grep -v -F "$app" "$rules_file" > "$rules_file.tmp" || true
+        grep -v -F "$application_name" "$rules_file" > "$rules_file.tmp" || true
         mv -f "$rules_file.tmp" "$rules_file"
       fi
       echo "Rule deleted"
@@ -278,3 +278,57 @@ fi
 echo "PASS: Invalid CLI flag rejection verified."
 
 echo "All Task 3 tests passed!"
+
+# Task 4: Privilege Escalation & Execution Isolation
+echo "--- Test 15: Privileged wrapper invoked for status inspection ---"
+MOCK_WRAPPER_LOG="$TEST_TEMP_DIRECTORY/privileged_wrapper.log"
+touch "$MOCK_WRAPPER_LOG"
+MOCK_SUDO_COMMAND="$TEST_TEMP_DIRECTORY/bin/mock_sudo"
+
+cat << 'EOF' > "$MOCK_SUDO_COMMAND"
+#!/usr/bin/env bash
+wrapper_log="${MOCK_WRAPPER_LOG}"
+echo "$@" >> "$wrapper_log"
+exec "$@"
+EOF
+chmod +x "$MOCK_SUDO_COMMAND"
+export MOCK_WRAPPER_LOG
+
+# Ensure application profile is installed in mock system directory
+enable_application "kdeconnect"
+: > "$MOCK_WRAPPER_LOG"
+
+# Call get_application_status with wrapper configured and no cache
+status_under_test=""
+UFW_PRIVILEGED_WRAPPER="$MOCK_SUDO_COMMAND" get_application_status "KDEConnect" status_under_test
+if [[ "$status_under_test" != "active" ]]; then
+  echo "FAIL: Expected 'active' status via privileged wrapper, got '$status_under_test'" >&2
+  exit 1
+fi
+if ! grep -q "$MOCK_UFW_COMMAND status" "$MOCK_WRAPPER_LOG"; then
+  echo "FAIL: Expected privileged wrapper to be invoked for 'ufw status', log content: $(<"$MOCK_WRAPPER_LOG")" >&2
+  exit 1
+fi
+echo "PASS: Privileged wrapper invoked for status inspection verified."
+
+echo "--- Test 16: Status cache prevents repeated status invocations ---"
+: > "$MOCK_WRAPPER_LOG"
+status_cache_value="$("$MOCK_UFW_COMMAND" status)"
+UFW_PRIVILEGED_WRAPPER="$MOCK_SUDO_COMMAND" get_application_status "KDEConnect" status_under_test "$status_cache_value"
+if [[ -s "$MOCK_WRAPPER_LOG" ]]; then
+  echo "FAIL: Expected zero privileged invocations when cached_status_output is provided, got: $(<"$MOCK_WRAPPER_LOG")" >&2
+  exit 1
+fi
+echo "PASS: Status cache bypasses privileged wrapper call verified."
+
+echo "--- Test 17: Root execution restriction removed ---"
+if grep -q "Dotfiles firewall manager should NOT be run directly as root" "$UTILITY_SCRIPT"; then
+  echo "FAIL: Script still contains forbidden root rejection check" >&2
+  exit 1
+fi
+
+UFW_PRIVILEGED_WRAPPER="" ensure_privileged_access
+echo "PASS: Root execution compatibility verified."
+
+echo "All Task 4 tests passed!"
+
