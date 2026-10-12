@@ -229,6 +229,24 @@ if [ "$zsh_output" != "OK" ]; then
 fi
 echo "PASS: Full dotfiles plugin loader sourced angular.zsh cleanly"
 
+echo "--- Test 6: Deprecated plugin symlink cleanup ---"
+CUSTOM_PLUGINS="$TEST_TEMP_DIR/oh-my-zsh/custom/plugins"
+mkdir -p "$CUSTOM_PLUGINS"
+ln -sf "$TEST_TEMP_DIR/nonexistent" "$CUSTOM_PLUGINS/nvm-init"
+if [ ! -L "$CUSTOM_PLUGINS/nvm-init" ]; then
+  echo "FAIL: Setup for Test 6 failed"
+  exit 1
+fi
+
+OHMYZSH_FOLDER="$TEST_TEMP_DIR/oh-my-zsh"
+[ -L "$OHMYZSH_FOLDER/custom/plugins/nvm-init" ] && rm -f "$OHMYZSH_FOLDER/custom/plugins/nvm-init"
+
+if [ -e "$CUSTOM_PLUGINS/nvm-init" ] || [ -L "$CUSTOM_PLUGINS/nvm-init" ]; then
+  echo "FAIL: nvm-init symlink was not cleaned up"
+  exit 1
+fi
+echo "PASS: Deprecated nvm-init symlink successfully cleaned up"
+
 echo "=========================================================="
 echo "ALL ZSH NVM & ANGULAR AUTOCOMPLETION TESTS PASSED!"
 echo "=========================================================="

@@ -74,6 +74,7 @@ fi
 # Add aliases (using symlinks - ensure directory exists first)
 mkdir -p "$OHMYZSH_FOLDER/custom/plugins"
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
+[ -L "$OHMYZSH_FOLDER/custom/plugins/nvm-init" ] && rm -f "$OHMYZSH_FOLDER/custom/plugins/nvm-init"
 
 # Edit date format for history command output
 if ! grep -q '^HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE" && ! grep -q "^HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"; then
