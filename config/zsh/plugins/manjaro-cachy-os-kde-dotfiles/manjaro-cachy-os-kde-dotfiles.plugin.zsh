@@ -2,6 +2,7 @@
 0="${${(M)0:#/*}:-$PWD/$0}"
 
 source "${0:A:h}"/aliases.zsh
+source "${0:A:h}"/angular.zsh
 source "${0:A:h}"/bat.zsh
 source "${0:A:h}"/eza.zsh
 source "${0:A:h}"/fzf.zsh
