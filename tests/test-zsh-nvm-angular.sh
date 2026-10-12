@@ -145,7 +145,11 @@ echo "PASS: angular.zsh successfully registered and handles missing ng gracefull
 
 echo "--- Test 4: angular.zsh triggers _omz_nvm_load and delegates to ng completion ---"
 zsh_output=$(zsh -f -c '
-  typeset -g nvm_loaded=0
+  TEST_DIR=$(mktemp -d)
+  mkdir -p "$TEST_DIR/bin"
+  export PATH="$TEST_DIR/bin:$PATH"
+
+  typeset -A _comps
   typeset -g compdef_deleted=""
   typeset -g ng_completion_invoked=0
   typeset -g ng_completion_args=""
@@ -153,17 +157,30 @@ zsh_output=$(zsh -f -c '
   compdef() {
     if [[ "$1" == "-d" ]]; then
       compdef_deleted="$2"
+      unset "_comps[$2]"
+    else
+      _comps[$2]="$1"
     fi
   }
 
+  # OMZ lazy stub defined prior to NVM load
+  ng() {
+    _omz_nvm_load
+    "$TEST_DIR/bin/ng" "$@"
+  }
+
   _omz_nvm_load() {
-    nvm_loaded=1
-    # Mock ng command becoming available after NVM load
-    ng() {
-      if [[ "$1" == "completion" && "$2" == "script" ]]; then
-        echo "_ng() { ng_completion_invoked=1; ng_completion_args=\"\$*\"; }"
-      fi
-    }
+    unfunction _omz_nvm_load 2>/dev/null || true
+    unfunction ng 2>/dev/null || true
+    # Create the real ng executable in PATH
+    cat << "EOF" > "$TEST_DIR/bin/ng"
+#!/usr/bin/env bash
+if [[ "$1" == "completion" && "$2" == "script" ]]; then
+  echo "_ng_yargs_completions() { ng_completion_invoked=1; ng_completion_args=\"\$*\"; }"
+  echo "compdef _ng_yargs_completions ng"
+fi
+EOF
+    chmod +x "$TEST_DIR/bin/ng"
   }
 
   source "'"$BASEDIR"'/config/zsh/plugins/manjaro-cachy-os-kde-dotfiles/angular.zsh"
@@ -171,18 +188,13 @@ zsh_output=$(zsh -f -c '
   # Invoke completion
   _ng_lazy_complete test_arg1 test_arg2
 
-  if [[ "$nvm_loaded" -ne 1 ]]; then
-    echo "FAIL: _omz_nvm_load was not called"
-    exit 1
-  fi
-
   if [[ "$compdef_deleted" != "ng" ]]; then
     echo "FAIL: compdef -d ng was not called"
     exit 1
   fi
 
   if [[ "$ng_completion_invoked" -ne 1 ]]; then
-    echo "FAIL: official _ng completion function was not invoked"
+    echo "FAIL: official _ng_yargs_completions function was not invoked"
     exit 1
   fi
 
@@ -192,6 +204,7 @@ zsh_output=$(zsh -f -c '
   fi
 
   echo "OK"
+  rm -rf "$TEST_DIR"
 ')
 if [ "$zsh_output" != "OK" ]; then
   echo "FAIL: Test 4 failed: $zsh_output"
