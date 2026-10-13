@@ -53,7 +53,7 @@ export DOTFILES_GIT_SIGNING_KEY
 ######################### HOMEDIR ##########################
 LOGNAME="${USER:-$(id -un)}"
 export LOGNAME
-HOMEDIR="${REAL_HOME:-${HOME:-$(eval echo ~"$LOGNAME")}}}"
+HOMEDIR="${REAL_HOME:-${HOME:-$(eval echo ~"$LOGNAME")}}"
 export HOMEDIR
 ######################### HOMEDIR ##########################
 
