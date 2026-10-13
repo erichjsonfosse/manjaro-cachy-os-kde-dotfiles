@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 logHeader "Configuring Zsh Shell"
+HOMEDIR="${HOMEDIR:-$HOME}"
 ZSH="$HOMEDIR/.oh-my-zsh"
 export ZSH
 
@@ -42,6 +43,27 @@ if ! grep -q '^ZSH_THEME="powerlevel10k/powerlevel10k"' "$ZSHRC_FILE"; then
   sed -i "s/^ZSH_THEME=\(.*\)/\# ZSH_THEME=\1/g" "$ZSHRC_FILE"
   sed -i '/^\# ZSH_THEME=\(.*\)/a ZSH_THEME="powerlevel10k/powerlevel10k"' "$ZSHRC_FILE"
 fi
+# Initialize NVM directory and symlinks for Arch Linux pacman package
+ARCH_NVM_DIR="${ARCH_NVM_DIR:-/usr/share/nvm}"
+if [ -f "$ARCH_NVM_DIR/nvm.sh" ]; then
+  mkdir -p "$HOMEDIR/.nvm"
+  [ ! -e "$HOMEDIR/.nvm/nvm.sh" ] && ln -sf "$ARCH_NVM_DIR/nvm.sh" "$HOMEDIR/.nvm/nvm.sh"
+  [ ! -e "$HOMEDIR/.nvm/nvm-exec" ] && ln -sf "$ARCH_NVM_DIR/nvm-exec" "$HOMEDIR/.nvm/nvm-exec"
+  if [ -f "$ARCH_NVM_DIR/bash_completion" ] && [ ! -e "$HOMEDIR/.nvm/bash_completion" ]; then
+    ln -sf "$ARCH_NVM_DIR/bash_completion" "$HOMEDIR/.nvm/bash_completion"
+  fi
+fi
+
+# Configure Oh My Zsh NVM plugin settings
+if ! grep -q ":omz:plugins:nvm" "$ZSHRC_FILE"; then
+  if grep -q '^# Which plugins would you like to load?' "$ZSHRC_FILE"; then
+    sed -i '/^# Which plugins would you like to load?/i # NVM Plugin Settings\nzstyle ":omz:plugins:nvm" lazy yes\nzstyle ":omz:plugins:nvm" autoload yes\nzstyle ":omz:plugins:nvm" lazy-cmd ng\n' "$ZSHRC_FILE"
+  elif grep -q '^plugins=' "$ZSHRC_FILE"; then
+    sed -i '/^plugins=/i # NVM Plugin Settings\nzstyle ":omz:plugins:nvm" lazy yes\nzstyle ":omz:plugins:nvm" autoload yes\nzstyle ":omz:plugins:nvm" lazy-cmd ng\n' "$ZSHRC_FILE"
+  else
+    printf '# NVM Plugin Settings\nzstyle ":omz:plugins:nvm" lazy yes\nzstyle ":omz:plugins:nvm" autoload yes\nzstyle ":omz:plugins:nvm" lazy-cmd ng\n\n' >> "$ZSHRC_FILE"
+  fi
+fi
 
 # Activate plugins
 if ! grep -q '^plugins=.*manjaro-cachy-os-kde-dotfiles' "$ZSHRC_FILE" && ! awk '/^plugins=\(/,/^\)/' "$ZSHRC_FILE" | grep -q 'manjaro-cachy-os-kde-dotfiles'; then
@@ -52,6 +74,7 @@ fi
 # Add aliases (using symlinks - ensure directory exists first)
 mkdir -p "$OHMYZSH_FOLDER/custom/plugins"
 ln -sfn "$ZSHPLUGINDIR/"* "$OHMYZSH_FOLDER/custom/plugins/"
+[ -L "$OHMYZSH_FOLDER/custom/plugins/nvm-init" ] && rm -f "$OHMYZSH_FOLDER/custom/plugins/nvm-init"
 
 # Edit date format for history command output
 if ! grep -q '^HIST_STAMPS="yyyy-mm-dd"' "$ZSHRC_FILE" && ! grep -q "^HIST_STAMPS=yyyy-mm-dd" "$ZSHRC_FILE"; then
