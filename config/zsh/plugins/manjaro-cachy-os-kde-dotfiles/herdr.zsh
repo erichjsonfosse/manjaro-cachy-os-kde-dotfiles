@@ -11,16 +11,3 @@ _refresh_herdr_config() {
     fi
   fi
 }
-
-# Auto-start Herdr when running inside Yakuake
-if command -v herdr &> /dev/null && [[ -z "$HERDR_ENV" && -o interactive ]]; then
-  # Check if the shell's parent process is yakuake or if we are inside a yakuake DBus context
-  if [[ "$(ps -p $PPID -o comm= 2>/dev/null)" == *"yakuake"* || -n "$YAKUAKE_DBUS_WINDOW" ]]; then
-    _refresh_herdr_config
-    # If starting in /, default to home folder so that Herdr sessions start in $HOME
-    if [[ "$PWD" == "/" ]]; then
-      cd "$HOME" || exit
-    fi
-    exec herdr
-  fi
-fi

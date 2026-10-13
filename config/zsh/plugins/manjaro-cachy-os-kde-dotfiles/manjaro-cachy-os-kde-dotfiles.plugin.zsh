@@ -3,7 +3,6 @@
 
 source "${0:A:h}"/aliases.zsh
 source "${0:A:h}"/bat.zsh
-source "${0:A:h}"/direnv.zsh
 source "${0:A:h}"/eza.zsh
 source "${0:A:h}"/fzf.zsh
 source "${0:A:h}"/gh-cli.zsh

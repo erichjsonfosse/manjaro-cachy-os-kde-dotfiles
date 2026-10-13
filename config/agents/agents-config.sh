@@ -4,7 +4,7 @@
 
 # Fallback definitions for standalone execution
 if [ -z "$HOMEDIR" ]; then
-  HOMEDIR="$HOME"
+  HOMEDIR="${REAL_HOME:-$HOME}"
 fi
 
 if [ -z "$LOGNAME" ]; then
@@ -78,3 +78,70 @@ if [ -d "$SOURCE_PLUGINS_DIR" ]; then
   shopt -u nullglob
   logSuccess "AI agent plugins linked successfully: dotfiles -> $AGENTS_PLUGINS_DIR -> $GEMINI_CONFIG_PLUGINS_DIR"
 fi
+
+# Configure AI Agent Profile Wrapper (agy)
+AGY_WRAPPER_SOURCE="$SCRIPT_DIR/../../bin/agy"
+AGY_WRAPPER_TARGET="$HOMEDIR/.local/bin/agy"
+
+if [ -f "$AGY_WRAPPER_SOURCE" ]; then
+  mkdir -p "$HOMEDIR/.local/bin"
+  logInfo "Linking agy wrapper: $AGY_WRAPPER_TARGET -> $AGY_WRAPPER_SOURCE..."
+  chmod +x "$AGY_WRAPPER_SOURCE"
+  ln -sfn "$AGY_WRAPPER_SOURCE" "$AGY_WRAPPER_TARGET"
+  logSuccess "AI agent profile wrapper linked successfully: $AGY_WRAPPER_TARGET -> $AGY_WRAPPER_SOURCE"
+fi
+
+# Configure AI Agent Global Settings & Baseline Permissions
+GEMINI_SETTINGS_FILE="$GEMINI_CLI_DIR/settings.json"
+
+if [ ! -f "$GEMINI_SETTINGS_FILE" ]; then
+  logInfo "Initializing AI agent global settings with baseline permissions..."
+  cat > "$GEMINI_SETTINGS_FILE" <<'EOF'
+{
+  "colorScheme": "tokyo night",
+  "notifications": true,
+  "permissions": {
+    "allow": [
+      "command(cat)",
+      "command(echo)",
+      "command(find)",
+      "command(git)",
+      "command(grep)",
+      "command(head)",
+      "command(ls)",
+      "command(pwd)",
+      "command(rg)"
+    ]
+  }
+}
+EOF
+  chmod 600 "$GEMINI_SETTINGS_FILE"
+  logSuccess "AI agent global settings initialized: $GEMINI_SETTINGS_FILE"
+elif command -v jq >/dev/null 2>&1; then
+  # Merge baseline permissions into existing settings without overwriting user customizations
+  real_destination="$(readlink -f "$GEMINI_SETTINGS_FILE" 2>/dev/null || true)"
+  [ -z "$real_destination" ] && real_destination="$GEMINI_SETTINGS_FILE"
+  tmp_settings=$(mktemp "${real_destination}.tmp.XXXXXX" 2>/dev/null || mktemp)
+  if jq '
+    .permissions = (.permissions // {})
+    | .permissions.allow = ((.permissions.allow // []) + [
+        "command(cat)",
+        "command(echo)",
+        "command(find)",
+        "command(git)",
+        "command(grep)",
+        "command(head)",
+        "command(ls)",
+        "command(pwd)",
+        "command(rg)"
+      ] | unique)
+  ' "$real_destination" > "$tmp_settings" 2>/dev/null; then
+    chmod 600 "$tmp_settings"
+    mv -f "$tmp_settings" "$real_destination"
+    logSuccess "Merged baseline command permissions into $GEMINI_SETTINGS_FILE"
+  else
+    rm -f "$tmp_settings"
+  fi
+fi
+
+

@@ -42,7 +42,6 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Eza Modern Directory Listings:** Replaces `ls` with `eza` featuring icons, Git status indicators, and tree hierarchy views.
 * **Fzf Interactive Fuzzy Search:** Integrated `Ctrl+R` for history, `Ctrl+T` for file search with live `bat` syntax previews, and `Alt+C` for quick directory navigation with live `eza` tree previews.
 * **Bat Syntax Highlighting:** Replaces `cat` with `bat` (unpaged) and provides syntax-highlighted manual pages (`man <command>`).
-* **Direnv & Google Cloud Integration:** Automatic per-directory environment loading via `direnv`. Includes the globally available `setupDirenvForGoogleCloudProject` helper function (aliases: `setup-gcp-direnv`, `direnv-gcp`) to configure `.envrc` and a committable `.envrc.example` template with Google Cloud project IDs and Vertex/Gemini locations, automatic `.gitignore` safeguards, and instant `direnv allow` authorization.
 * **Herdr Workspace & HUD Integration:** Drop-down terminal automatically manages AI agent workspaces and terminal sessions via `herdr-bin`. Includes the [herdr-hud](https://github.com/erichjsonfosse/herdr-hud) plugin with top tab bar shortcut info (`herdr-hud line`) and interactive command palette modal (`prefix Space`), supporting seamless machine-local overrides in `~/.config/herdr/config.local.toml`.
 * **Node Version Manager (NVM):** Automatic NVM hooks and Angular CLI autocompletion support.
 
@@ -57,7 +56,10 @@ The installer features an interactive TUI powered by **[Gum](https://github.com/
 * **Modular Git Config:** Maintains separation between tracked global `.gitconfig` and machine-local `.gitconfig.local`.
 * **KDE SSH Askpass (`ksshaskpass`):** Symlinks `/usr/lib/ssh/ssh-askpass` to `/usr/bin/ksshaskpass` and exports `SSH_ASKPASS` across Plasma 6 environment, providing native graphical passphrase dialogs for GUI tools (Obsidian, IDEs).
 
-### 🩺 System Diagnostics
+### 🩺 System Diagnostics & Backups
+* **Categorized Backup Engine:** Pre-installation safely archives existing configurations into domain categories (`git/`, `zsh/`, `kde/`, `ssh/`, `herdr/`, `nano/`, `paru/`, `agents/`) under `~/.manjaro-cachy-os-kde-dotfiles-backup/<timestamp>/`.
+* **Symlink Dereferencing:** Preserves actual file content as immutable snapshots rather than copying fragile symlink pointers.
+* **Dual Manifests:** Generates both a Markdown summary (`manifest.md`) and a machine-readable JSON manifest (`manifest.json`) detailing original locations, targets, and status for auditing or future automated restoration.
 * **KDE Dotfiles Doctor:** Includes `utilities/post-install/kde-dotfiles-doctor.sh` to verify system health, package dependencies, and configuration integrity after installation.
 
 ---

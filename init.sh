@@ -152,7 +152,7 @@ backupExistingConfigs()
 
 chmodScripts()
 {
-  find . -type f -name "*.sh" -exec chmod +x {} +
+  find . -type f \( -name "*.sh" -o -path "./bin/*" \) -exec chmod +x {} +
 }
 
 checkPacmanLock()
