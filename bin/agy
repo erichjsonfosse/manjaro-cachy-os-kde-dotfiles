@@ -284,6 +284,29 @@ link_adc_credentials() {
     fi
 }
 
+link_profile_shell_env() {
+    local original_home="$1"
+    local profile_directory="$2"
+
+    for rc in .bashrc .bash_profile .profile .zshrc .zshenv .zshrc.local .p10k.zsh; do
+        [[ -f "$original_home/$rc" ]] && ln -sfn "$original_home/$rc" "$profile_directory/$rc"
+    done
+
+    if [[ -d "$original_home/.oh-my-zsh" ]]; then
+        if [[ -d "$profile_directory/.oh-my-zsh" && ! -L "$profile_directory/.oh-my-zsh" ]]; then
+            rm -rf "$profile_directory/.oh-my-zsh"
+        fi
+        ln -sfn "$original_home/.oh-my-zsh" "$profile_directory/.oh-my-zsh"
+    fi
+
+    if [[ -d "$original_home/.nvm" ]]; then
+        if [[ -d "$profile_directory/.nvm" && ! -L "$profile_directory/.nvm" ]]; then
+            rm -rf "$profile_directory/.nvm"
+        fi
+        ln -sfn "$original_home/.nvm" "$profile_directory/.nvm"
+    fi
+}
+
 run_profile_with_keyring() {
     local profile_directory="$1"
     shift
@@ -458,10 +481,8 @@ main() {
             ln -sfn "$ORIGINAL_HOME/.gemini/config" "$PROFILE_DIRECTORY/.gemini/config"
         fi
 
-        # Link shell startup files so subshells maintain your environment & PATH
-        for rc in .bashrc .bash_profile .profile .zshrc .zshenv; do
-            [[ -f "$ORIGINAL_HOME/$rc" ]] && ln -sfn "$ORIGINAL_HOME/$rc" "$PROFILE_DIRECTORY/$rc"
-        done
+        # Link shell startup files, Oh My Zsh, and NVM so subshells maintain your environment & PATH
+        link_profile_shell_env "$ORIGINAL_HOME" "$PROFILE_DIRECTORY"
 
         # Switch environment to the profile
         export REAL_HOME="$ORIGINAL_HOME"

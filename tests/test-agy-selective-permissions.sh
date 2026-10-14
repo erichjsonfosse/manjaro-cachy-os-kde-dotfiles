@@ -649,4 +649,37 @@ echo "=== Test 15: Signal trap syncs permissions on SIGINT / SIGTERM ==="
   echo "PASS: Signal traps safely sync permissions on SIGINT and SIGTERM."
 )
 
+echo "=== Test 16: link_profile_shell_env symlinks rc files, .oh-my-zsh, and replaces stale .nvm directory ==="
+(
+  ORIG_H="$TEST_TMPDIR/t16_orig"
+  PROF_D="$TEST_TMPDIR/t16_prof"
+  mkdir -p "$ORIG_H/.oh-my-zsh" "$ORIG_H/.nvm/versions/node/v24.21.0/bin" "$PROF_D"
+
+  for rc in .bashrc .bash_profile .profile .zshrc .zshenv .zshrc.local .p10k.zsh; do
+    echo "# mock $rc" > "$ORIG_H/$rc"
+  done
+  echo "#!/usr/bin/env bash" > "$ORIG_H/.nvm/versions/node/v24.21.0/bin/npm"
+  chmod +x "$ORIG_H/.nvm/versions/node/v24.21.0/bin/npm"
+
+  # Pre-populate a stale real .nvm directory in the profile (simulating partial Arch symlink folder)
+  mkdir -p "$PROF_D/.nvm"
+  touch "$PROF_D/.nvm/stale_file"
+
+  link_profile_shell_env "$ORIG_H" "$PROF_D"
+
+  for rc in .bashrc .bash_profile .profile .zshrc .zshenv .zshrc.local .p10k.zsh; do
+    [[ -L "$PROF_D/$rc" ]] || { echo "FAIL: $rc not symlinked in profile"; exit 1; }
+    [[ "$(readlink -f "$PROF_D/$rc")" == "$(readlink -f "$ORIG_H/$rc")" ]] || { echo "FAIL: $rc symlink target mismatch"; exit 1; }
+  done
+
+  [[ -L "$PROF_D/.oh-my-zsh" ]] || { echo "FAIL: .oh-my-zsh is not a symlink"; exit 1; }
+  [[ "$(readlink -f "$PROF_D/.oh-my-zsh")" == "$(readlink -f "$ORIG_H/.oh-my-zsh")" ]] || { echo "FAIL: .oh-my-zsh target mismatch"; exit 1; }
+
+  [[ -L "$PROF_D/.nvm" ]] || { echo "FAIL: .nvm was not converted from real directory to symlink"; exit 1; }
+  [[ "$(readlink -f "$PROF_D/.nvm")" == "$(readlink -f "$ORIG_H/.nvm")" ]] || { echo "FAIL: .nvm target mismatch"; exit 1; }
+  [[ -x "$PROF_D/.nvm/versions/node/v24.21.0/bin/npm" ]] || { echo "FAIL: .nvm/versions/node/v24.21.0/bin/npm not accessible via profile"; exit 1; }
+
+  echo "PASS: link_profile_shell_env links all shell startup files, .oh-my-zsh, and .nvm."
+)
+
 echo "All tests passed successfully!"
