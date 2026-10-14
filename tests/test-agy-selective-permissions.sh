@@ -649,4 +649,84 @@ echo "=== Test 15: Signal trap syncs permissions on SIGINT / SIGTERM ==="
   echo "PASS: Signal traps safely sync permissions on SIGINT and SIGTERM."
 )
 
+echo "=== Test 16: link_profile_shell_env symlinks rc files, .oh-my-zsh, and replaces stale .nvm directory ==="
+(
+  ORIG_H="$TEST_TMPDIR/t16_orig"
+  PROF_D="$TEST_TMPDIR/t16_prof"
+  mkdir -p "$ORIG_H/.oh-my-zsh" "$ORIG_H/.nvm/versions/node/v24.21.0/bin" "$PROF_D"
+
+  for rc in .bashrc .bash_profile .profile .zshrc .zshenv .zshrc.local .p10k.zsh; do
+    echo "# mock $rc" > "$ORIG_H/$rc"
+  done
+  echo "#!/usr/bin/env bash" > "$ORIG_H/.nvm/versions/node/v24.21.0/bin/npm"
+  chmod +x "$ORIG_H/.nvm/versions/node/v24.21.0/bin/npm"
+
+  # Pre-populate a stale real .nvm directory in the profile (simulating partial Arch symlink folder)
+  mkdir -p "$PROF_D/.nvm"
+  touch "$PROF_D/.nvm/stale_file"
+
+  link_profile_shell_env "$ORIG_H" "$PROF_D"
+
+  for rc in .bashrc .bash_profile .profile .zshrc .zshenv .zshrc.local .p10k.zsh; do
+    [[ -L "$PROF_D/$rc" ]] || { echo "FAIL: $rc not symlinked in profile"; exit 1; }
+    [[ "$(readlink -f "$PROF_D/$rc")" == "$(readlink -f "$ORIG_H/$rc")" ]] || { echo "FAIL: $rc symlink target mismatch"; exit 1; }
+  done
+
+  [[ -L "$PROF_D/.oh-my-zsh" ]] || { echo "FAIL: .oh-my-zsh is not a symlink"; exit 1; }
+  [[ "$(readlink -f "$PROF_D/.oh-my-zsh")" == "$(readlink -f "$ORIG_H/.oh-my-zsh")" ]] || { echo "FAIL: .oh-my-zsh target mismatch"; exit 1; }
+
+  [[ -L "$PROF_D/.nvm" ]] || { echo "FAIL: .nvm was not converted from real directory to symlink"; exit 1; }
+  [[ "$(readlink -f "$PROF_D/.nvm")" == "$(readlink -f "$ORIG_H/.nvm")" ]] || { echo "FAIL: .nvm target mismatch"; exit 1; }
+  [[ -x "$PROF_D/.nvm/versions/node/v24.21.0/bin/npm" ]] || { echo "FAIL: .nvm/versions/node/v24.21.0/bin/npm not accessible via profile"; exit 1; }
+
+  echo "PASS: link_profile_shell_env links all shell startup files, .oh-my-zsh, and .nvm."
+)
+
+echo "=== Test 17: bootstrap_zsh_path resolves lazy NVM PATH via Zsh while ignoring banner stdout noise ==="
+(
+  MOCK_H="$TEST_TMPDIR/t17_home"
+  MOCK_NODE_BIN="$MOCK_H/.nvm/versions/node/v24.21.0/bin"
+  mkdir -p "$MOCK_NODE_BIN"
+
+  cat << 'EOF' > "$MOCK_NODE_BIN/node"
+#!/usr/bin/env bash
+echo "v24.21.0"
+EOF
+  # Make mock npm a bash script that checks node is in PATH, simulating #!/usr/bin/env node
+  cat << 'EOF' > "$MOCK_NODE_BIN/npm"
+#!/usr/bin/env bash
+command -v node >/dev/null 2>&1 || { echo "env: 'node': No such file or directory" >&2; exit 127; }
+echo "11.19.0"
+EOF
+  chmod +x "$MOCK_NODE_BIN/node" "$MOCK_NODE_BIN/npm"
+
+  cat << EOF > "$MOCK_H/.zshrc"
+# Simulate noisy greeting banner like onefetch / motd
+echo "=== WELCOME TO ZSH BANNER ==="
+echo "Repository: dotfiles"
+_omz_nvm_load() {
+  export PATH="$MOCK_NODE_BIN:\$PATH"
+}
+EOF
+
+  HOME="$MOCK_H"
+  export HOME
+  ORIG_PATH="$PATH"
+
+  bootstrap_zsh_path
+
+  # Ensure PATH does not contain the banner text
+  [[ "$PATH" != *"WELCOME TO ZSH BANNER"* ]] || { echo "FAIL: Banner stdout polluted PATH: $PATH"; exit 1; }
+
+  # Ensure MOCK_NODE_BIN is now in PATH
+  [[ ":$PATH:" == *":$MOCK_NODE_BIN:"* ]] || { echo "FAIL: Mock node bin not added to PATH: $PATH"; exit 1; }
+
+  # Verify a child non-interactive bash subshell can run npm --version
+  npm_out="$(bash -c "npm --version")"
+  [[ "$npm_out" == "11.19.0" ]] || { echo "FAIL: Expected npm --version 11.19.0, got '$npm_out'"; exit 1; }
+
+  export PATH="$ORIG_PATH"
+  echo "PASS: bootstrap_zsh_path safely extracts lazy NVM PATH and enables npm in bash subshells."
+)
+
 echo "All tests passed successfully!"
