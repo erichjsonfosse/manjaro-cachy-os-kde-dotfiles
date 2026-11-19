@@ -20,7 +20,6 @@ fi
 declare -a packages=(
 "antigravity"
 "antigravity-cli"
-"google-chrome"
 "google-cloud-cli"
 "google-cloud-cli-gsutil"
 "herdr-bin"
