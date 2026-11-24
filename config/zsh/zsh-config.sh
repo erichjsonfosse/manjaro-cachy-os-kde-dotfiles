@@ -68,7 +68,7 @@ fi
 # Activate plugins
 if ! grep -q '^plugins=.*manjaro-cachy-os-kde-dotfiles' "$ZSHRC_FILE" && ! awk '/^plugins=\(/,/^\)/' "$ZSHRC_FILE" | grep -q 'manjaro-cachy-os-kde-dotfiles'; then
   sed -i "s/^plugins=\(.*\)/\# plugins=\1/g" "$ZSHRC_FILE"
-  sed -i '/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-cachy-os-kde-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins' "$ZSHRC_FILE"
+  sed -i '/^\# plugins=\(.*\)/a plugins=\(\n  command-not-found\n  docker\n  docker-compose\n  dotnet\n  gh\n  git\n  helm\n  isodate\n  jsontools\n  kubectl\n  manjaro-cachy-os-kde-dotfiles\n  nvm\n  qrcode\n  sudo\n\)\n\n\# End plugins' "$ZSHRC_FILE"
 fi
 
 # Add aliases (using symlinks - ensure directory exists first)
