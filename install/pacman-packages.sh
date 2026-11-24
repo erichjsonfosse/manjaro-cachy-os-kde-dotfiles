@@ -85,6 +85,7 @@ declare -a packages=(
 "dotnet-runtime"
 "dotnet-sdk"
 "dotnet-targeting-pack"
+"github-cli"
 "nvm"
 "openjdk-src"
 "pyenv"
