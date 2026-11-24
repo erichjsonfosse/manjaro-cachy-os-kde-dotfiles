@@ -683,6 +683,7 @@ echo "=== Test 16: link_profile_shell_env symlinks rc files, .oh-my-zsh, and rep
 )
 
 echo "=== Test 17: bootstrap_zsh_path resolves lazy NVM PATH via Zsh while ignoring banner stdout noise ==="
+# shellcheck disable=SC2030,SC2031
 (
   MOCK_H="$TEST_TMPDIR/t17_home"
   MOCK_NODE_BIN="$MOCK_H/.nvm/versions/node/v24.21.0/bin"
@@ -727,6 +728,61 @@ EOF
 
   export PATH="$ORIG_PATH"
   echo "PASS: bootstrap_zsh_path safely extracts lazy NVM PATH and enables npm in bash subshells."
+)
+
+echo "=== Test 18: export_host_gh_token resolves GH_TOKEN from host gh CLI before profile isolation ==="
+# shellcheck disable=SC2030,SC2031
+(
+  MOCK_ORIG_H="$TEST_TMPDIR/t18_orig_home"
+  MOCK_PROF_H="$TEST_TMPDIR/t18_prof_home"
+  MOCK_BIN="$TEST_TMPDIR/t18_bin"
+  mkdir -p "$MOCK_ORIG_H/.config/gh" "$MOCK_PROF_H/.config" "$MOCK_BIN"
+
+  cat << 'EOF' > "$MOCK_BIN/gh"
+#!/usr/bin/env bash
+if [[ "$1" == "auth" && "$2" == "token" ]]; then
+  # Real gh auth token returns GH_TOKEN from env if set unless cleared;
+  # verify export_host_gh_token clears GH_TOKEN/GITHUB_TOKEN when querying host keyring
+  if [[ -n "${GH_TOKEN:-}" || -n "${GITHUB_TOKEN:-}" ]]; then
+    echo "${GH_TOKEN:-$GITHUB_TOKEN}"
+    exit 0
+  fi
+  if [[ "$HOME" == *"/t18_orig_home" && "$XDG_CONFIG_HOME" == *"/t18_orig_home/.config" ]]; then
+    echo "gho_host_keyring_token_abc123"
+    exit 0
+  fi
+  exit 1
+fi
+exit 1
+EOF
+  chmod +x "$MOCK_BIN/gh"
+
+  export PATH="$MOCK_BIN:$PATH"
+  unset GH_TOKEN GITHUB_TOKEN
+
+  # 1. Resolves token from host environment even if current HOME was changed
+  export HOME="$MOCK_PROF_H"
+  export XDG_CONFIG_HOME="$MOCK_PROF_H/.config"
+  export_host_gh_token "$MOCK_ORIG_H"
+
+  [[ "${GH_TOKEN:-}" == "gho_host_keyring_token_abc123" ]] || { echo "FAIL: Expected GH_TOKEN 'gho_host_keyring_token_abc123', got '${GH_TOKEN:-}'"; exit 1; }
+
+  # 2. Overwrites pre-existing stale GH_TOKEN with fresh host token
+  export GH_TOKEN="gho_stale_token"
+  export_host_gh_token "$MOCK_ORIG_H"
+  [[ "$GH_TOKEN" == "gho_host_keyring_token_abc123" ]] || { echo "FAIL: Stale GH_TOKEN was not overwritten by host token: $GH_TOKEN"; exit 1; }
+
+  # 3. Gracefully no-ops when gh auth token fails (unauthenticated host)
+  unset GH_TOKEN
+  cat << 'EOF' > "$MOCK_BIN/gh"
+#!/usr/bin/env bash
+exit 1
+EOF
+  chmod +x "$MOCK_BIN/gh"
+  export_host_gh_token "$MOCK_ORIG_H"
+  [[ -z "${GH_TOKEN:-}" ]] || { echo "FAIL: GH_TOKEN should be empty when gh auth token fails, got '${GH_TOKEN:-}'"; exit 1; }
+
+  echo "PASS: export_host_gh_token always overwrites GH_TOKEN from host GitHub CLI session."
 )
 
 echo "All tests passed successfully!"

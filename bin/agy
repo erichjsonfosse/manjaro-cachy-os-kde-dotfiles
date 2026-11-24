@@ -271,6 +271,18 @@ export_profile_gcp_env() {
     fi
 }
 
+export_host_gh_token() {
+    local original_home="${1:-$HOME}"
+
+    command -v gh >/dev/null 2>&1 || return 0
+
+    local gh_token
+    gh_token="$(GH_TOKEN="" GITHUB_TOKEN="" HOME="$original_home" XDG_CONFIG_HOME="$original_home/.config" gh auth token 2>/dev/null || true)"
+    if [[ -n "$gh_token" ]]; then
+        export GH_TOKEN="$gh_token"
+    fi
+}
+
 link_adc_credentials() {
     local original_home="$1"
     local profile_directory="$2"
@@ -484,6 +496,7 @@ main() {
         ensure_profile_settings "$GLOBAL_SETTINGS" "$PROFILE_SETTINGS"
         sync_permissions_to_profile "$GLOBAL_SETTINGS" "$PROFILE_SETTINGS"
         export_profile_gcp_env "$PROFILE_SETTINGS"
+        export_host_gh_token "$ORIGINAL_HOME"
         link_adc_credentials "$ORIGINAL_HOME" "$PROFILE_DIRECTORY"
 
         # Link global gemini config (MCP servers, plugins, etc.)
